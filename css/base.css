@@ -1,0 +1,22 @@
+*, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+html { background: var(--bg); color: var(--ink); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  font-family: var(--ui-font);
+  font-size: 11px;
+  font-stretch: 87.5%;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, p { margin: 0; font-weight: 400; }
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+::selection { background: var(--select); }
+.empty { padding: 96px 32px; text-align: center; color: var(--ink-3); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

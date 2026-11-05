@@ -1,0 +1,59 @@
+:root {
+  color-scheme: light dark;
+  --ui-font: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --code-font: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --serif: "Newsreader", Georgia, serif;
+  --code-size: 18px;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --bg: light-dark(#EFEDE8, #0F1012);
+  --bg-2: light-dark(#E7E4DD, #15171A);
+  --ink: light-dark(#141414, #ECEAE4);
+  --ink-2: light-dark(#55534E, #9A978F);
+  --ink-3: light-dark(#6E6B64, #797C83);
+  --ghost: light-dark(#8D877A, #5D6068);
+  --rule: light-dark(#D6D2C8, #24272C);
+  --rule-2: light-dark(#BDB8AC, #34383E);
+  --error: light-dark(#C8321B, #FF5A3C);
+  --select: light-dark(rgba(20, 20, 20, .08), rgba(236, 234, 228, .08));
+  --pg-python: light-dark(#8B650A, #E2B54A);
+  --pg-lua: light-dark(#3646B0, #8C9CFF);
+  --pg-go: light-dark(#0A767B, #4FD0D4);
+  --pg-rust: light-dark(#B0441A, #F27C4B);
+  --pg-c: light-dark(#4A505A, #AEB6C2);
+  --pg-cpp: light-dark(#863A75, #DB8CC8);
+  --pg-csharp: light-dark(#2C784B, #6FD49B);
+  --pg-pandas: light-dark(#5E3F8F, #B79BF2);
+  --pg-polars: light-dark(#1F5FB8, #6FA8FF);
+  --pg-numpy: light-dark(#3B6A86, #7FB6D6);
+  --pg-pytorch: light-dark(#C0400C, #FF8A4C);
+  --pg-sklearn: light-dark(#AD5009, #F5B041);
+  --pg-javascript: light-dark(#736D0F, #E3D45A);
+  --pg-typescript: light-dark(#2770A8, #6FB4EE);
+  --pg-sql: light-dark(#B2406F, #F08AB4);
+  --pg-bash: light-dark(#527347, #9ACB8A);
+  --pg-java: light-dark(#9A5A1F, #E0A06A);
+  --pg-dart: light-dark(#007786, #4FD3E6);
+  --pg-powershell: light-dark(#2C4A7C, #8DA7D6);
+  --pg: var(--pg-python);
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+body[data-pg="python"] { --pg: var(--pg-python); }
+body[data-pg="lua"] { --pg: var(--pg-lua); }
+body[data-pg="go"] { --pg: var(--pg-go); }
+body[data-pg="rust"] { --pg: var(--pg-rust); }
+body[data-pg="c"] { --pg: var(--pg-c); }
+body[data-pg="cpp"] { --pg: var(--pg-cpp); }
+body[data-pg="csharp"] { --pg: var(--pg-csharp); }
+body[data-pg="pandas"] { --pg: var(--pg-pandas); }
+body[data-pg="polars"] { --pg: var(--pg-polars); }
+body[data-pg="numpy"] { --pg: var(--pg-numpy); }
+body[data-pg="pytorch"] { --pg: var(--pg-pytorch); }
+body[data-pg="sklearn"] { --pg: var(--pg-sklearn); }
+body[data-pg="javascript"] { --pg: var(--pg-javascript); }
+body[data-pg="typescript"] { --pg: var(--pg-typescript); }
+body[data-pg="sql"] { --pg: var(--pg-sql); }
+body[data-pg="bash"] { --pg: var(--pg-bash); }
+body[data-pg="java"] { --pg: var(--pg-java); }
+body[data-pg="dart"] { --pg: var(--pg-dart); }
+body[data-pg="powershell"] { --pg: var(--pg-powershell); }

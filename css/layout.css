@@ -1,0 +1,43 @@
+.hdr {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 48px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--rule);
+  transition: opacity 120ms var(--ease);
+}
+.mark {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+  font-stretch: 100%;
+  font-size: 13px;
+  letter-spacing: .02em;
+}
+.mark .bar { display: inline-block; width: 2px; height: 1em; margin-left: 4px; background: var(--pg); }
+body[data-view="index"] .mark .bar { animation: blink 1.2s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.crumb { flex: 1; min-width: 0; display: flex; gap: 8px; color: var(--ink-3); white-space: nowrap; overflow: hidden; }
+.crumb i { font-style: normal; color: var(--rule-2); }
+.crumb a:hover { color: var(--ink); }
+.crumb > :last-child { color: var(--ink-2); }
+.modes, .nav { display: flex; gap: 20px; }
+.modes { margin-right: 24px; }
+.modes a, .nav a { color: var(--ink-3); }
+.modes a:hover, .nav a:hover { color: var(--ink-2); }
+.modes a.on, .nav a.on {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--pg);
+  text-underline-offset: 6px;
+}
+.theme { color: var(--ink-2); display: inline-flex; gap: 8px; align-items: baseline; min-width: 20px; }
+.theme #tl { color: var(--ink-3); }
+main { flex: 1; min-width: 0; }
+@media (max-width: 759px) {
+  .hdr { padding: 0 16px; gap: 16px; }
+  .crumb, .modes { display: none; }
+  .nav { margin-left: auto; }
+}

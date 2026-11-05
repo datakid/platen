@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>platen validator</title>
+<style>
+body { font: 13px/1.6 ui-monospace, Menlo, monospace; margin: 32px; background: #efede8; color: #141414; }
+h1 { font-size: 13px; font-weight: 500; }
+h2 { font-size: 13px; font-weight: 500; margin: 24px 0 4px; }
+p { margin: 2px 0; }
+.ok { color: #2c784b; }
+.bad { color: #c8321b; }
+</style>
+</head>
+<body>
+<h1>platen content validator</h1>
+<div id="out"></div>
+<script type="module">
+import { validateLanguage } from "./validate.js";
+import { registry, loadLanguage, readyIds } from "../js/content/registry.js";
+import { lexers } from "../js/engine/langs.js";
+const out = document.getElementById("out");
+for (const id of readyIds()) {
+  const data = await loadLanguage(id);
+  const h = document.createElement("h2");
+  out.append(h);
+  if (!data) {
+    h.textContent = `${id}: failed to load`;
+    h.className = "bad";
+    continue;
+  }
+  const issues = validateLanguage(data, registry.find((l) => l.id === id), lexers);
+  const plates = data.topics.reduce((a, t) => a + t.concepts.reduce((b, c) => b + c.examples.length, 0), 0);
+  h.textContent = `${id}: ${data.topics.length} topics, ${plates} plates, ${issues.length} issues`;
+  h.className = issues.length ? "bad" : "ok";
+  for (const i of issues) {
+    const p = document.createElement("p");
+    p.textContent = `${i.where}  ${i.msg}`;
+    out.append(p);
+  }
+}
+</script>
+</body>
+</html>
