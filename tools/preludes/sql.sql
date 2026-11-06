@@ -1,0 +1,10 @@
+CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT NOT NULL, city TEXT, country TEXT, created TEXT);
+CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, total DECIMAL(10, 2), status TEXT, placed TEXT);
+CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT, price DECIMAL(10, 2), category TEXT);
+CREATE TABLE order_items (order_id INTEGER, product_id INTEGER, qty INTEGER);
+CREATE TABLE employees (id INTEGER PRIMARY KEY, name TEXT, dept TEXT, salary INTEGER, manager_id INTEGER, hired TEXT);
+INSERT INTO customers VALUES (1, 'Ada', 'London', 'UK', '2023-01-15'), (2, 'Grace', 'New York', 'US', '2023-03-02'), (3, 'Linus', 'Helsinki', 'FI', '2023-06-20'), (4, 'Alan', 'London', 'UK', '2024-01-05'), (5, 'Edsger', NULL, 'NL', '2024-02-11');
+INSERT INTO orders VALUES (1, 1, 120.50, 'paid', '2024-01-10'), (2, 1, 80.00, 'paid', '2024-02-14'), (3, 2, 45.25, 'pending', '2024-02-20'), (4, 3, 300.00, 'paid', '2024-03-01'), (5, 4, 15.00, 'cancelled', '2024-03-05'), (6, 2, 99.99, 'paid', '2024-03-09');
+INSERT INTO products VALUES (1, 'Keyboard', 49.00, 'hardware'), (2, 'Mouse', 19.50, 'hardware'), (3, 'Manual', 9.00, 'books'), (4, 'Course', 120.00, 'training');
+INSERT INTO order_items VALUES (1, 1, 1), (1, 2, 2), (2, 3, 4), (3, 2, 1), (4, 4, 2), (6, 1, 1);
+INSERT INTO employees VALUES (1, 'Ana', 'eng', 120, NULL, '2020-01-01'), (2, 'Ben', 'eng', 100, 1, '2021-05-10'), (3, 'Cleo', 'eng', 100, 1, '2022-03-15'), (4, 'Dev', 'ops', 90, 1, '2021-08-01'), (5, 'Eli', 'ops', 85, 4, '2023-02-20'), (6, 'Fay', 'sales', 70, NULL, '2019-11-30');

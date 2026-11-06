@@ -477,9 +477,9 @@ type Dog struct {
 
 d := Dog{Animal: Animal{Name: "rex"}, Breed: "lab"}`, notes: [{ at: "Animal: Animal", text: "build the embedded value by type name" }] },
             { code: `type Animal struct{ Name string }
-func (a Animal) Speak() string { return a.Name + " speaks" }
+type Dog struct{ Animal }
 
-type Dog struct{ Animal }`, notes: [{ at: "type Dog", text: "the Dog type gets Speak for free" }] }
+func (a Animal) Speak() string { return a.Name + " speaks" }`, notes: [{ at: "type Dog", text: "the Dog type gets Speak for free" }] }
           ]
         },
         {
@@ -544,7 +544,7 @@ func (c *Counter) Value() int {
 }`, notes: [] },
             { code: `type Counter struct{ n int }
 
-func (c *Counter) Inc() { c.n++ }
+func (c *Counter) Inc()   { c.n++ }
 func (c *Counter) Reset() { c.n = 0 }`, notes: [{ at: "Reset", text: "the compiler takes &c for you at calls" }] }
           ]
         },
@@ -644,7 +644,7 @@ type Rect struct{ W, H float64 }
 func (r Rect) Area() float64 { return r.W * r.H }`, notes: [{ at: "func (r Rect) Area()", text: "no implements keyword needed" }] },
             { code: `type Rect struct{ W, H float64 }
 
-func (r Rect) Area() float64 { return r.W * r.H }
+func (r Rect) Area() float64      { return r.W * r.H }
 func (r Rect) Perimeter() float64 { return 2 * (r.W + r.H) }`, notes: [{ at: "Perimeter", text: "one type can satisfy many interfaces" }] },
             { code: `type Speaker interface{ Speak() string }
 type Dog struct{}
@@ -1035,6 +1035,876 @@ close(jobs)`, notes: [] },
 for range 3 {
     fmt.Println(<-results)
 }`, notes: [{ at: "for range 3", text: "no loop variable needed, Go 1.22" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "select",
+      n: 13,
+      title: "select",
+      concepts: [
+        {
+          id: "select-basics", n: 1, title: "select basics", level: 2,
+          gloss: "Waits on several channel operations and runs the first one that is ready.",
+          examples: [
+            { code: `results := make(chan string)
+errs := make(chan error)
+
+select {
+case r := <-results:
+    fmt.Println("got", r)
+case err := <-errs:
+    fmt.Println("failed:", err)
+}`, notes: [{ at: "select", text: "ready cases are picked at random" }] },
+            { code: `jobs := make(chan int, 1)
+
+select {
+case jobs <- 42:
+    fmt.Println("queued")
+case <-time.After(time.Second):
+    fmt.Println("queue full")
+}`, notes: [{ at: "jobs <- 42", text: "a send can be a case too" }] },
+            { code: `a, b := make(chan int), make(chan int)
+
+for {
+    select {
+    case v := <-a:
+        fmt.Println("a", v)
+    case v := <-b:
+        fmt.Println("b", v)
+    }
+}`, notes: [{ at: "for", text: "keeps serving whichever is ready" }] }
+          ]
+        },
+        {
+          id: "select-default", n: 2, title: "default case", level: 2,
+          gloss: "Adds a default case so a select never blocks.",
+          examples: [
+            { code: `ready := make(chan int)
+
+select {
+case v := <-ready:
+    fmt.Println("received", v)
+default:
+    fmt.Println("nothing ready")
+}`, notes: [{ at: "default", text: "runs when no case can proceed" }] },
+            { code: `alerts := make(chan string, 1)
+
+select {
+case alerts <- "disk full":
+default:
+    fmt.Println("alert dropped")
+}`, notes: [{ at: "default", text: "a non-blocking send" }] },
+            { code: `ready := make(chan int)
+
+for i := range 3 {
+    select {
+    case v := <-ready:
+        fmt.Println(v)
+    default:
+        fmt.Println("tick", i)
+    }
+}`, notes: [] }
+          ]
+        },
+        {
+          id: "select-timeout", n: 3, title: "timeouts", level: 2,
+          gloss: "Gives up on a channel receive after a deadline.",
+          examples: [
+            { code: `results := make(chan string)
+
+select {
+case res := <-results:
+    fmt.Println(res)
+case <-time.After(2 * time.Second):
+    fmt.Println("timed out")
+}`, notes: [{ at: "time.After", text: "a channel that fires once" }] },
+            { code: `lines := make(chan string)
+timer := time.NewTimer(500 * time.Millisecond)
+defer timer.Stop()
+
+select {
+case line := <-lines:
+    fmt.Println(line)
+case <-timer.C:
+    fmt.Println("no input")
+}`, notes: [{ at: "timer.Stop()", text: "frees the timer if unused" }] },
+            { code: `done := make(chan struct{})
+ticker := time.NewTicker(time.Second)
+defer ticker.Stop()
+
+for {
+    select {
+    case t := <-ticker.C:
+        fmt.Println("tick", t.Unix())
+    case <-done:
+        return
+    }
+}`, notes: [{ at: "ticker.C", text: "fires every second" }] }
+          ]
+        },
+        {
+          id: "quit-signal", n: 4, title: "quit signals", level: 3,
+          gloss: "Stops goroutines by closing a done channel.",
+          examples: [
+            { code: `done := make(chan struct{})
+go func() {
+    <-done
+    fmt.Println("stopping")
+}()
+close(done)`, notes: [{ at: "struct{}", text: "carries no data, only the signal" }, { at: "close(done)", text: "wakes every receiver" }] },
+            { code: `func worker(done <-chan struct{}, jobs <-chan int) {
+    for {
+        select {
+        case <-done:
+            return
+        case j := <-jobs:
+            fmt.Println("job", j)
+        }
+    }
+}`, notes: [{ at: "done <-chan", text: "receive-only parameter" }] },
+            { code: `func count(done <-chan struct{}, out chan<- int) {
+    for i := 0; ; i++ {
+        select {
+        case out <- i:
+        case <-done:
+            return
+        }
+    }
+}`, notes: [{ at: "out <- i", text: "send, unless done fires first" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "sync",
+      n: 14,
+      title: "sync",
+      concepts: [
+        {
+          id: "waitgroup", n: 1, title: "WaitGroup", level: 2,
+          gloss: "Waits for a group of goroutines to finish.",
+          examples: [
+            { code: `var wg sync.WaitGroup
+
+for i := range 3 {
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        fmt.Println("worker", i)
+    }()
+}
+wg.Wait()`, notes: [{ at: "wg.Add(1)", text: "count before starting the goroutine" }, { at: "wg.Wait()", text: "blocks until the count is zero" }] },
+            { code: `func fetchAll(urls []string) {
+    var wg sync.WaitGroup
+    for _, u := range urls {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            http.Get(u)
+        }()
+    }
+    wg.Wait()
+}`, notes: [{ at: "defer wg.Done()", text: "runs even on early return" }] },
+            { code: `inputs := []int{1, 2, 3}
+results := make([]int, len(inputs))
+var wg sync.WaitGroup
+
+for i, n := range inputs {
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        results[i] = n * n
+    }()
+}
+wg.Wait()`, notes: [{ at: "results[i]", text: "each goroutine owns one slot" }] }
+          ]
+        },
+        {
+          id: "mutex", n: 2, title: "Mutex", level: 2,
+          gloss: "Guards shared data so only one goroutine touches it at a time.",
+          examples: [
+            { code: `type Counter struct {
+    mu sync.Mutex
+    n  int
+}
+
+func (c *Counter) Inc() {
+    c.mu.Lock()
+    defer c.mu.Unlock()
+    c.n++
+}`, notes: [{ at: "defer c.mu.Unlock()", text: "unlocks on every return path" }] },
+            { code: `var (
+    mu    sync.Mutex
+    cache = map[string]int{}
+)
+
+func put(key string, v int) {
+    mu.Lock()
+    cache[key] = v
+    mu.Unlock()
+}`, notes: [{ at: "mu.Lock()", text: "others wait here until Unlock" }] },
+            { code: `type SafeMap struct {
+    sync.Mutex
+    items map[string]string
+}
+
+func (m *SafeMap) Get(k string) string {
+    m.Lock()
+    defer m.Unlock()
+    return m.items[k]
+}`, notes: [{ at: "sync.Mutex", text: "embedded, so Lock is promoted" }] }
+          ]
+        },
+        {
+          id: "rwmutex", n: 3, title: "RWMutex", level: 3,
+          gloss: "Allows many readers at once but only one writer.",
+          examples: [
+            { code: `type Store struct {
+    mu   sync.RWMutex
+    data map[string]int
+}
+
+func (s *Store) Get(k string) int {
+    s.mu.RLock()
+    defer s.mu.RUnlock()
+    return s.data[k]
+}`, notes: [{ at: "RLock", text: "shared with other readers" }] },
+            { code: `type Store struct {
+    mu   sync.RWMutex
+    data map[string]int
+}
+
+func (s *Store) Set(k string, v int) {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+    s.data[k] = v
+}`, notes: [{ at: "s.mu.Lock()", text: "exclusive, blocks all readers" }] },
+            { code: `var (
+    mu    sync.RWMutex
+    stats = map[string]int{}
+)
+
+func count() int {
+    mu.RLock()
+    defer mu.RUnlock()
+    return len(stats)
+}`, notes: [] }
+          ]
+        },
+        {
+          id: "sync-once", n: 4, title: "Once", level: 2,
+          gloss: "Runs an initialization exactly once, however many goroutines call it.",
+          examples: [
+            { code: `var once sync.Once
+
+func setup() {
+    once.Do(func() {
+        fmt.Println("initialized")
+    })
+}`, notes: [{ at: "once.Do", text: "later calls return immediately" }] },
+            { code: `var (
+    settings map[string]string
+    once     sync.Once
+)
+
+func Settings() map[string]string {
+    once.Do(func() {
+        settings = map[string]string{"mode": "prod"}
+    })
+    return settings
+}`, notes: [] },
+            { code: `var loadHome = sync.OnceValue(func() string {
+    home, _ := os.UserHomeDir()
+    return home
+})`, notes: [{ at: "sync.OnceValue", text: "caches the first result" }] }
+          ]
+        },
+        {
+          id: "atomic-counters", n: 5, title: "atomic counters", level: 3,
+          gloss: "Updates a shared value without a lock using sync/atomic types.",
+          examples: [
+            { code: `var hits atomic.Int64
+
+hits.Add(1)
+fmt.Println(hits.Load())`, notes: [{ at: "atomic.Int64", text: "safe from many goroutines" }] },
+            { code: `var ready atomic.Bool
+
+ready.Store(true)
+if ready.Load() {
+    fmt.Println("ready")
+}`, notes: [] },
+            { code: `var state atomic.Int32
+
+if state.CompareAndSwap(0, 1) {
+    fmt.Println("won the race")
+}`, notes: [{ at: "CompareAndSwap(0, 1)", text: "sets 1 only if still 0" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "generics",
+      n: 15,
+      title: "generics",
+      concepts: [
+        {
+          id: "generic-functions", n: 1, title: "generic functions", level: 2,
+          gloss: "Writes one function that works for many types.",
+          examples: [
+            { code: `func Map[T, U any](items []T, f func(T) U) []U {
+    out := make([]U, 0, len(items))
+    for _, it := range items {
+        out = append(out, f(it))
+    }
+    return out
+}`, notes: [{ at: "[T, U any]", text: "type parameters" }] },
+            { code: `func Keys[K comparable, V any](m map[K]V) []K {
+    keys := make([]K, 0, len(m))
+    for k := range m {
+        keys = append(keys, k)
+    }
+    return keys
+}`, notes: [{ at: "comparable", text: "usable as a map key" }] },
+            { code: `func First[T any](items []T) (T, bool) {
+    var zero T
+    if len(items) == 0 {
+        return zero, false
+    }
+    return items[0], true
+}`, notes: [{ at: "var zero T", text: "the zero value of any type" }] }
+          ]
+        },
+        {
+          id: "constraints", n: 2, title: "constraints", level: 2,
+          gloss: "Limits a type parameter to the types that support an operation.",
+          examples: [
+            { code: `func Max[T cmp.Ordered](a, b T) T {
+    if a > b {
+        return a
+    }
+    return b
+}`, notes: [{ at: "cmp.Ordered", text: "types that support < and >" }] },
+            { code: `type Number interface {
+    ~int | ~int64 | ~float64
+}
+
+func Sum[T Number](xs []T) T {
+    var total T
+    for _, x := range xs {
+        total += x
+    }
+    return total
+}`, notes: [{ at: "~int", text: "also types built on int" }] },
+            { code: `func Contains[T comparable](items []T, want T) bool {
+    for _, it := range items {
+        if it == want {
+            return true
+        }
+    }
+    return false
+}`, notes: [{ at: "it == want", text: "needs comparable" }] }
+          ]
+        },
+        {
+          id: "generic-types", n: 3, title: "generic types", level: 2,
+          gloss: "Declares a type that holds values of a type the caller chooses.",
+          examples: [
+            { code: `type Stack[T any] struct {
+    items []T
+}
+
+func (s *Stack[T]) Push(v T) {
+    s.items = append(s.items, v)
+}`, notes: [{ at: "Stack[T]", text: "methods repeat the parameter" }] },
+            { code: `type Pair[K comparable, V any] struct {
+    Key   K
+    Value V
+}
+
+var age = Pair[string, int]{"age", 36}`, notes: [{ at: "Pair[string, int]", text: "instantiated with real types" }] },
+            { code: `type List[T any] struct {
+    head *node[T]
+}
+
+type node[T any] struct {
+    val  T
+    next *node[T]
+}`, notes: [] }
+          ]
+        },
+        {
+          id: "type-inference", n: 4, title: "type inference", level: 2,
+          gloss: "Lets the compiler infer type arguments from the call.",
+          examples: [
+            { code: `nums := []int{3, 1, 2}
+
+fmt.Println(slices.Max(nums))
+fmt.Println(slices.Contains(nums, 2))`, notes: [{ at: "slices.Max(nums)", text: "the type argument is inferred" }] },
+            { code: `names := []string{"bo", "al", "cy"}
+
+slices.Sort(names)
+idx, found := slices.BinarySearch(names, "bo")
+fmt.Println(idx, found)`, notes: [] },
+            { code: `func Zero[T any]() T {
+    var z T
+    return z
+}
+
+var n = Zero[int]()`, notes: [{ at: "Zero[int]()", text: "nothing to infer from, so name it" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "context",
+      n: 16,
+      title: "context",
+      concepts: [
+        {
+          id: "with-cancel", n: 1, title: "cancellation", level: 2,
+          gloss: "Creates a context you can cancel to stop related work.",
+          examples: [
+            { code: `ctx, cancel := context.WithCancel(context.Background())
+defer cancel()
+
+go func() {
+    <-ctx.Done()
+    fmt.Println("stopped:", ctx.Err())
+}()`, notes: [{ at: "defer cancel()", text: "always release the context" }, { at: "ctx.Done()", text: "closed when canceled" }] },
+            { code: `parent, cancel := context.WithCancel(context.Background())
+child, stop := context.WithCancel(parent)
+defer stop()
+
+cancel()
+fmt.Println(child.Err())`, notes: [{ at: "cancel()", text: "also cancels every child" }] },
+            { code: `ctx, cancel := context.WithCancelCause(context.Background())
+
+cancel(errors.New("shutting down"))
+fmt.Println(context.Cause(ctx))`, notes: [{ at: "context.Cause", text: "why it was canceled" }] }
+          ]
+        },
+        {
+          id: "with-timeout", n: 2, title: "timeouts and deadlines", level: 2,
+          gloss: "Cancels a context automatically after a duration.",
+          examples: [
+            { code: `ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+defer cancel()
+
+fmt.Println(ctx.Err())`, notes: [{ at: "WithTimeout", text: "relative duration" }] },
+            { code: `deadline := time.Now().Add(30 * time.Second)
+ctx, cancel := context.WithDeadline(context.Background(), deadline)
+defer cancel()
+
+fmt.Println(ctx.Deadline())`, notes: [{ at: "WithDeadline", text: "an absolute time" }] },
+            { code: `url := "https://example.com"
+ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+defer cancel()
+
+req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)`, notes: [{ at: "NewRequestWithContext", text: "the request obeys the context" }] }
+          ]
+        },
+        {
+          id: "ctx-done", n: 3, title: "watching for cancellation", level: 3,
+          gloss: "Checks a context inside long work so it can stop early.",
+          examples: [
+            { code: `func poll(ctx context.Context) error {
+    for {
+        select {
+        case <-ctx.Done():
+            return ctx.Err()
+        case <-time.After(time.Second):
+            fmt.Println("polling")
+        }
+    }
+}`, notes: [{ at: "ctx.Err()", text: "canceled or deadline exceeded" }] },
+            { code: `func process(ctx context.Context, items []string) error {
+    for _, item := range items {
+        if err := ctx.Err(); err != nil {
+            return err
+        }
+        fmt.Println("handling", item)
+    }
+    return nil
+}`, notes: [] },
+            { code: `func cancelled(ctx context.Context) bool {
+    select {
+    case <-ctx.Done():
+        return true
+    default:
+        return false
+    }
+}`, notes: [{ at: "default", text: "checks without blocking" }] }
+          ]
+        },
+        {
+          id: "ctx-parameter", n: 4, title: "context parameters", level: 2,
+          gloss: "Passes the context as the first parameter of any call that may block.",
+          examples: [
+            { code: `func fetchUser(ctx context.Context, id int) (string, error) {
+    if err := ctx.Err(); err != nil {
+        return "", err
+    }
+    return fmt.Sprintf("user-%d", id), nil
+}`, notes: [{ at: "ctx context.Context", text: "first, named ctx" }] },
+            { code: `func handler(w http.ResponseWriter, r *http.Request) {
+    ctx, cancel := context.WithTimeout(r.Context(), time.Second)
+    defer cancel()
+    fmt.Fprintln(w, ctx.Err())
+}`, notes: [{ at: "r.Context()", text: "ends when the client leaves" }] },
+            { code: `func step(ctx context.Context, name string) error {
+    select {
+    case <-ctx.Done():
+        return fmt.Errorf("%s: %w", name, ctx.Err())
+    default:
+        return nil
+    }
+}`, notes: [{ at: "%w", text: "keeps the cause for errors.Is" }] }
+          ]
+        },
+        {
+          id: "context-values", n: 5, title: "context values", level: 3,
+          gloss: "Attaches request-scoped values to a context under a typed key.",
+          examples: [
+            { code: `type ctxKey string
+
+ctx := context.WithValue(context.Background(), ctxKey("user"), "ada")
+fmt.Println(ctx.Value(ctxKey("user")))`, notes: [{ at: "ctxKey", text: "a private type avoids collisions" }] },
+            { code: `type ctxKey string
+
+func userFrom(ctx context.Context) (string, bool) {
+    u, ok := ctx.Value(ctxKey("user")).(string)
+    return u, ok
+}`, notes: [{ at: ".(string)", text: "value returns any" }] },
+            { code: `type requestID struct{}
+
+ctx := context.WithValue(context.Background(), requestID{}, "abc123")
+fmt.Println(ctx.Value(requestID{}))`, notes: [{ at: "requestID{}", text: "an empty struct works as a key" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "encoding-json",
+      n: 17,
+      title: "encoding/json",
+      concepts: [
+        {
+          id: "json-marshal", n: 1, title: "marshal", level: 1,
+          gloss: "Encodes a Go value as JSON bytes.",
+          examples: [
+            { code: `user := map[string]any{"name": "ada", "age": 36}
+
+data, err := json.Marshal(user)
+fmt.Println(string(data), err)`, notes: [{ at: "json.Marshal", text: "returns []byte and an error" }] },
+            { code: `type Point struct {
+    X, Y int
+}
+
+data, _ := json.Marshal(Point{X: 1, Y: 2})
+fmt.Println(string(data))`, notes: [{ at: "X, Y", text: "only exported fields are encoded" }] },
+            { code: `tags := []string{"go", "json"}
+
+data, err := json.Marshal(tags)
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(string(data))`, notes: [] }
+          ]
+        },
+        {
+          id: "json-indent", n: 2, title: "indented output", level: 2,
+          gloss: "Formats JSON output with indentation for people to read.",
+          examples: [
+            { code: `cfg := map[string]int{"port": 8080, "workers": 4}
+
+out, err := json.MarshalIndent(cfg, "", "    ")
+fmt.Println(string(out), err)`, notes: [{ at: "\"\", \"    \"", text: "line prefix, then indent unit" }] },
+            { code: `enc := json.NewEncoder(os.Stdout)
+enc.SetIndent("", "  ")
+enc.Encode(map[string]int{"port": 8080})`, notes: [] },
+            { code: `cfg := struct {
+    Host string
+    Port int
+}{"localhost", 8080}
+
+out, _ := json.MarshalIndent(cfg, "", "  ")
+fmt.Println(string(out))`, notes: [] }
+          ]
+        },
+        {
+          id: "struct-tags", n: 3, title: "struct tags", level: 1,
+          gloss: "Controls how each field appears in JSON with struct tags.",
+          examples: [
+            { code: `type User struct {
+    ID    int    \`json:"id"\`
+    Name  string \`json:"name"\`
+    Email string \`json:"email,omitempty"\`
+}`, notes: [{ at: "omitempty", text: "left out when empty" }, { at: "`json:\"id\"`", text: "the key name in the JSON" }] },
+            { code: `type Account struct {
+    Owner    string \`json:"owner"\`
+    Password string \`json:"-"\`
+}`, notes: [{ at: "\"-\"", text: "never encoded or decoded" }] },
+            { code: `type Event struct {
+    Name string    \`json:"name"\`
+    At   time.Time \`json:"at"\`
+    Seq  int64     \`json:"seq,string"\`
+}`, notes: [{ at: ",string", text: "number written as a string" }] }
+          ]
+        },
+        {
+          id: "json-unmarshal", n: 4, title: "unmarshal", level: 1,
+          gloss: "Decodes JSON bytes into a Go value.",
+          examples: [
+            { code: `data := []byte(\`{"id": 7, "name": "ada"}\`)
+var user struct {
+    ID   int    \`json:"id"\`
+    Name string \`json:"name"\`
+}
+
+err := json.Unmarshal(data, &user)`, notes: [{ at: "&user", text: "pass a pointer so it can be filled" }] },
+            { code: `var ids []int
+
+err := json.Unmarshal([]byte("[1, 2, 3]"), &ids)
+fmt.Println(ids, err)`, notes: [] },
+            { code: `var cfg map[string]any
+err := json.Unmarshal([]byte("{oops"), &cfg)
+
+var syn *json.SyntaxError
+if errors.As(err, &syn) {
+    fmt.Println("bad byte at", syn.Offset)
+}`, notes: [{ at: "errors.As", text: "pulls out the typed error" }] }
+          ]
+        },
+        {
+          id: "json-any", n: 5, title: "unknown shapes", level: 2,
+          gloss: "Decodes JSON of unknown shape into maps and slices.",
+          examples: [
+            { code: `var doc map[string]any
+
+json.Unmarshal([]byte(\`{"n": 1, "ok": true}\`), &doc)
+fmt.Println(doc["n"])`, notes: [{ at: "doc[\"n\"]", text: "numbers arrive as float64" }] },
+            { code: `var v any
+json.Unmarshal([]byte(\`[1, "two", null]\`), &v)
+
+for _, item := range v.([]any) {
+    fmt.Println(item)
+}`, notes: [{ at: "v.([]any)", text: "arrays become []any" }] },
+            { code: `var doc map[string]any
+json.Unmarshal([]byte(\`{"name": "ada"}\`), &doc)
+
+if name, ok := doc["name"].(string); ok {
+    fmt.Println(name)
+}`, notes: [{ at: ".(string)", text: "check the type before use" }] }
+          ]
+        },
+        {
+          id: "json-streams", n: 6, title: "streaming", level: 3,
+          gloss: "Reads and writes JSON values on a stream instead of in memory.",
+          examples: [
+            { code: `enc := json.NewEncoder(os.Stdout)
+
+enc.Encode(map[string]int{"a": 1})
+enc.Encode(map[string]int{"a": 2})`, notes: [{ at: "Encode", text: "one value per line" }] },
+            { code: `dec := json.NewDecoder(os.Stdin)
+
+for {
+    var event map[string]any
+    if err := dec.Decode(&event); err == io.EOF {
+        break
+    }
+    fmt.Println(event)
+}`, notes: [{ at: "io.EOF", text: "the stream has ended" }] },
+            { code: `func readUser(r *http.Request) (map[string]any, error) {
+    var u map[string]any
+    err := json.NewDecoder(r.Body).Decode(&u)
+    return u, err
+}`, notes: [{ at: "r.Body", text: "decode straight from the request" }] }
+          ]
+        }
+      ]
+    },
+    {
+      id: "testing",
+      n: 18,
+      title: "testing",
+      concepts: [
+        {
+          id: "test-functions", n: 1, title: "test functions", level: 1,
+          gloss: "Checks behavior in a TestXxx function that receives a *testing.T.",
+          examples: [
+            { code: `func TestUpper(t *testing.T) {
+    got := strings.ToUpper("go")
+    if got != "GO" {
+        t.Errorf("got %q, want %q", got, "GO")
+    }
+}`, notes: [{ at: "t.Errorf", text: "fails the test and keeps going" }] },
+            { code: `func TestParse(t *testing.T) {
+    n, err := strconv.Atoi("42")
+    if err != nil {
+        t.Fatal(err)
+    }
+    if n != 42 {
+        t.Errorf("n = %d, want 42", n)
+    }
+}`, notes: [{ at: "t.Fatal", text: "fails and stops this test" }] },
+            { code: `func TestAtoiRejectsText(t *testing.T) {
+    _, err := strconv.Atoi("abc")
+    if err == nil {
+        t.Fatal("expected an error")
+    }
+}`, notes: [] }
+          ]
+        },
+        {
+          id: "table-driven-tests", n: 2, title: "table-driven tests", level: 2,
+          gloss: "Runs one check over a slice of inputs and expected outputs.",
+          examples: [
+            { code: `func TestAbs(t *testing.T) {
+    cases := []struct{ in, want float64 }{
+        {-3, 3},
+        {0, 0},
+        {2.5, 2.5},
+    }
+    for _, c := range cases {
+        if got := math.Abs(c.in); got != c.want {
+            t.Errorf("Abs(%v) = %v, want %v", c.in, got, c.want)
+        }
+    }
+}`, notes: [{ at: "cases", text: "each row is one scenario" }] },
+            { code: `func TestTrim(t *testing.T) {
+    tests := []struct{ in, want string }{
+        {" go ", "go"},
+        {"", ""},
+    }
+    for _, tc := range tests {
+        if got := strings.TrimSpace(tc.in); got != tc.want {
+            t.Errorf("TrimSpace(%q) = %q", tc.in, got)
+        }
+    }
+}`, notes: [] },
+            { code: `func TestMax(t *testing.T) {
+    tests := map[string]struct{ a, b, want int }{
+        "first":  {3, 1, 3},
+        "second": {1, 4, 4},
+    }
+    for name, tc := range tests {
+        if got := max(tc.a, tc.b); got != tc.want {
+            t.Errorf("%s: got %d", name, got)
+        }
+    }
+}`, notes: [{ at: "\"first\"", text: "the key doubles as the case name" }] }
+          ]
+        },
+        {
+          id: "subtests", n: 3, title: "subtests", level: 2,
+          gloss: "Groups related checks as named subtests with t.Run.",
+          examples: [
+            { code: `func TestStrings(t *testing.T) {
+    t.Run("upper", func(t *testing.T) {
+        if strings.ToUpper("go") != "GO" {
+            t.Fail()
+        }
+    })
+    t.Run("lower", func(t *testing.T) {
+        if strings.ToLower("GO") != "go" {
+            t.Fail()
+        }
+    })
+}`, notes: [{ at: "t.Run", text: "each name can be run alone" }] },
+            { code: `func TestHasPrefix(t *testing.T) {
+    for _, s := range []string{"gopher", "golang"} {
+        t.Run(s, func(t *testing.T) {
+            if !strings.HasPrefix(s, "go") {
+                t.Errorf("%s lacks the prefix", s)
+            }
+        })
+    }
+}`, notes: [] },
+            { code: `func TestCases(t *testing.T) {
+    for _, n := range []int{1, 2, 3} {
+        t.Run(strconv.Itoa(n), func(t *testing.T) {
+            t.Parallel()
+            time.Sleep(time.Duration(n) * time.Millisecond)
+        })
+    }
+}`, notes: [{ at: "t.Parallel()", text: "runs beside sibling subtests" }] }
+          ]
+        },
+        {
+          id: "test-helpers", n: 4, title: "test helpers", level: 2,
+          gloss: "Marks a function as a helper so failures point at the caller.",
+          examples: [
+            { code: `func mustAtoi(t *testing.T, s string) int {
+    t.Helper()
+    n, err := strconv.Atoi(s)
+    if err != nil {
+        t.Fatal(err)
+    }
+    return n
+}`, notes: [{ at: "t.Helper()", text: "reports the caller's line" }] },
+            { code: `func assertEqual(t *testing.T, got, want string) {
+    t.Helper()
+    if got != want {
+        t.Errorf("got %q, want %q", got, want)
+    }
+}`, notes: [] },
+            { code: `func requireNoError(t *testing.T, err error) {
+    t.Helper()
+    if err != nil {
+        t.Fatalf("unexpected error: %v", err)
+    }
+}`, notes: [] }
+          ]
+        },
+        {
+          id: "test-cleanup", n: 5, title: "temp files and cleanup", level: 2,
+          gloss: "Creates scratch files and environment that the test cleans up itself.",
+          examples: [
+            { code: `func TestFiles(t *testing.T) {
+    dir := t.TempDir()
+    path := dir + "/note.txt"
+    os.WriteFile(path, []byte("hi"), 0o644)
+}`, notes: [{ at: "t.TempDir()", text: "removed when the test ends" }] },
+            { code: `func TestWithResource(t *testing.T) {
+    f, err := os.CreateTemp("", "scratch")
+    if err != nil {
+        t.Fatal(err)
+    }
+    t.Cleanup(func() { os.Remove(f.Name()) })
+}`, notes: [{ at: "t.Cleanup", text: "runs after the test, last in first out" }] },
+            { code: `func TestEnv(t *testing.T) {
+    t.Setenv("APP_MODE", "test")
+    if os.Getenv("APP_MODE") != "test" {
+        t.Fatal("env not set")
+    }
+}`, notes: [{ at: "t.Setenv", text: "restored after the test" }] }
+          ]
+        },
+        {
+          id: "benchmarks", n: 6, title: "benchmarks", level: 3,
+          gloss: "Measures speed in a BenchmarkXxx function that loops b.N times.",
+          examples: [
+            { code: `func BenchmarkUpper(b *testing.B) {
+    for i := 0; i < b.N; i++ {
+        strings.ToUpper("gopher")
+    }
+}`, notes: [{ at: "b.N", text: "the framework picks the count" }] },
+            { code: `func BenchmarkSort(b *testing.B) {
+    data := make([]int, 1000)
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        sort.Ints(data)
+    }
+}`, notes: [{ at: "b.ResetTimer()", text: "excludes the setup above" }] },
+            { code: `func BenchmarkJoin(b *testing.B) {
+    b.ReportAllocs()
+    words := []string{"a", "b", "c"}
+    for i := 0; i < b.N; i++ {
+        strings.Join(words, ",")
+    }
+}`, notes: [{ at: "ReportAllocs", text: "adds allocation counts" }] }
           ]
         }
       ]

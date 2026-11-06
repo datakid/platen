@@ -1,13 +1,17 @@
 const NUMBER = /(?:0[xXoObB][0-9a-fA-F_]+|(?:\d[\d_]*\.?[\d_]*|\.\d[\d_]*)(?:[eE][+-]?\d+)?)[jJ]?/y;
 const DIRECTIVE = /#[ \t]*[A-Za-z_]+/y;
 const IDENT = /[\p{L}_][\p{L}\p{N}_]*/uy;
+const LIFETIME = /'[A-Za-z_][A-Za-z0-9_]*/y;
+const RAW_HASH = /b?r(#+)"/y;
+const DASH_WORD = /-[A-Za-z]+/y;
 
 export function tokenize(code, def) {
   const n = code.length;
   const cls = new Array(n);
   const tok = new Array(n);
   const cluster = new Array(n).fill(null);
-  const keywords = new Set(def.keywords || []);
+  const fold = Boolean(def.ignoreCase);
+  const keywords = new Set((def.keywords || []).map((k) => (fold ? k.toUpperCase() : k)));
   const soft = new Set(def.softKeywords || []);
   const clusters = [...(def.clusters || [])].sort((a, b) => b.length - a.length);
   let t = 0;
@@ -44,6 +48,15 @@ export function tokenize(code, def) {
   const stringEnd = (i) => {
     const st = def.strings;
     if (!st) return 0;
+    if (st.rawHash) {
+      RAW_HASH.lastIndex = i;
+      const rh = RAW_HASH.exec(code);
+      if (rh) {
+        const close = code.indexOf(`"${rh[1]}`, i + rh[0].length);
+        return close < 0 ? n : close + 1 + rh[1].length;
+      }
+    }
+    const esc = st.escape || "\\";
     let j = i;
     while (j < n && j - i < 2 && /[A-Za-z]/.test(code[j])) j++;
     const pre = code.slice(i, j);
@@ -53,9 +66,9 @@ export function tokenize(code, def) {
     const raw = /[rR]/.test(pre) || Boolean(st.rawQuotes && st.rawQuotes.includes(q));
     let k = j + q.length;
     while (k < n) {
-      if (!raw && code[k] === "\\") k += 2;
+      if (!raw && code[k] === esc) k += 2;
       else if (code.startsWith(q, k)) return k + q.length;
-      else if (q.length === 1 && !raw && code[k] === "\n") return k;
+      else if (q.length === 1 && !raw && code[k] === "\n" && !(st.multiline && st.multiline.includes(q))) return k;
       else k++;
     }
     return n;
@@ -95,12 +108,60 @@ export function tokenize(code, def) {
       i = j;
       continue;
     }
-    if (def.lineComment && code.startsWith(def.lineComment, i)) {
+    if (
+      def.lineComment &&
+      code.startsWith(def.lineComment, i) &&
+      (!def.commentBoundary || i === 0 || /\s/.test(code[i - 1]))
+    ) {
       let j = code.indexOf("\n", i);
       if (j < 0) j = n;
       run(i, j, "comment");
       i = j;
       continue;
+    }
+    if (def.lifetimes && ch === "'") {
+      LIFETIME.lastIndex = i;
+      const lm = LIFETIME.exec(code);
+      if (lm && code[i + lm[0].length] !== "'") {
+        one(i, i + lm[0].length, "ident");
+        i += lm[0].length;
+        continue;
+      }
+    }
+    if (def.regexLiterals && ch === "/") {
+      const before = code.slice(code.lastIndexOf("\n", i - 1) + 1, i).trimEnd().slice(-1);
+      if (before === "" || "(,=:[!&|?{};+-*%<>~^".includes(before)) {
+        let j = i + 1;
+        let inClass = false;
+        while (j < n && code[j] !== "\n") {
+          const c = code[j];
+          if (c === "\\") {
+            j += 2;
+            continue;
+          }
+          if (c === "[") inClass = true;
+          else if (c === "]") inClass = false;
+          else if (c === "/" && !inClass) {
+            j++;
+            break;
+          }
+          j++;
+        }
+        while (j < n && /[a-z]/.test(code[j])) j++;
+        run(i, j, "string");
+        i = j;
+        continue;
+      }
+    }
+    if (def.dashWords && ch === "-" && (i === 0 || /[\s(]/.test(code[i - 1]))) {
+      DASH_WORD.lastIndex = i;
+      const dm = DASH_WORD.exec(code);
+      if (dm) {
+        const name = dm[0].slice(1).toLowerCase();
+        one(i, i + dm[0].length, def.dashWords.includes(name) ? "keyword" : "ident");
+        i += dm[0].length;
+        continue;
+      }
     }
     const se = stringEnd(i);
     if (se) {
@@ -140,7 +201,7 @@ export function tokenize(code, def) {
     const im = IDENT.exec(code);
     if (im) {
       const w = im[0];
-      one(i, i + w.length, keywords.has(w) || (soft.has(w) && softHit(w, i)) ? "keyword" : "ident");
+      one(i, i + w.length, keywords.has(fold ? w.toUpperCase() : w) || (soft.has(w) && softHit(w, i)) ? "keyword" : "ident");
       i += im[0].length;
       continue;
     }
