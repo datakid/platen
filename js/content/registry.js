@@ -38,7 +38,7 @@ export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell"]);
 const modules = new Map();
 const flat = new WeakMap();
 

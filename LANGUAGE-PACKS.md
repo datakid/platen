@@ -1,6 +1,6 @@
 # platen: language batches for parallel building
 
-Give each chatbot two things: **part A** (the spec, the same for everyone) and **one batch from part C**. Each batch is four languages. Ask the chatbot to build **one language per reply** and to finish a language before starting the next.
+Batch 1 (SQL, Bash, Java, PowerShell) is already built and installed, so start at batch 2. Give each chatbot two things: **part A** (the spec, the same for everyone) and **one batch from part C**. Each batch is four languages. Ask the chatbot to build **one language per reply** and to finish a language before starting the next.
 
 What you get back is a **pack**: a small folder per language. You drop the folder into `packs/` and run one command, which merges it into the app and validates it. Nothing else in the project is touched, so batches never collide.
 
@@ -25,11 +25,11 @@ Reply with these files, each in its own fenced code block, with the path on the 
 | file | when |
 |---|---|
 | `packs/{id}/content.txt` | always |
-| `packs/{id}/meta.json` | new languages (batches 2 to 6). For the five registered languages, only `{"indent": N}` using the indent in part C |
+| `packs/{id}/meta.json` | new languages (batches 2 to 6). For dart, only `{"indent": 2}` |
 | `packs/{id}/lexer.mjs` | new languages that do not reuse an existing lexer |
 | `packs/{id}/NOTES.md` | always, 3 lines: toolchain and version used to verify, how, anything unverified |
 
-For the five languages that are already registered (sql, bash, java, powershell, dart) the pack is `content.txt`, `NOTES.md` and a one-line `meta.json` holding the indent. If the reply would be too long, send topics 1 to 7 first, then say what comes next; parts of `content.txt` can simply be joined end to end.
+For `dart`, which is already registered, the pack is `content.txt`, `NOTES.md` and a one-line `meta.json` holding the indent. If the reply would be too long, send topics 1 to 7 first, then say what comes next; parts of `content.txt` can simply be joined end to end.
 
 Do not edit, quote or rewrite any other project file, and do not change the engine to make a language fit. If something cannot be expressed, say what is missing in `NOTES.md`.
 
@@ -160,22 +160,9 @@ Supported options:
 
 Every roster is the minimum: the listed topics, in order, at least 3 concepts each. Targets for `version` are floors, see A5.
 
-### Batch 1: already registered (`content.txt`, `NOTES.md` and `meta.json` with only the indent)
+### Batch 1: done
 
-| id | name | version | indent | verify with |
-|---|---|---|---|---|
-| sql | SQL | ANSI-style | 2 | every example must run on both SQLite and DuckDB. `tools/preludes/sql.sql` defines the tables (customers, orders, products, order_items, employees) and `python3 tools/check_sql.py` runs them |
-| bash | Bash | 5.x | 2 | `bash -n` and a real run |
-| java | Java | 21 | 4 | `javac` |
-| powershell | PowerShell | 7.x | 4 | `pwsh` if available, otherwise unverified |
-
-**sql** (16): 01 SELECT & WHERE · 02 ORDER BY & LIMIT · 03 aggregates & GROUP BY · 04 HAVING · 05 joins · 06 subqueries · 07 CTEs · 08 window functions · 09 CASE · 10 INSERT, UPDATE, DELETE · 11 CREATE TABLE & constraints · 12 indexes & EXPLAIN · 13 NULL handling · 14 set operations · 15 dates & strings · 16 transactions. Keep dates as ISO text strings and use only syntax both engines accept (no `EXTRACT`, no `ILIKE`, no `SAVEPOINT`).
-
-**bash** (14): 01 variables & quoting · 02 conditionals & tests · 03 loops · 04 functions · 05 arrays · 06 parameter expansion · 07 pipes & redirects · 08 grep, sed, awk · 09 find & xargs · 10 arguments & getopts · 11 exit codes & strict mode · 12 here-docs & process substitution · 13 traps · 14 arithmetic.
-
-**java** (16): 01 basics & types · 02 strings · 03 arrays & ArrayList · 04 HashMap & collections · 05 classes & objects · 06 interfaces & polymorphism · 07 records · 08 enums · 09 generics · 10 lambdas & streams · 11 Optional · 12 exceptions · 13 switch expressions & pattern matching · 14 sealed types · 15 text blocks & var · 16 concurrency basics.
-
-**powershell** (16): 01 variables & types · 02 strings & here-strings · 03 arrays & hashtables · 04 the pipeline · 05 Where-Object & Select-Object · 06 loops & ForEach-Object · 07 functions & parameters · 08 if & switch · 09 try, catch, finally · 10 files & paths · 11 Get-ChildItem · 12 Sort-Object & Group-Object · 13 CSV & JSON · 14 regular expressions · 15 classes · 16 modules.
+SQL (16 topics), Bash (14), Java (16) and PowerShell (16) are built, checked against real toolchains (SQLite and DuckDB, bash, javac 21, pwsh 7.6) and installed. Skip this batch.
 
 ### Batch 2
 
@@ -307,4 +294,26 @@ express: {"name":"Express","short":"XP","version":"5.x","indent":2,"family":"jav
 
 ## Part D: sizes and order
 
-Plan on roughly 12 to 16 topics, 3 to 4 concepts per topic, 3 examples per concept: about 130 to 200 plates per language. Batches 1 and 2 are the best first wave, because the registry, pigments and lexers for most of batch 1 already exist. Batch 6 libraries are quick once Python and JavaScript are in place.
+Plan on roughly 12 to 16 topics, 3 to 4 concepts per topic, 3 examples per concept: about 130 to 200 plates per language. Batch 2 is the best first wave, because `dart` is already registered. Batch 6 libraries are quick once Python and JavaScript are in place, since they reuse those lexers.
+
+---
+
+## Part E: what to expect, from building batch 1 by hand
+
+Four languages, 62 topics and 771 plates were built with exactly these rules. Almost every error was mechanical, and the validator catches all of them, so the loop is cheap. A chatbot without a code sandbox should expect roughly 5 to 20 validator issues per language on its first submission, and it cannot see them itself. Run the installer, paste the issues back, and ask for corrected `content.txt` only.
+
+The mistakes that came up most, in order:
+
+1. **A comma after the gloss verb.** "Sorts, copies and prints arrays" fails. The first word must end in "s" and be followed by a space: "Handles sorting, copying and printing".
+2. **A note anchor that is not literally in the code.** A descriptive anchor such as `(SELECT AVG ...)`, `double quotes` or `$( )` fails. Copy a real substring of the example, such as `(SELECT AVG(price) FROM products)`.
+3. **A note that starts with a capital letter or runs past 40 characters.** The text after `==>` must start lowercase, even before a keyword: write "a NULL breaks NOT IN", not "NOT IN breaks on a NULL".
+4. **A line over 72 columns.** Break long statements, pipelines and chained calls across lines.
+5. **A stray `foo`, `bar` or `baz`.** It is also caught inside a variable name, so a variable called `bar` fails.
+
+Real toolchains found genuine bugs that no checklist would have caught, so verification matters more than the checklist. A SQL column named `at` is reserved in DuckDB. Two SQL examples compared a text column with a date, which DuckDB rejects. One PowerShell example, `5 -gt 3, 5 -eq 5`, failed because the comma binds tighter than the operators, and two sibling examples with the same comma ran without an error but did not mean what they said. Ask the chatbot to run every example, not just read it.
+
+To return a failed pack to its author, paste this:
+
+> The installer rejected `content.txt` with the issues below. Return the complete corrected `content.txt`, changing only what the issues need. Do not add code comments. Issues:
+>
+> (paste the installer output here)

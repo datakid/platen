@@ -9,8 +9,8 @@ Run it with any static server from this folder, for example `python3 -m http.ser
 - P0 shell: done
 - P1 engine with Python 01–03: done
 - P2 identity layer: done
-- P3 content: done for the plan's twelve languages and libraries (python: 21 topics, 273 plates; c: 14 topics, 180 plates; cpp: 18 topics, 225 plates; pandas: 16 topics, 198 plates; numpy: 15 topics, 198 plates; sklearn: 14 topics, 165 plates; polars: 15 topics, 210 plates; lua: 15 topics, 210 plates; go: 18 topics, 258 plates; rust: 20 topics, 273 plates; csharp: 19 topics, 252 plates; pytorch: 13 topics, 183 plates), plus two addendum languages (javascript: 16 topics, 225 plates; typescript: 14 topics, 162 plates)
-- Not yet written: sql, bash, java, dart, powershell (rosters in PLAN-ADDENDUM.md). They are add-on content and wait until the app itself is finished.
+- P3 content: done for the plan's twelve languages and libraries (python: 21 topics, 273 plates; c: 14 topics, 180 plates; cpp: 18 topics, 225 plates; pandas: 16 topics, 198 plates; numpy: 15 topics, 198 plates; sklearn: 14 topics, 165 plates; polars: 15 topics, 210 plates; lua: 15 topics, 210 plates; go: 18 topics, 258 plates; rust: 20 topics, 273 plates; csharp: 19 topics, 252 plates; pytorch: 13 topics, 183 plates), plus six addendum languages (javascript: 16 topics, 225 plates; typescript: 14 topics, 162 plates; sql: 16 topics, 195 plates; bash: 14 topics, 165 plates; java: 16 topics, 204 plates; powershell: 16 topics, 207 plates)
+- Not yet written: dart (roster in PLAN-ADDENDUM.md). It and every further language are add-on content and wait until the app itself is finished; see LANGUAGE-PACKS.md.
 - P4 drill/sprint/stats, P5 recall and polish: remaining
 
 ## Features
@@ -57,6 +57,7 @@ One key, `platen:v1`, written debounced (500ms) and on `visibilitychange`. Shape
 - `python3 tools/check_c.py c` and `python3 tools/check_c.py cpp` compile every snippet with gcc (`-std=c17`) or g++ (`-std=c++20`) against a precompiled header of the common standard headers (there is no `using namespace std`, so every name must be qualified). A snippet passes if it compiles as a file or inside `main`, so each snippet declares what it uses. Pass topic or concept prefixes after the language to check a subset, for example `python3 tools/check_c.py cpp lambdas templates`. The full C++ run takes about 100 seconds on one core.
 - `python tools/run_python.py pandas [prefix ...]` executes every snippet of a Python-library data file after a shared prelude in `tools/preludes/pandas.py` (a sample `df`, `customers`, `orders`, `left`, `right`, `ts` and some files), with all warnings turned into errors so deprecated idioms fail. Run it in an environment with the target versions installed: the pandas file was checked with pandas 2.2.3, NumPy 2.1.3 and pyarrow, and the NumPy file on both NumPy 2.1.3 and 2.4.4. NumPy snippets are self-contained, so their prelude only imports numpy. The scikit-learn file was checked on scikit-learn 1.5.2 (with SciPy 1.14, since 1.5 warns on newer SciPy) and on 1.8.0; its prelude supplies the imports plus `X`, `y`, `X_train` and friends, a regression set, a DataFrame `df` and some prediction arrays. The polars file was checked on polars 1.44.2 and on 2.1.0 (the plan says 1.x; 2.x is out, and every plate passes on both).
 - `node tools/install_pack.mjs packs/<id> [--replace]` merges a language pack (content.txt, meta.json, lexer.mjs) into the registry, pigments, lexers and data folder, validates it and rolls back on failure. `LANGUAGE-PACKS.md` is the brief for building packs in parallel with other chatbots.
+- `python3 tools/check_sql.py` runs every SQL snippet on SQLite and DuckDB. `python3 tools/check_bash.py` runs bash snippets in a seeded temp folder. `python3 tools/check_java.py` compiles Java with javac 21 in one JVM. `python3 tools/check_powershell.py` runs PowerShell snippets in real pwsh (set `PWSH` to its path).
 - `node tools/author.mjs <id> <chunk.txt> [--indent=N]` appends topics to a data file from a plain-text chunk (`@@T id | title`, `@@C id | title | level | gloss`, `@@E` per example, `@@N anchor ==> note` per note, `@@N1` for the second occurrence). It escapes the code for the data file and runs gofmt on Go.
 - `python3 tools/check_go.py`, `python3 tools/check_rust.py` (rustc 2021, metadata only), `python3 tools/check_csharp.py` (Roslyn, .NET 8 reference assemblies) compile every snippet. `node tools/check_js.mjs` runs JavaScript snippets in a sandbox with stubs (module snippets get a syntax check). `node tools/check_ts.mjs` type-checks TypeScript in one `tsc --strict` run (the 5.x snippets were checked with tsc 6.0.3). PyTorch snippets are syntax-checked only, because torch could not be installed in the sandbox.
 - `match`, `case` and `type` are soft keywords: the lexer colors them only in statement position.
@@ -67,7 +68,7 @@ The plan's `--ghost`, `--ink-3` and five light-theme pigments did not meet the p
 
 ## Remaining work
 
-- P3 add-ons: sql, bash, java, dart, powershell, after P4 and P5. `tools/check_sql.py` and `tools/preludes/sql.sql` are ready (every snippet must run on SQLite and DuckDB).
+- P3 add-ons: dart and further languages, after P4 and P5.
 - P4: unit EWMA, drill, sprint, stats trend and keyboard heatmap, hesitations
 - P5: recall mode, shortcut sheet, export/import, README polish
 
