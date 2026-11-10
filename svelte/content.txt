@@ -1,0 +1,1279 @@
+@@T reactive-state | reactive state
+@@C state-rune | $state rune | 1 | Declares reactive state with the $state rune.
+@@E
+<script>
+  let count = $state(0);
+</script>
+
+<button onclick={() => count++}>
+  Clicked {count} times
+</button>
+@@N $state(0) ==> runes need no import
+@@N count++ ==> plain assignment updates the ui
+@@E
+<script>
+  let name = $state("Ada");
+</script>
+
+<input bind:value={name} />
+<p>Hello, {name}</p>
+@@N bind:value ==> input writes back to state
+@@E
+<script>
+  let open = $state(false);
+</script>
+
+<button onclick={() => (open = !open)}>
+  {open ? "Hide" : "Show"} details
+</button>
+@@N open = !open ==> reassign to toggle
+@@C deep-state | objects & arrays | 2 | Makes objects and arrays deeply reactive so property changes update the page.
+@@E
+<script>
+  let user = $state({ name: "Ada", visits: 1 });
+</script>
+
+<button onclick={() => user.visits++}>
+  {user.name}: {user.visits}
+</button>
+@@N user.visits++ ==> nested change is tracked
+@@E
+<script>
+  let todos = $state(["Write docs"]);
+</script>
+
+<button onclick={() => todos.push("Ship release")}>
+  {todos.length} todos
+</button>
+@@N todos.push ==> array methods are reactive
+@@E
+<script>
+  let cart = $state({ items: [{ sku: "A1", qty: 1 }] });
+</script>
+
+<button onclick={() => cart.items[0].qty++}>
+  Quantity: {cart.items[0].qty}
+</button>
+@@N cart.items[0].qty ==> deep proxies track every level
+@@C raw-snapshot | raw state & snapshots | 3 | Opts out of deep reactivity with $state.raw and copies state with $state.snapshot.
+@@E
+<script>
+  let points = $state.raw([1, 2, 3]);
+</script>
+
+<button onclick={() => (points = [...points, points.length + 1])}>
+  {points.join(", ")}
+</button>
+@@N $state.raw ==> only reassignment updates
+@@E
+<script>
+  let form = $state({ email: "", agreed: false });
+  const save = () => console.log($state.snapshot(form));
+</script>
+
+<button onclick={save}>Save</button>
+@@N $state.snapshot ==> plain copy without the proxy
+@@E
+<script>
+  let config = $state.raw({ theme: "dark", size: 14 });
+</script>
+
+<button onclick={() => (config = { ...config, size: config.size + 1 })}>
+  {config.theme} {config.size}
+</button>
+@@N ...config ==> copy then replace the object
+@@T derived-values | derived values
+@@C derived-rune | $derived | 1 | Computes a value from other state that updates when they change.
+@@E
+<script>
+  let count = $state(2);
+  let doubled = $derived(count * 2);
+</script>
+
+<button onclick={() => count++}>{count} x 2 = {doubled}</button>
+@@N $derived ==> no import needed
+@@N count * 2 ==> reruns when count changes
+@@E
+<script>
+  let first = $state("Ada");
+  let last = $state("Lovelace");
+  let full = $derived(`${first} ${last}`);
+</script>
+
+<p>{full}</p>
+@@N `${first} ${last}` ==> tracks both sources
+@@E
+<script>
+  let prices = $state([4, 12, 7]);
+  let total = $derived(prices.reduce((a, b) => a + b, 0));
+</script>
+
+<button onclick={() => prices.push(10)}>Total: {total}</button>
+@@N prices.reduce ==> updates after push
+@@C derived-by | $derived.by | 2 | Runs a function body to compute a derived value with several statements.
+@@E
+<script>
+  let items = $state([{ price: 5 }, { price: 8 }]);
+  let total = $derived.by(() => {
+    let sum = 0;
+    for (const item of items) sum += item.price;
+    return sum;
+  });
+</script>
+
+<p>Total: {total}</p>
+@@N $derived.by ==> takes a function
+@@E
+<script>
+  let query = $state("");
+  let names = ["ada", "grace", "linus"];
+  let matches = $derived.by(() => {
+    return names.filter((n) => n.includes(query));
+  });
+</script>
+
+<input bind:value={query} />
+<p>{matches.length} matches</p>
+@@N return ==> the returned value is derived
+@@E
+<script>
+  let raw = $state(120);
+  let level = $derived.by(() => {
+    if (raw > 100) return 100;
+    return Math.max(raw, 0);
+  });
+</script>
+
+<input type="number" bind:value={raw} />
+<p>Level: {level}</p>
+@@N if (raw > 100) ==> branching is allowed here
+@@C derived-chains | chained derived values | 2 | Builds derived values on top of other derived values.
+@@E
+<script>
+  let width = $state(4);
+  let height = $state(3);
+  let area = $derived(width * height);
+  let label = $derived(area > 10 ? "large" : "small");
+</script>
+
+<p>{area} is {label}</p>
+@@N area > 10 ==> reads another derived value
+@@E
+<script>
+  let celsius = $state(20);
+  let fahrenheit = $derived(celsius * 1.8 + 32);
+  let advice = $derived(fahrenheit > 80 ? "hot" : "mild");
+</script>
+
+<input type="number" bind:value={celsius} />
+<p>{fahrenheit}F, {advice}</p>
+@@N fahrenheit > 80 ==> depends on the first derived
+@@E
+<script>
+  let tasks = $state([{ done: true }, { done: false }]);
+  let remaining = $derived(tasks.filter((t) => !t.done));
+  let summary = $derived(`${remaining.length} of ${tasks.length} left`);
+</script>
+
+<p>{summary}</p>
+@@N remaining.length ==> filtered list feeds the text
+@@T effects | effects
+@@C effect-rune | $effect | 1 | Runs code after the DOM updates whenever the state it reads changes.
+@@E
+<script>
+  let count = $state(0);
+  $effect(() => {
+    document.title = `Count: ${count}`;
+  });
+</script>
+
+<button onclick={() => count++}>{count}</button>
+@@N $effect ==> no import needed
+@@N count ==> reading it registers a dependency
+@@E
+<script>
+  let query = $state("");
+  $effect(() => {
+    console.log("searching for", query);
+  });
+</script>
+
+<input bind:value={query} />
+@@N console.log ==> runs again on every change
+@@E
+<script>
+  let theme = $state("light");
+  $effect(() => {
+    localStorage.setItem("theme", theme);
+  });
+</script>
+
+<button onclick={() => (theme = theme === "light" ? "dark" : "light")}>
+  {theme}
+</button>
+@@N localStorage.setItem ==> sync state to storage
+@@C effect-cleanup | effect cleanup | 2 | Returns a function from an effect to tear down timers and listeners.
+@@E
+<script>
+  let seconds = $state(0);
+  $effect(() => {
+    const id = setInterval(() => seconds++, 1000);
+    return () => clearInterval(id);
+  });
+</script>
+
+<p>{seconds} seconds</p>
+@@N return () => ==> runs before the next run
+@@E
+<script>
+  let width = $state(0);
+  $effect(() => {
+    const update = () => (width = window.innerWidth);
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  });
+</script>
+
+<p>{width}px wide</p>
+@@N removeEventListener ==> mirrors the add call
+@@E
+<script>
+  let query = $state("");
+  let debounced = $state("");
+  $effect(() => {
+    const id = setTimeout(() => (debounced = query), 300);
+    return () => clearTimeout(id);
+  });
+</script>
+
+<input bind:value={query} />
+<p>{debounced}</p>
+@@N clearTimeout(id) ==> restarts the wait on each key
+@@C effect-pre-untrack | pre effects & untrack | 3 | Controls effect timing and dependencies with $effect.pre and untrack.
+@@E
+<script>
+  let messages = $state(["hi"]);
+  $effect.pre(() => {
+    console.log("before update", messages.length);
+  });
+</script>
+
+<button onclick={() => messages.push("hello")}>Send</button>
+@@N $effect.pre ==> runs before the dom updates
+@@E
+<script>
+  import { untrack } from "svelte";
+  let a = $state(1);
+  let b = $state(2);
+  $effect(() => {
+    console.log(a, untrack(() => b));
+  });
+</script>
+
+<button onclick={() => a++}>{a} {b}</button>
+@@N untrack ==> b is read without tracking
+@@E
+<script>
+  let count = $state(0);
+  const stop = $effect.root(() => {
+    $effect(() => console.log("count", count));
+    return () => console.log("stopped");
+  });
+</script>
+
+<button onclick={stop}>Stop logging</button>
+@@N $effect.root ==> a manually controlled scope
+@@T props | props
+@@C props-rune | $props | 1 | Reads values passed by the parent with the $props rune.
+@@E
+<script>
+  let { name } = $props();
+</script>
+
+<h1>Hello, {name}</h1>
+@@N $props() ==> no import needed
+@@N { name } ==> destructure the props you use
+@@E
+<script>
+  let { title, price } = $props();
+</script>
+
+<p>{title}: {price}</p>
+@@N { title, price } ==> one declaration for all props
+@@E
+<script>
+  let { user } = $props();
+</script>
+
+<p>{user.name} ({user.role})</p>
+@@N user.name ==> props can be objects
+@@C prop-defaults | defaults & rest props | 2 | Sets default values and gathers remaining props with a rest element.
+@@E
+<script>
+  let { label = "Save" } = $props();
+</script>
+
+<button>{label}</button>
+@@N label = "Save" ==> used when the prop is missing
+@@E
+<script>
+  let { label, ...rest } = $props();
+</script>
+
+<a {...rest}>{label}</a>
+@@N ...rest ==> everything else the parent passed
+@@E
+<script>
+  let { class: klass = "box" } = $props();
+</script>
+
+<div class={klass}>Content</div>
+@@N class: klass ==> rename a reserved word
+@@C bindable-props | $bindable | 3 | Lets a child update a prop that the parent binds to.
+@@E
+<script>
+  let { value = $bindable("") } = $props();
+</script>
+
+<input bind:value />
+@@N $bindable("") ==> parent can use bind:value
+@@E
+<script>
+  let { open = $bindable(false) } = $props();
+</script>
+
+<button onclick={() => (open = !open)}>
+  {open ? "Close" : "Open"}
+</button>
+@@N open = !open ==> writes back to the parent
+@@E
+<script>
+  let { count = $bindable(0), step = 1 } = $props();
+</script>
+
+<button onclick={() => (count += step)}>{count}</button>
+@@N step = 1 ==> plain prop beside a bindable one
+@@T markup-expressions | markup & expressions
+@@C text-expressions | text expressions | 1 | Embeds JavaScript expressions in markup with curly braces.
+@@E
+<script>
+  let user = { name: "Ada", visits: 3 };
+</script>
+
+<p>{user.name} has visited {user.visits} times</p>
+@@N <p> ==> plain markup needs no import
+@@N {user.name} ==> any expression fits in braces
+@@E
+<script>
+  let prices = [4.5, 12, 7.25];
+  let total = prices.reduce((sum, price) => sum + price, 0);
+</script>
+
+<p>Subtotal: {total.toFixed(2)}</p>
+@@N {total.toFixed(2)} ==> method calls work
+@@E
+<script>
+  let item = { name: "Lamp", stock: 0 };
+</script>
+
+<p>{item.name}: {item.stock > 0 ? "in stock" : "sold out"}</p>
+@@N ? "in stock" ==> ternary inside the text
+@@C attributes | attributes | 1 | Binds attribute values to expressions with braces and shorthand.
+@@E
+<script>
+  let photo = { url: "/img/ada.png", alt: "Ada Lovelace" };
+</script>
+
+<img src={photo.url} alt={photo.alt} width={48} />
+@@N src={photo.url} ==> no quotes around braces
+@@E
+<script>
+  let src = "/img/logo.svg";
+  let alt = "Platen";
+</script>
+
+<img {src} {alt} />
+@@N {src} ==> shorthand for src={src}
+@@E
+<script>
+  let attrs = { href: "/docs", target: "_blank", rel: "noopener" };
+</script>
+
+<a {...attrs}>Docs</a>
+@@N {...attrs} ==> object keys become attributes
+@@C html-const | raw HTML & constants | 3 | Renders trusted HTML with @html and names values in markup with @const.
+@@E
+<script>
+  let note = "Saved <strong>2 files</strong>";
+</script>
+
+<p>{@html note}</p>
+@@N {@html ==> only for trusted strings
+@@E
+<script>
+  let boxes = [{ w: 2, h: 3 }, { w: 4, h: 5 }];
+</script>
+
+{#each boxes as box}
+  {@const area = box.w * box.h}
+  <p>{area}</p>
+{/each}
+@@N {@const ==> a local value inside the block
+@@E
+<script>
+  let order = { qty: 3, price: 5 };
+</script>
+
+{#if order.qty > 0}
+  {@const total = order.qty * order.price}
+  <p>Total: {total}</p>
+{/if}
+@@N order.qty * order.price ==> computed once per branch
+@@T events | events
+@@C event-attributes | event attributes | 1 | Handles DOM events with onclick-style attributes.
+@@E
+<script>
+  function save() {
+    console.log("saved");
+  }
+</script>
+
+<button onclick={save}>Save</button>
+@@N onclick ==> lowercase attribute, no colon
+@@N console.log ==> no import needed for events
+@@E
+<script>
+  let likes = $state(0);
+</script>
+
+<button onclick={() => likes++}>Like {likes}</button>
+@@N () => likes++ ==> inline handler
+@@E
+<script>
+  let last = $state("none");
+</script>
+
+<input onkeydown={(event) => (last = event.key)} />
+<p>Last key: {last}</p>
+@@N onkeydown ==> any dom event name works
+@@C event-object | the event object | 2 | Reads details of an interaction from the event argument.
+@@E
+<script>
+  function submit(event) {
+    event.preventDefault();
+    console.log("searching");
+  }
+</script>
+
+<form onsubmit={submit}><button>Go</button></form>
+@@N event.preventDefault() ==> stops the page reload
+@@E
+<script>
+  let text = $state("");
+</script>
+
+<input oninput={(e) => (text = e.currentTarget.value)} />
+<p>{text.length} characters</p>
+@@N currentTarget ==> the element with the handler
+@@E
+<script>
+  const pick = (e) => console.log(e.currentTarget.dataset.id);
+</script>
+
+<button data-id="42" onclick={pick}>Select</button>
+@@N dataset.id ==> reads the data-id attribute
+@@C callback-props | callback props | 2 | Passes functions as props so a child can notify its parent.
+@@E
+<script>
+  let { onsave } = $props();
+</script>
+
+<button onclick={() => onsave("draft")}>Save draft</button>
+@@N onsave ==> the parent supplies the function
+@@E
+<script>
+  let { onclose, label = "Close" } = $props();
+</script>
+
+<button onclick={onclose}>{label}</button>
+@@N onclick={onclose} ==> pass the prop straight through
+@@E
+<script>
+  let { children, ...rest } = $props();
+</script>
+
+<button {...rest}>{@render children?.()}</button>
+@@N {...rest} ==> forwards handlers like onclick
+@@T conditionals-key-blocks | conditionals & key blocks
+@@C if-blocks | if blocks | 1 | Renders markup only when a condition is true with {#if}.
+@@E
+<script>
+  let loggedIn = $state(false);
+</script>
+
+{#if loggedIn}
+  <p>Welcome back</p>
+{/if}
+@@N {#if ==> block opens with a hash
+@@N loggedIn ==> no import needed for blocks
+@@E
+<script>
+  let online = $state(true);
+</script>
+
+{#if online}
+  <p>Online</p>
+{:else}
+  <p>Offline</p>
+{/if}
+@@N {:else} ==> colon marks a branch
+@@E
+<script>
+  let stock = $state(3);
+</script>
+
+{#if stock === 0}
+  <p>Sold out</p>
+{:else if stock < 5}
+  <p>Only {stock} left</p>
+{:else}
+  <p>In stock</p>
+{/if}
+@@N {:else if ==> chain more conditions
+@@C key-blocks | key blocks | 2 | Recreates content whenever a key expression changes with {#key}.
+@@E
+<script>
+  let id = $state(1);
+</script>
+
+<button onclick={() => id++}>Next</button>
+{#key id}
+  <p>Item {id}</p>
+{/key}
+@@N {#key id} ==> rebuilds when id changes
+@@E
+<script>
+  import { fade } from "svelte/transition";
+  let count = $state(0);
+</script>
+
+<button onclick={() => count++}>Bump</button>
+{#key count}
+  <span in:fade>{count}</span>
+{/key}
+@@N in:fade ==> replays on every key change
+@@E
+<script>
+  let userId = $state("u1");
+</script>
+
+<button onclick={() => (userId = "u2")}>Switch user</button>
+{#key userId}
+  <input placeholder="Draft for {userId}" />
+{/key}
+@@N {#key userId} ==> resets the input state
+@@C inline-conditions | inline conditions | 1 | Chooses small pieces of text inline with ternary and nullish operators.
+@@E
+<script>
+  let count = $state(1);
+</script>
+
+<p>{count} {count === 1 ? "item" : "items"}</p>
+@@N count === 1 ? ==> pluralise inline
+@@E
+<script>
+  let user = $state({ name: "Ada" });
+</script>
+
+<p>Hello, {user?.name ?? "guest"}</p>
+@@N ?? "guest" ==> fallback for null or undefined
+@@E
+<script>
+  let errors = $state([]);
+</script>
+
+<p>{errors.length ? `${errors.length} problems` : "No problems"}</p>
+@@N errors.length ? ==> avoid rendering false
+@@T each-blocks | each blocks
+@@C each-basics | each blocks | 1 | Repeats markup for every item in an array with {#each}.
+@@E
+<script>
+  let fruits = ["apple", "pear", "plum"];
+</script>
+
+<ul>
+  {#each fruits as fruit}
+    <li>{fruit}</li>
+  {/each}
+</ul>
+@@N {#each fruits as fruit} ==> array then alias
+@@N fruits ==> no import needed for blocks
+@@E
+<script>
+  let steps = ["Cut", "Mix", "Bake"];
+</script>
+
+<ol>
+  {#each steps as step, i}
+    <li>{i + 1}. {step}</li>
+  {/each}
+</ol>
+@@N step, i ==> second name is the index
+@@E
+<script>
+  let prices = [
+    { label: "Lamp", cents: 2400 },
+    { label: "Desk", cents: 18900 },
+  ];
+</script>
+
+<ul>
+  {#each prices as { label, cents }}
+    <li>{label}: {cents / 100}</li>
+  {/each}
+</ul>
+@@N { label, cents } ==> destructure each item
+@@C each-keys | keyed each | 2 | Keys each items so Svelte moves elements instead of recreating them.
+@@E
+<script>
+  let users = $state([
+    { id: 1, name: "Ada" },
+    { id: 2, name: "Grace" },
+  ]);
+</script>
+
+<ul>
+  {#each users as user (user.id)}
+    <li>{user.name}</li>
+  {/each}
+</ul>
+@@N (user.id) ==> the key expression
+@@E
+<script>
+  let tasks = $state([{ id: 1 }, { id: 2 }]);
+  const drop = (id) => (tasks = tasks.filter((t) => t.id !== id));
+</script>
+
+{#each tasks as task (task.id)}
+  <button onclick={() => drop(task.id)}>Remove {task.id}</button>
+{/each}
+@@N tasks.filter ==> new array without the item
+@@E
+<script>
+  let lines = [{ order: "A", sku: "S1" }, { order: "A", sku: "S2" }];
+</script>
+
+{#each lines as line (`${line.order}-${line.sku}`)}
+  <p>{line.sku}</p>
+{/each}
+@@N `${line.order}-${line.sku}` ==> combine fields for uniqueness
+@@C each-else | empty lists | 2 | Shows fallback content with {:else} when the array is empty.
+@@E
+<script>
+  let messages = $state([]);
+</script>
+
+{#each messages as message}
+  <p>{message}</p>
+{:else}
+  <p>No messages yet</p>
+{/each}
+@@N {:else} ==> runs when there are no items
+@@E
+<script>
+  let query = $state("zzz");
+  let names = ["ada", "grace"];
+  let hits = $derived(names.filter((n) => n.includes(query)));
+</script>
+
+{#each hits as hit}
+  <li>{hit}</li>
+{:else}
+  <li>No matches for {query}</li>
+{/each}
+@@N $derived ==> filtered list drives the block
+@@E
+<script>
+  let cart = $state(["tea"]);
+</script>
+
+{#each cart as item, i}
+  <p>{i}: {item}</p>
+{:else}
+  <p>Your cart is empty</p>
+{/each}
+@@N {#each cart as item, i} ==> index and fallback together
+@@T await-blocks | await blocks
+@@C await-branches | pending, then, catch | 2 | Renders pending, resolved and failed states of a promise with {#await}.
+@@E
+<script>
+  let promise = Promise.resolve({ name: "Ada" });
+</script>
+
+{#await promise}
+  <p>Loading</p>
+{:then user}
+  <p>Hello, {user.name}</p>
+{:catch error}
+  <p>Failed: {error.message}</p>
+{/await}
+@@N {:then user} ==> receives the resolved value
+@@N promise ==> no import needed for blocks
+@@E
+<script>
+  const load = fetch("/api/orders").then((res) => res.json());
+</script>
+
+{#await load}
+  <p>Loading orders</p>
+{:then orders}
+  <p>{orders.length} orders</p>
+{/await}
+@@N {#await load} ==> pending branch comes first
+@@E
+<script>
+  let attempt = Promise.reject(new Error("offline"));
+</script>
+
+{#await attempt}
+  <p>Trying</p>
+{:catch error}
+  <p>{error.message}</p>
+{/await}
+@@N {:catch error} ==> receives the rejection
+@@C await-shorthand | then shorthand | 2 | Skips the pending branch by putting then on the opening await tag.
+@@E
+<script>
+  let weather = Promise.resolve({ temp: 21 });
+</script>
+
+{#await weather then data}
+  <p>{data.temp} degrees</p>
+{/await}
+@@N then data ==> no loading markup
+@@E
+<script>
+  let prices = fetch("/api/prices").then((r) => r.json());
+</script>
+
+{#await prices then list}
+  <p>{list.length} prices</p>
+{/await}
+@@N prices ==> any promise works
+@@E
+<script>
+  let user = Promise.resolve({ name: "Linus", role: "admin" });
+</script>
+
+{#await user then { name, role }}
+  <p>{name} ({role})</p>
+{/await}
+@@N { name, role } ==> destructure the value
+@@C await-reload | reloading data | 2 | Reassigns a promise in state to reload data and restart the pending branch.
+@@E
+<script>
+  let promise = $state(Promise.resolve(1));
+  const reload = () => (promise = Promise.resolve(2));
+</script>
+
+<button onclick={reload}>Reload</button>
+{#await promise then value}
+  <p>Value {value}</p>
+{/await}
+@@N promise = ==> new promise reruns the block
+@@E
+<script>
+  let id = $state(1);
+  let user = $derived(Promise.resolve({ name: `User ${id}` }));
+</script>
+
+<button onclick={() => id++}>Next</button>
+{#await user then u}
+  <p>{u.name}</p>
+{/await}
+@@N $derived(Promise ==> derived promise follows id
+@@E
+<script>
+  let attempts = $state(0);
+  let result = $derived(Promise.resolve(attempts * 10));
+</script>
+
+<button onclick={() => attempts++}>Retry</button>
+{#await result}
+  <p>Loading</p>
+{:then value}
+  <p>{value}</p>
+{/await}
+@@N attempts++ ==> each click starts a new promise
+@@T bindings | bindings
+@@C bind-value | bind:value | 1 | Keeps an input and a variable in sync with bind:value.
+@@E
+<script>
+  let name = $state("");
+</script>
+
+<input bind:value={name} placeholder="Your name" />
+<p>Hello, {name || "stranger"}</p>
+@@N bind:value ==> two-way binding
+@@N $state ==> no import needed for bindings
+@@E
+<script>
+  let volume = $state(5);
+</script>
+
+<input type="range" min="0" max="10" bind:value={volume} />
+<p>Volume {volume}</p>
+@@N type="range" ==> value is a number
+@@E
+<script>
+  let size = $state("medium");
+</script>
+
+<select bind:value={size}>
+  <option>small</option>
+  <option>medium</option>
+  <option>large</option>
+</select>
+<p>{size}</p>
+@@N bind:value={size} ==> works on select too
+@@C bind-checked-group | checkboxes & groups | 2 | Binds checkboxes and radio groups with bind:checked and bind:group.
+@@E
+<script>
+  let agreed = $state(false);
+</script>
+
+<label>
+  <input type="checkbox" bind:checked={agreed} />
+  Accept terms
+</label>
+<p>{agreed ? "Accepted" : "Pending"}</p>
+@@N bind:checked ==> boolean binding
+@@E
+<script>
+  let speed = $state("standard");
+</script>
+
+<label>
+  <input type="radio" value="standard" bind:group={speed} />
+  Standard
+</label>
+<label>
+  <input type="radio" value="express" bind:group={speed} />
+  Express
+</label>
+@@N bind:group ==> one variable for all radios
+@@E
+<script>
+  let tags = $state([]);
+</script>
+
+<input type="checkbox" value="new" bind:group={tags} />
+<input type="checkbox" value="sale" bind:group={tags} />
+<p>{tags.join(", ")}</p>
+@@N bind:group={tags} ==> checkboxes fill an array
+@@C bind-this | elements & sizes | 2 | Reads DOM elements and measurements with bind:this and dimension bindings.
+@@E
+<script>
+  let input = $state();
+</script>
+
+<input bind:this={input} />
+<button onclick={() => input.focus()}>Focus</button>
+@@N bind:this ==> the element once mounted
+@@E
+<script>
+  let box = $state();
+  let width = $state(0);
+  $effect(() => {
+    width = box.getBoundingClientRect().width;
+  });
+</script>
+
+<div bind:this={box}>Width: {width}</div>
+@@N $effect ==> element exists after mount
+@@E
+<script>
+  let w = $state(0);
+</script>
+
+<div bind:clientWidth={w}>Width: {w}px</div>
+@@N bind:clientWidth ==> read-only measurement
+@@T snippets | snippets
+@@C snippet-render | snippets | 2 | Defines reusable markup with {#snippet} and renders it with {@render}.
+@@E
+{#snippet badge(text)}
+  <span class="badge">{text}</span>
+{/snippet}
+
+{@render badge("New")}
+{@render badge("Sale")}
+@@N {#snippet badge(text)} ==> like a small function
+@@N badge ==> no import needed for snippets
+@@E
+{#snippet row(name)}
+  <li>{name}</li>
+{/snippet}
+
+<ul>
+  {#each ["Ada", "Grace"] as user}
+    {@render row(user)}
+  {/each}
+</ul>
+@@N {@render row(user)} ==> call it where needed
+@@E
+{#snippet price(label, cents)}
+  <p>{label}: {cents / 100}</p>
+{/snippet}
+
+{@render price("Lamp", 2400)}
+@@N (label, cents) ==> several parameters
+@@C children-snippet | children snippets | 2 | Receives nested content as the children snippet and renders it.
+@@E
+<script>
+  let { children } = $props();
+</script>
+
+<div class="card">
+  {@render children()}
+</div>
+@@N children ==> content between the tags
+@@E
+<script>
+  let { title, children } = $props();
+</script>
+
+<section>
+  <h2>{title}</h2>
+  {@render children?.()}
+</section>
+@@N children?.() ==> optional when not passed
+@@E
+<script>
+  let { header, footer } = $props();
+</script>
+
+<article>
+  {@render header()}
+  {@render footer?.()}
+</article>
+@@N header ==> named snippet as a prop
+@@C snippet-props | snippets with arguments | 3 | Passes data into snippet props so the parent controls how each item looks.
+@@E
+<script>
+  let { items, row } = $props();
+</script>
+
+<ul>
+  {#each items as item}
+    <li>{@render row(item)}</li>
+  {/each}
+</ul>
+@@N row(item) ==> child supplies the data
+@@E
+<script>
+  let { empty } = $props();
+  let items = $state([]);
+</script>
+
+{#if items.length === 0}
+  {@render empty?.()}
+{/if}
+@@N empty?.() ==> optional fallback snippet
+@@E
+<script>
+  let { icon, label } = $props();
+</script>
+
+<button>
+  {@render icon()}
+  {label}
+</button>
+@@N icon ==> markup passed as a prop
+@@T classes-styles | classes & styles
+@@C class-attribute | class attributes | 1 | Toggles classes with objects, arrays and the class directive.
+@@E
+<script>
+  let active = $state(false);
+</script>
+
+<button class={{ active }} onclick={() => (active = !active)}>
+  Toggle
+</button>
+@@N class={{ active }} ==> object keys with true values
+@@N $state ==> no import needed for classes
+@@E
+<script>
+  let { size = "md", tone = "info" } = $props();
+</script>
+
+<span class={["badge", size, tone]}>New</span>
+@@N ["badge", size, tone] ==> array joins the names
+@@E
+<script>
+  let done = $state(false);
+</script>
+
+<label class:done>
+  <input type="checkbox" bind:checked={done} />
+  Write tests
+</label>
+@@N class:done ==> toggles on the variable
+@@C style-directive | style directives | 2 | Sets individual inline styles with style: directives.
+@@E
+<script>
+  let color = $state("tomato");
+</script>
+
+<p style:color>Colored text</p>
+@@N style:color ==> shorthand for style:color={color}
+@@E
+<script>
+  let size = $state(16);
+</script>
+
+<input type="range" min="10" max="40" bind:value={size} />
+<p style:font-size="{size}px">Resize me</p>
+@@N style:font-size ==> value with a unit
+@@E
+<script>
+  let visible = $state(true);
+</script>
+
+<div style:display={visible ? "block" : "none"}>
+  Panel content
+</div>
+@@N style:display ==> expression as the value
+@@C scoped-css | scoped styles | 2 | Scopes CSS to a component and reaches outside it with :global.
+@@E
+<p>Warning</p>
+
+<style>
+  p {
+    color: crimson;
+  }
+</style>
+@@N p ==> only styles this component
+@@E
+<div class="prose">{@html "<em>Hi</em>"}</div>
+
+<style>
+  .prose :global(em) {
+    font-style: normal;
+  }
+</style>
+@@N :global(em) ==> matches injected html
+@@E
+<script>
+  let hue = $state(200);
+</script>
+
+<div style:--hue={hue}>Swatch</div>
+<style>
+  div {
+    background: hsl(var(--hue) 70% 50%);
+  }
+</style>
+@@N style:--hue ==> sets a css variable
+@@T context-lifecycle | context & lifecycle
+@@C on-mount | onMount | 1 | Runs code once after the component mounts and can return a cleanup.
+@@E
+<script>
+  let title = $state("");
+  onMount(() => {
+    title = document.title;
+  });
+</script>
+
+<p>{title}</p>
+@@N onMount ==> imports from svelte assumed
+@@E
+<script>
+  let ticks = $state(0);
+  onMount(() => {
+    const id = setInterval(() => ticks++, 1000);
+    return () => clearInterval(id);
+  });
+</script>
+
+<p>{ticks}</p>
+@@N return () => ==> cleanup on destroy
+@@E
+<script>
+  let users = $state([]);
+  onMount(async () => {
+    const res = await fetch("/api/users");
+    users = await res.json();
+  });
+</script>
+
+<p>{users.length} users</p>
+@@N async () => ==> async work after mount
+@@C context-api | setContext & getContext | 2 | Shares values with descendants through setContext and getContext.
+@@E
+<script>
+  let { children } = $props();
+  setContext("theme", "dark");
+</script>
+
+{@render children?.()}
+@@N setContext ==> imports from svelte assumed
+@@N "theme" ==> the key children look up
+@@E
+<script>
+  const theme = getContext("theme");
+</script>
+
+<p class={theme}>Theme: {theme}</p>
+@@N getContext("theme") ==> read during init only
+@@E
+<script>
+  let { children } = $props();
+  const cart = $state({ items: [] });
+  setContext("cart", cart);
+</script>
+
+{@render children?.()}
+@@N $state({ items: [] }) ==> reactive object as context
+@@C tick-destroy | tick & onDestroy | 2 | Waits for pending DOM updates with tick and runs teardown with onDestroy.
+@@E
+<script>
+  let text = $state("a");
+  let box;
+  async function update() {
+    text = "b";
+    await tick();
+    console.log(box.textContent);
+  }
+</script>
+
+<button onclick={update}>Update</button>
+<p bind:this={box}>{text}</p>
+@@N await tick() ==> dom now shows the new text
+@@N tick ==> imports from svelte assumed
+@@E
+<script>
+  onDestroy(() => {
+    console.log("component removed");
+  });
+</script>
+
+<p>Temporary panel</p>
+@@N onDestroy ==> runs on removal
+@@E
+<script>
+  let items = $state(["a"]);
+  let list;
+  async function add() {
+    items.push("b");
+    await tick();
+    console.log(list.children.length);
+  }
+</script>
+
+<button onclick={add}>Add</button>
+<ul bind:this={list}>{#each items as i}<li>{i}</li>{/each}</ul>
+@@N list.children.length ==> counted after the update
+@@T transitions-animations | transitions & animations
+@@C transition-directive | transitions | 1 | Fades elements in and out as they enter or leave the DOM.
+@@E
+<script>
+  import { fade } from "svelte/transition";
+  let visible = $state(true);
+</script>
+
+<button onclick={() => (visible = !visible)}>Toggle</button>
+{#if visible}
+  <p transition:fade>Hello</p>
+{/if}
+@@N transition:fade ==> plays in both directions
+@@N svelte/transition ==> built-in effects live here
+@@E
+<script>
+  import { fly } from "svelte/transition";
+  let open = $state(true);
+</script>
+
+{#if open}
+  <aside transition:fly={{ x: 200, duration: 300 }}>Menu</aside>
+{/if}
+<button onclick={() => (open = !open)}>Menu</button>
+@@N {{ x: 200, duration: 300 }} ==> parameters object
+@@E
+<script>
+  import { slide } from "svelte/transition";
+  let shown = $state(false);
+</script>
+
+<button onclick={() => (shown = !shown)}>Details</button>
+{#if shown}
+  <p transition:slide>More information</p>
+{/if}
+@@N slide ==> animates height
+@@C in-out | in and out | 2 | Applies separate transitions on entering and leaving with in: and out:.
+@@E
+<script>
+  import { fade, fly } from "svelte/transition";
+  let on = $state(true);
+</script>
+
+{#if on}
+  <p in:fly={{ y: 20 }} out:fade>Notice</p>
+{/if}
+<button onclick={() => (on = !on)}>Toggle</button>
+@@N in:fly ==> only when entering
+@@N out:fade ==> only when leaving
+@@E
+<script>
+  import { scale } from "svelte/transition";
+  let items = $state([1, 2]);
+</script>
+
+{#each items as item (item)}
+  <p transition:scale|global>{item}</p>
+{/each}
+@@N |global ==> also plays for parent blocks
+@@E
+<script>
+  import { blur } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
+  let show = $state(true);
+</script>
+
+{#if show}
+  <p transition:blur={{ easing: cubicOut }}>Soft edge</p>
+{/if}
+@@N svelte/easing ==> easing functions
+@@C animate-flip | animate:flip | 3 | Animates keyed each items to their new positions with animate:flip.
+@@E
+<script>
+  import { flip } from "svelte/animate";
+  let items = $state(["a", "b", "c"]);
+</script>
+
+<button onclick={() => items.reverse()}>Reverse</button>
+{#each items as item (item)}
+  <p animate:flip>{item}</p>
+{/each}
+@@N animate:flip ==> needs a keyed each
+@@E
+<script>
+  import { flip } from "svelte/animate";
+  let tasks = $state([{ id: 1 }, { id: 2 }]);
+</script>
+
+{#each tasks as task (task.id)}
+  <p animate:flip={{ duration: 200 }}>Task {task.id}</p>
+{/each}
+@@N duration: 200 ==> milliseconds
+@@E
+<script>
+  import { flip } from "svelte/animate";
+  let names = $state(["Grace", "Ada", "Linus"]);
+  const sort = () => names.sort();
+</script>
+
+<button onclick={sort}>Sort</button>
+{#each names as name (name)}
+  <p animate:flip>{name}</p>
+{/each}
+@@N names.sort() ==> reorder triggers the motion
