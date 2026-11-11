@@ -1,0 +1,1652 @@
+@@T components-jsx | components & JSX
+@@C function-components | function components | 1 | Declares a component as a function that returns JSX.
+@@E
+function Greeting() {
+  return <h1>Welcome back, Ada</h1>;
+}
+@@N function ==> imports from react assumed
+@@N Greeting ==> capitalized name
+@@E
+function PriceTag() {
+  return (
+    <p className="price">
+      Total: <strong>$24.50</strong>
+    </p>
+  );
+}
+@@N className ==> class is a reserved word
+@@N return ( ==> parentheses wrap multi-line jsx
+@@E
+const EmptyCart = () => <p>Your cart is empty.</p>;
+@@N => ==> implicit return of the jsx
+@@C jsx-expressions | JSX expressions | 1 | Embeds JavaScript values inside JSX with curly braces.
+@@E
+function Welcome() {
+  const user = { name: "Ada", visits: 3 };
+  return (
+    <p>
+      {user.name} has visited {user.visits} times
+    </p>
+  );
+}
+@@N {user.name} ==> any expression fits in braces
+@@E
+function Avatar() {
+  const photo = { url: "/img/ada.png", alt: "Ada Lovelace" };
+  return <img src={photo.url} alt={photo.alt} width={48} />;
+}
+@@N {48} ==> numbers go in braces
+@@E
+function Subtotal() {
+  const prices = [4.5, 12, 7.25];
+  const total = prices.reduce((sum, price) => sum + price, 0);
+  return <p>Subtotal: {total.toFixed(2)}</p>;
+}
+@@N {total.toFixed(2)} ==> calls run before rendering
+@@C fragments | fragments | 1 | Groups sibling elements without adding a wrapper node to the DOM.
+@@E
+function Header() {
+  return (
+    <>
+      <h1>Inventory</h1>
+      <p>42 items in stock</p>
+    </>
+  );
+}
+@@N <> ==> short fragment syntax
+@@E
+function ContactLines() {
+  return (
+    <>
+      <dt>Email</dt>
+      <dd>ada@example.com</dd>
+    </>
+  );
+}
+@@N <dt> ==> no extra wrapper in the dom
+@@E
+function Glossary() {
+  const terms = [{ id: 1, term: "prop", meaning: "an input" }];
+  return terms.map((t) => (
+    <Fragment key={t.id}>
+      <dt>{t.term}</dt>
+      <dd>{t.meaning}</dd>
+    </Fragment>
+  ));
+}
+@@N Fragment ==> a key needs the long form
+@@C nesting-components | nesting components | 2 | Composes small components into larger ones by nesting them as tags.
+@@E
+function Logo() {
+  return <img src="/logo.svg" alt="Platen" />;
+}
+
+function Navbar() {
+  return (
+    <nav>
+      <Logo />
+      <a href="/docs">Docs</a>
+    </nav>
+  );
+}
+@@N <Logo /> ==> self-closing component tag
+@@E
+function Badge() {
+  return <span className="badge">New</span>;
+}
+
+function ProductTitle() {
+  return (
+    <h2>
+      Desk lamp <Badge />
+    </h2>
+  );
+}
+@@N <Badge /> ==> reused inline like any element
+@@E
+function Copyright() {
+  return <small>2026 Platen Labs</small>;
+}
+
+function Footer() {
+  return (
+    <footer>
+      <Copyright />
+    </footer>
+  );
+}
+@@N Copyright ==> one small piece per component
+@@T props | props
+@@C passing-props | passing props | 1 | Passes values from a parent to a child as attributes on the tag.
+@@E
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+
+function App() {
+  return <Welcome name="Grace" />;
+}
+@@N function ==> imports from react assumed
+@@N props.name ==> read from the props object
+@@N name="Grace" ==> string props use quotes
+@@E
+function Stock({ item, count }) {
+  return (
+    <p>
+      {item}: {count} left
+    </p>
+  );
+}
+
+function App() {
+  return <Stock item="Lamp" count={12} />;
+}
+@@N { item, count } ==> destructured in the signature
+@@N count={12} ==> other types use braces
+@@E
+function UserCard({ user }) {
+  return <p>{user.name} ({user.role})</p>;
+}
+
+function App() {
+  const user = { name: "Linus", role: "admin" };
+  return <UserCard user={user} />;
+}
+@@N user={user} ==> any value can be a prop
+@@C default-values | default values | 1 | Falls back to a default value when a prop is not passed.
+@@E
+function Button({ label = "Save" }) {
+  return <button>{label}</button>;
+}
+
+function App() {
+  return <Button />;
+}
+@@N label = "Save" ==> used when the prop is undefined
+@@E
+function Pagination({ page = 1, perPage = 20 }) {
+  return (
+    <p>
+      Page {page}, {perPage} rows each
+    </p>
+  );
+}
+
+function App() {
+  return <Pagination page={3} />;
+}
+@@N perPage = 20 ==> keeps its default
+@@E
+function Panel({ title, tone = "info" }) {
+  return <section className={tone}>{title}</section>;
+}
+
+function App() {
+  return <Panel title="Backup finished" />;
+}
+@@N tone = "info" ==> only title is required
+@@C children | children | 2 | Receives nested content through the children prop.
+@@E
+function Card({ children }) {
+  return <div className="card">{children}</div>;
+}
+
+function App() {
+  return (
+    <Card>
+      <p>Order shipped</p>
+    </Card>
+  );
+}
+@@N children ==> whatever sits between the tags
+@@E
+function Section({ title, children }) {
+  return (
+    <section>
+      <h2>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function App() {
+  return <Section title="Notes">Remember the milk</Section>;
+}
+@@N {children} ==> rendered where you place it
+@@E
+function Stack({ children, gap = 8 }) {
+  return <div style={{ display: "grid", gap }}>{children}</div>;
+}
+
+function App() {
+  return (
+    <Stack gap={4}>
+      <span>One</span>
+      <span>Two</span>
+    </Stack>
+  );
+}
+@@N style={{ ==> outer braces for jsx, inner for object
+@@C spreading-props | spreading props | 2 | Forwards a whole object of props to an element with the spread operator.
+@@E
+function TextInput(props) {
+  return <input type="text" {...props} />;
+}
+
+function App() {
+  return <TextInput name="email" placeholder="you@example.com" />;
+}
+@@N {...props} ==> copies every prop onto the input
+@@E
+function Link({ label, ...rest }) {
+  return <a {...rest}>{label}</a>;
+}
+
+function App() {
+  return <Link label="Docs" href="/docs" target="_blank" />;
+}
+@@N ...rest ==> collects the remaining props
+@@E
+function App() {
+  const config = { src: "/hero.jpg", alt: "Mountain", width: 640 };
+  return <img {...config} />;
+}
+@@N {...config} ==> object keys become attributes
+@@T usestate | useState
+@@C state-value | state value | 1 | Stores a value that triggers a re-render when it changes.
+@@E
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Clicked {count} times
+    </button>
+  );
+}
+@@N useState ==> imports from react assumed
+@@N [count, setCount] ==> value and setter pair
+@@E
+function Disclosure() {
+  const [open, setOpen] = useState(false);
+  return (
+    <button onClick={() => setOpen(!open)}>
+      {open ? "Hide details" : "Show details"}
+    </button>
+  );
+}
+@@N useState(false) ==> initial state is false
+@@E
+function Rating() {
+  const [stars, setStars] = useState(3);
+  return (
+    <div>
+      <button onClick={() => setStars(stars - 1)}>-</button>
+      <span>{stars}</span>
+      <button onClick={() => setStars(stars + 1)}>+</button>
+    </div>
+  );
+}
+@@N setStars(stars - 1) ==> the setter schedules a re-render
+@@C functional-updates | functional updates | 2 | Computes the next state from the previous state with an updater function.
+@@E
+function Counter() {
+  const [count, setCount] = useState(0);
+  const addThree = () => {
+    setCount((n) => n + 1);
+    setCount((n) => n + 1);
+    setCount((n) => n + 1);
+  };
+  return <button onClick={addThree}>{count}</button>;
+}
+@@N (n) => n + 1 ==> n is the latest queued state
+@@E
+function Switch() {
+  const [on, setOn] = useState(false);
+  return (
+    <button onClick={() => setOn((prev) => !prev)}>
+      {on ? "On" : "Off"}
+    </button>
+  );
+}
+@@N (prev) => !prev ==> flips the latest value
+@@E
+function Stepper() {
+  const [value, setValue] = useState(10);
+  const next = (step) => setValue((v) => Math.min(v + step, 100));
+  return (
+    <button onClick={() => next(25)}>
+      {value}
+    </button>
+  );
+}
+@@N Math.min ==> caps the new value
+@@C objects-arrays | objects & arrays | 2 | Replaces objects and arrays in state with new copies instead of mutating them.
+@@E
+function Profile() {
+  const [user, setUser] = useState({ name: "Ada", age: 36 });
+  const birthday = () => setUser({ ...user, age: user.age + 1 });
+  return <button onClick={birthday}>{user.name}: {user.age}</button>;
+}
+@@N ...user ==> copy the rest, change one key
+@@E
+function Todos() {
+  const [todos, setTodos] = useState(["Write docs"]);
+  const add = () => setTodos([...todos, "Ship release"]);
+  return <button onClick={add}>{todos.length} todos</button>;
+}
+@@N [...todos, ==> new array with the item added
+@@E
+function Cart() {
+  const [items, setItems] = useState(["tea", "milk", "bread"]);
+  const drop = (name) => setItems(items.filter((i) => i !== name));
+  return <button onClick={() => drop("milk")}>{items.length}</button>;
+}
+@@N items.filter ==> filter returns a new array
+@@C lazy-initial-state | lazy initial state | 3 | Computes the initial state once by passing a function to useState.
+@@E
+const saved = '{"volume": 7}';
+
+function Mixer() {
+  const [config] = useState(() => JSON.parse(saved));
+  return <p>Volume: {config.volume}</p>;
+}
+@@N () => JSON.parse(saved) ==> runs only on the first render
+@@E
+function makeRows() {
+  return Array.from({ length: 1000 }, (_, i) => ({ id: i }));
+}
+
+function Grid() {
+  const [rows] = useState(makeRows);
+  return <p>{rows.length} rows</p>;
+}
+@@N useState(makeRows) ==> pass the function, do not call it
+@@E
+function YearFooter() {
+  const [year] = useState(() => new Date().getFullYear());
+  return <small>Copyright {year}</small>;
+}
+@@N new Date() ==> evaluated once, not every render
+@@T events | events
+@@C event-handlers | event handlers | 1 | Runs a function when the user interacts with an element.
+@@E
+function SaveButton() {
+  function handleClick() {
+    console.log("Saved");
+  }
+  return <button onClick={handleClick}>Save</button>;
+}
+@@N function ==> imports from react assumed
+@@N onClick={handleClick} ==> pass the function, not a call
+@@E
+function LikeButton() {
+  return (
+    <button onClick={() => console.info("Liked")}>
+      Like
+    </button>
+  );
+}
+@@N () => ==> inline arrow handler
+@@E
+function Tooltip() {
+  const [shown, setShown] = useState(false);
+  return (
+    <span
+      onMouseEnter={() => setShown(true)}
+      onMouseLeave={() => setShown(false)}
+    >
+      {shown ? "Press Enter to save" : "Hover me"}
+    </span>
+  );
+}
+@@N onMouseEnter ==> camelCase event names
+@@C event-object | the event object | 2 | Reads details of an interaction from the event passed to the handler.
+@@E
+function SearchForm() {
+  function handleSubmit(event) {
+    event.preventDefault();
+    console.log("searching");
+  }
+  return <form onSubmit={handleSubmit}><button>Go</button></form>;
+}
+@@N event.preventDefault() ==> stops the page reload
+@@E
+function Shortcut() {
+  const onKeyDown = (event) => {
+    if (event.key === "Enter") {
+      console.log("confirmed");
+    }
+  };
+  return <input onKeyDown={onKeyDown} />;
+}
+@@N event.key ==> the key that was pressed
+@@E
+function RowAction() {
+  const handleClick = (event) => {
+    console.log(event.currentTarget.dataset.id);
+  };
+  return (
+    <button data-id="42" onClick={handleClick}>
+      Select
+    </button>
+  );
+}
+@@N currentTarget ==> the element with the handler
+@@C passing-arguments | passing arguments | 2 | Passes extra values to a handler by wrapping the call in an arrow function.
+@@E
+function Toolbar() {
+  const select = (tool) => console.log("selected", tool);
+  return (
+    <div>
+      <button onClick={() => select("pen")}>Pen</button>
+      <button onClick={() => select("eraser")}>Eraser</button>
+    </div>
+  );
+}
+@@N () => select("pen") ==> wrapper delays the call
+@@E
+function UserList() {
+  const users = [{ id: 1, name: "Ada" }, { id: 2, name: "Grace" }];
+  const remove = (id) => console.log("remove", id);
+  return users.map((user) => (
+    <button key={user.id} onClick={() => remove(user.id)}>
+      {user.name}
+    </button>
+  ));
+}
+@@N remove(user.id) ==> each button captures its own id
+@@E
+function Rate() {
+  const rate = (stars, event) => {
+    console.log(stars, event.type);
+  };
+  return <button onClick={(e) => rate(5, e)}>Five stars</button>;
+}
+@@N (e) => rate(5, e) ==> forward the event as well
+@@T conditional-rendering | conditional rendering
+@@C ternary | ternary expressions | 1 | Chooses between two pieces of JSX with a ternary expression.
+@@E
+function Status({ online }) {
+  return <p>{online ? "Online" : "Offline"}</p>;
+}
+@@N function ==> imports from react assumed
+@@N ? ==> condition before the question mark
+@@E
+function Banner({ user }) {
+  return user ? (
+    <h1>Hello, {user.name}</h1>
+  ) : (
+    <a href="/login">Sign in</a>
+  );
+}
+@@N ) : ( ==> else branch
+@@E
+function Stock({ count }) {
+  return (
+    <span className={count > 0 ? "in-stock" : "sold-out"}>
+      {count > 0 ? `${count} left` : "Sold out"}
+    </span>
+  );
+}
+@@N className={count ==> ternaries work in attributes
+@@C logical-and | logical and | 1 | Renders an element only when a condition is true using the and operator.
+@@E
+function Inbox({ unread }) {
+  return <h2>Inbox {unread > 0 && <span>({unread})</span>}</h2>;
+}
+@@N unread > 0 && ==> false renders nothing
+@@E
+function Warning({ message }) {
+  return message && <p role="alert">{message}</p>;
+}
+@@N message && ==> skips when message is empty
+@@E
+function Cart({ items }) {
+  return (
+    <div>
+      {items.length > 0 && <p>{items.length} items in cart</p>}
+    </div>
+  );
+}
+@@N items.length > 0 ==> comparison avoids rendering 0
+@@C early-return | early return | 2 | Returns early from a component to skip the rest of its markup.
+@@E
+function Profile({ user }) {
+  if (!user) {
+    return <p>No profile found</p>;
+  }
+  return <h1>{user.name}</h1>;
+}
+@@N if (!user) ==> guard clause
+@@E
+function Report({ loading, rows }) {
+  if (loading) {
+    return <p>Loading report</p>;
+  }
+  return <p>{rows.length} rows loaded</p>;
+}
+@@N loading ==> handle the waiting state first
+@@E
+function AdminPanel({ role }) {
+  if (role !== "admin") {
+    return null;
+  }
+  return <button>Delete workspace</button>;
+}
+@@N return null ==> renders nothing
+@@T lists-keys | lists & keys
+@@C rendering-lists | rendering lists | 1 | Turns an array into a list of elements with map.
+@@E
+function Fruits() {
+  const fruits = ["apple", "pear", "plum"];
+  return (
+    <ul>
+      {fruits.map((fruit) => (
+        <li key={fruit}>{fruit}</li>
+      ))}
+    </ul>
+  );
+}
+@@N function ==> imports from react assumed
+@@N fruits.map ==> one element per item
+@@E
+function Prices() {
+  const prices = [
+    { id: 1, label: "Lamp", cents: 2400 },
+    { id: 2, label: "Desk", cents: 18900 },
+  ];
+  const rows = prices.map((p) => (
+    <li key={p.id}>{p.label}: {p.cents / 100}</li>
+  ));
+  return <ul>{rows}</ul>;
+}
+@@N const rows ==> build the list before returning
+@@E
+function Row({ name, role }) {
+  return <li>{name} ({role})</li>;
+}
+
+function Team() {
+  const team = [{ id: 7, name: "Ada", role: "lead" }];
+  return <ul>{team.map((m) => <Row key={m.id} {...m} />)}</ul>;
+}
+@@N <Row key ==> key sits on the outer element
+@@C keys | keys | 2 | Gives each list item a stable key so React can track it between renders.
+@@E
+function Inbox() {
+  const messages = [{ id: "m1", subject: "Invoice" }];
+  return (
+    <ul>
+      {messages.map((m) => (
+        <li key={m.id}>{m.subject}</li>
+      ))}
+    </ul>
+  );
+}
+@@N key={m.id} ==> a stable id from the data
+@@E
+function Lines({ order }) {
+  return order.lines.map((line) => (
+    <li key={`${order.id}-${line.sku}`}>
+      {line.qty} x {line.sku}
+    </li>
+  ));
+}
+@@N ${order.id}-${line.sku} ==> combine fields for uniqueness
+@@E
+function Draft() {
+  const [text, setText] = useState("");
+  const onChange = (e) => setText(e.target.value);
+  return <textarea value={text} onChange={onChange} />;
+}
+
+function App({ docId }) {
+  return <Draft key={docId} />;
+}
+@@N key={docId} ==> a new key resets the state
+@@C filter-sort | filtering & sorting | 2 | Filters and sorts an array before mapping it to elements.
+@@E
+function ActiveUsers({ users }) {
+  const active = users.filter((u) => u.active);
+  return (
+    <ul>
+      {active.map((u) => <li key={u.id}>{u.name}</li>)}
+    </ul>
+  );
+}
+@@N users.filter ==> keep matching items only
+@@E
+function Leaderboard({ scores }) {
+  const ranked = [...scores].sort((a, b) => b.points - a.points);
+  return (
+    <ol>
+      {ranked.map((s) => <li key={s.id}>{s.name}</li>)}
+    </ol>
+  );
+}
+@@N [...scores] ==> copy first, sort mutates
+@@E
+function TopSellers({ products }) {
+  const top = products.slice(0, 3);
+  return (
+    <ul>
+      {top.map((p) => <li key={p.id}>{p.title}</li>)}
+    </ul>
+  );
+}
+@@N slice(0, 3) ==> first three items
+@@T useeffect | useEffect
+@@C after-render | running after render | 1 | Runs side effects after React commits a render to the screen.
+@@E
+function PageTitle() {
+  useEffect(() => {
+    document.title = "Dashboard";
+  }, []);
+  return <h1>Dashboard</h1>;
+}
+@@N useEffect ==> imports from react assumed
+@@N [] ==> runs once after the first render
+@@E
+function RenderLogger() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    console.log("rendered with", count);
+  });
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+@@N }); ==> no array runs every render
+@@E
+function Landing() {
+  useEffect(() => {
+    document.body.classList.add("loaded");
+  }, []);
+  return <main>Welcome</main>;
+}
+@@N classList.add ==> touches the dom outside react
+@@C dependencies | dependencies | 2 | Runs an effect again only when the values in its dependency array change.
+@@E
+function Unread({ count }) {
+  useEffect(() => {
+    document.title = `Inbox (${count})`;
+  }, [count]);
+  return <p>{count} unread</p>;
+}
+@@N [count] ==> reruns when count changes
+@@E
+function ThemePicker({ theme }) {
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  return <p>Theme: {theme}</p>;
+}
+@@N [theme] ==> list every value the effect reads
+@@E
+function Search({ query, page }) {
+  useEffect(() => {
+    console.log("search", query, page);
+  }, [query, page]);
+  return <p>{query}</p>;
+}
+@@N [query, page] ==> either change triggers it
+@@C cleanup | cleanup functions | 2 | Returns a function that undoes an effect before the next run or on unmount.
+@@E
+function Clock() {
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setNow((n) => n + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return <p>{now} seconds</p>;
+}
+@@N return () => ==> cleanup runs on unmount
+@@E
+function WindowWidth() {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return <p>{width}px</p>;
+}
+@@N removeEventListener ==> mirror what the effect added
+@@E
+function Toast({ onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+  return <p>Saved</p>;
+}
+@@N clearTimeout ==> also runs before each rerun
+@@C fetching-data | fetching data | 3 | Fetches data in an effect and ignores results that arrive too late.
+@@E
+function Profile({ id }) {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(`/api/users/${id}`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then(setUser);
+    return () => controller.abort();
+  }, [id]);
+  return <p>{user ? user.name : "Loading"}</p>;
+}
+@@N controller.abort() ==> cancels the stale request
+@@E
+function Weather({ city }) {
+  const [temp, setTemp] = useState(null);
+  useEffect(() => {
+    let ignore = false;
+    fetch(`/api/weather?city=${city}`)
+      .then((res) => res.json())
+      .then((data) => !ignore && setTemp(data.temp));
+    return () => { ignore = true; };
+  }, [city]);
+  return <p>{temp ?? "Loading"}</p>;
+}
+@@N ignore ==> drops results from old runs
+@@E
+function Feed() {
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    fetch("/api/feed").catch((err) => setError(err.message));
+  }, []);
+  return <p>{error ?? "Feed ready"}</p>;
+}
+@@N .catch ==> failures become state
+@@C effect-events | effect events | 3 | Reads the latest props inside an effect without making them dependencies.
+@@E
+function Chat({ roomId, theme }) {
+  const onConnected = useEffectEvent(() => {
+    console.log("connected", theme);
+  });
+  useEffect(() => {
+    console.log("joining", roomId);
+    onConnected();
+  }, [roomId]);
+  return <p>{roomId}</p>;
+}
+@@N useEffectEvent ==> always sees the latest theme
+@@N [roomId] ==> theme is not a dependency
+@@E
+function Ticker({ symbol, onTick }) {
+  const handleTick = useEffectEvent((price) => onTick(price));
+  useEffect(() => {
+    const id = setInterval(() => handleTick(symbol.length), 1000);
+    return () => clearInterval(id);
+  }, [symbol]);
+  return <p>{symbol}</p>;
+}
+@@N handleTick ==> call it only from effects
+@@E
+function Page({ url, cart }) {
+  const logVisit = useEffectEvent((visitedUrl) => {
+    console.info("visit", visitedUrl, cart.length);
+  });
+  useEffect(() => {
+    logVisit(url);
+  }, [url]);
+  return <p>{url}</p>;
+}
+@@N cart.length ==> read without resubscribing
+@@T useref | useRef
+@@C dom-refs | DOM refs | 1 | Holds a reference to a DOM node that React renders.
+@@E
+function SearchBox() {
+  const inputRef = useRef(null);
+  return (
+    <div>
+      <input ref={inputRef} />
+      <button onClick={() => inputRef.current.focus()}>Focus</button>
+    </div>
+  );
+}
+@@N useRef ==> imports from react assumed
+@@N inputRef.current ==> the dom node after mount
+@@E
+function Terminal() {
+  const endRef = useRef(null);
+  const scroll = () => endRef.current.scrollIntoView();
+  return (
+    <div>
+      <button onClick={scroll}>Jump to end</button>
+      <div ref={endRef} />
+    </div>
+  );
+}
+@@N scrollIntoView ==> a native dom method
+@@E
+function Player() {
+  const videoRef = useRef(null);
+  return (
+    <>
+      <video ref={videoRef} src="/intro.mp4" />
+      <button onClick={() => videoRef.current.play()}>Play</button>
+    </>
+  );
+}
+@@N ref={videoRef} ==> attaches the node to the ref
+@@C mutable-values | mutable values | 2 | Keeps a mutable value between renders without triggering a re-render.
+@@E
+function Stopwatch() {
+  const timer = useRef(null);
+  const tick = () => console.log("tick");
+  const start = () => { timer.current = setInterval(tick, 1000); };
+  const stop = () => clearInterval(timer.current);
+  return (
+    <>
+      <button onClick={start}>Start</button>
+      <button onClick={stop}>Stop</button>
+    </>
+  );
+}
+@@N timer.current ==> changing it does not rerender
+@@E
+function Tracker() {
+  const clicks = useRef(0);
+  const onClick = () => {
+    clicks.current += 1;
+    console.log("clicks so far", clicks.current);
+  };
+  return <button onClick={onClick}>Track</button>;
+}
+@@N clicks.current += 1 ==> write refs in handlers
+@@E
+function Autosave({ draft }) {
+  const latest = useRef(draft);
+  useEffect(() => {
+    latest.current = draft;
+  });
+  useEffect(() => {
+    const id = setInterval(() => console.log(latest.current), 5000);
+    return () => clearInterval(id);
+  }, []);
+  return <p>Autosaving</p>;
+}
+@@N latest.current ==> interval reads the newest draft
+@@C ref-as-prop | ref as a prop | 2 | Accepts ref as an ordinary prop in React 19 without forwardRef.
+@@E
+function TextField({ ref, label }) {
+  return <input ref={ref} aria-label={label} />;
+}
+
+function App() {
+  const emailRef = useRef(null);
+  return <TextField ref={emailRef} label="Email" />;
+}
+@@N { ref, label } ==> ref arrives like any prop
+@@E
+function IconButton({ ref, children }) {
+  return <button ref={ref}>{children}</button>;
+}
+
+function App() {
+  const saveRef = useRef(null);
+  return <IconButton ref={saveRef}>Save</IconButton>;
+}
+@@N ref={saveRef} ==> no forwardRef wrapper needed
+@@E
+function FancyInput({ ref, ...props }) {
+  return <input ref={ref} className="fancy" {...props} />;
+}
+
+function App() {
+  const ref = useRef(null);
+  return <FancyInput ref={ref} placeholder="Name" />;
+}
+@@N ...props ==> everything except ref
+@@C callback-refs | callback refs | 3 | Runs a function when a node attaches and can return a cleanup for detaching.
+@@E
+function Box() {
+  const measure = (node) => {
+    if (node) console.log(node.getBoundingClientRect().height);
+  };
+  return <div ref={measure}>Content</div>;
+}
+@@N if (node) ==> null is passed on detach
+@@E
+function Observed() {
+  const watch = (node) => {
+    const observer = new ResizeObserver(() => console.log("resized"));
+    observer.observe(node);
+    return () => observer.disconnect();
+  };
+  return <div ref={watch}>Resizable</div>;
+}
+@@N return () => ==> cleanup runs on detach
+@@E
+function AutoFocus() {
+  const focusOnMount = (node) => {
+    node?.focus();
+  };
+  return <input ref={focusOnMount} />;
+}
+@@N node?.focus() ==> node is null on detach
+@@T usememo-usecallback | useMemo & useCallback
+@@C usememo | useMemo | 2 | Caches the result of a calculation until its dependencies change.
+@@E
+function Totals({ items }) {
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.price, 0),
+    [items]
+  );
+  return <p>Total: {total}</p>;
+}
+@@N useMemo ==> imports from react assumed
+@@N [items] ==> recomputes when items changes
+@@E
+function Catalog({ products, query }) {
+  const visible = useMemo(
+    () => products.filter((p) => p.title.includes(query)),
+    [products, query]
+  );
+  return <p>{visible.length} matches</p>;
+}
+@@N [products, query] ==> both inputs are listed
+@@E
+function Standings({ teams }) {
+  const sorted = useMemo(
+    () => [...teams].sort((a, b) => b.points - a.points),
+    [teams]
+  );
+  return <p>Leader: {sorted[0]?.name}</p>;
+}
+@@N sorted[0]?.name ==> optional chaining on empty lists
+@@C usecallback | useCallback | 2 | Keeps a function identity stable between renders until dependencies change.
+@@E
+function Parent() {
+  const [count, setCount] = useState(0);
+  const increment = useCallback(() => {
+    setCount((c) => c + 1);
+  }, []);
+  return <button onClick={increment}>{count}</button>;
+}
+@@N (c) => c + 1 ==> updater avoids a count dependency
+@@E
+function Search({ onSearch }) {
+  const [term, setTerm] = useState("");
+  const submit = useCallback(() => {
+    onSearch(term);
+  }, [onSearch, term]);
+  return (
+    <>
+      <input value={term} onChange={(e) => setTerm(e.target.value)} />
+      <button onClick={submit}>Search</button>
+    </>
+  );
+}
+@@N [onSearch, term] ==> new function when either changes
+@@E
+function Poller({ url }) {
+  const load = useCallback(() => fetch(url), [url]);
+  useEffect(() => {
+    load();
+  }, [load]);
+  return <p>Polling {url}</p>;
+}
+@@N [load] ==> stable enough to be a dependency
+@@C memo | memo | 3 | Skips re-rendering a component when its props have not changed.
+@@E
+const PriceLabel = memo(function PriceLabel({ amount }) {
+  return <span>{amount.toFixed(2)}</span>;
+});
+
+function App() {
+  const [qty, setQty] = useState(1);
+  return (
+    <button onClick={() => setQty(qty + 1)}>
+      <PriceLabel amount={9.5} /> x {qty}
+    </button>
+  );
+}
+@@N memo( ==> rerenders only if amount changes
+@@E
+const Chart = memo(
+  function Chart({ points }) {
+    return <p>{points.length} points</p>;
+  },
+  (prev, next) => prev.points.length === next.points.length
+);
+@@N (prev, next) ==> custom comparison function
+@@E
+const Row = memo(function Row({ order }) {
+  return <li>{order.id}</li>;
+});
+
+function Orders() {
+  const orders = [{ id: "A-100" }, { id: "A-101" }];
+  return <ul>{orders.map((o) => <Row key={o.id} order={o} />)}</ul>;
+}
+@@N order={o} ==> same object reference skips work
+@@T context | context
+@@C creating-providing | creating and providing | 2 | Shares a value with a whole subtree by rendering a context as its provider.
+@@E
+const ThemeContext = createContext("light");
+
+function App() {
+  return (
+    <ThemeContext value="dark">
+      <main>Dashboard</main>
+    </ThemeContext>
+  );
+}
+@@N createContext ==> imports from react assumed
+@@N createContext("light") ==> default without a provider
+@@N value="dark" ==> context is its own provider
+@@E
+const UserContext = createContext(null);
+
+function App() {
+  const user = { name: "Ada", plan: "pro" };
+  return (
+    <UserContext value={user}>
+      <main>Account</main>
+    </UserContext>
+  );
+}
+@@N value={user} ==> any value can be shared
+@@E
+const LocaleContext = createContext("en");
+
+function App() {
+  return (
+    <LocaleContext value="fr">
+      <LocaleContext value="de">
+        <p>Willkommen</p>
+      </LocaleContext>
+    </LocaleContext>
+  );
+}
+@@N value="de" ==> the nearest provider wins
+@@C reading-context | reading context | 1 | Reads the nearest context value inside a component with useContext.
+@@E
+const ThemeContext = createContext("light");
+
+function Button() {
+  const theme = useContext(ThemeContext);
+  return <button className={theme}>Save</button>;
+}
+@@N useContext ==> returns the default here
+@@E
+const UserContext = createContext({ name: "guest" });
+
+function Welcome() {
+  const user = useContext(UserContext);
+  return <h1>Hello, {user.name}</h1>;
+}
+@@N useContext(UserContext) ==> rerenders when the value changes
+@@E
+const ThemeContext = createContext("light");
+
+function Label({ show }) {
+  if (!show) return null;
+  const theme = use(ThemeContext);
+  return <span className={theme}>Label</span>;
+}
+@@N use(ThemeContext) ==> use can follow an early return
+@@C stateful-providers | stateful providers | 3 | Combines state and context in a provider component that exposes a value and setter.
+@@E
+const CartContext = createContext(null);
+
+function CartProvider({ children }) {
+  const [items, setItems] = useState([]);
+  return (
+    <CartContext value={{ items, setItems }}>
+      {children}
+    </CartContext>
+  );
+}
+@@N {{ items, setItems }} ==> state and setter in one value
+@@E
+const ThemeContext = createContext(null);
+
+function ThemeProvider({ children }) {
+  const [theme, setTheme] = useState("light");
+  const value = { theme, setTheme };
+  return <ThemeContext value={value}>{children}</ThemeContext>;
+}
+@@N const value ==> name the object before passing it
+@@E
+const AuthContext = createContext(null);
+
+function useAuth() {
+  const auth = useContext(AuthContext);
+  if (!auth) throw new Error("Wrap the app in AuthContext");
+  return auth;
+}
+@@N if (!auth) ==> fail early outside a provider
+@@T usereducer | useReducer
+@@C reducer-functions | reducer functions | 2 | Moves state updates into a pure function of the current state and an action.
+@@E
+function reducer(count, action) {
+  if (action.type === "increment") return count + 1;
+  return count;
+}
+
+function Counter() {
+  const [count, dispatch] = useReducer(reducer, 0);
+  const add = () => dispatch({ type: "increment" });
+  return <button onClick={add}>{count}</button>;
+}
+@@N useReducer ==> imports from react assumed
+@@N reducer, 0 ==> reducer and initial state
+@@E
+function menuReducer(open, action) {
+  if (action === "toggle") return !open;
+  if (action === "close") return false;
+  return open;
+}
+
+function Menu() {
+  const [open, dispatch] = useReducer(menuReducer, false);
+  const toggle = () => dispatch("toggle");
+  return <button onClick={toggle}>{open ? "Open" : "Closed"}</button>;
+}
+@@N dispatch("toggle") ==> an action can be a string
+@@E
+function reducer(status, action) {
+  if (action === "start") return "loading";
+  if (action === "done") return "ready";
+  return status;
+}
+
+function Upload() {
+  const [status, dispatch] = useReducer(reducer, "idle");
+  return <button onClick={() => dispatch("start")}>{status}</button>;
+}
+@@N return status ==> unknown actions keep state
+@@C dispatching-actions | dispatching actions | 2 | Sends action objects that carry a type and a payload describing what happened.
+@@E
+function reducer(todos, action) {
+  if (action.type === "add") return [...todos, action.text];
+  return todos;
+}
+
+function Todos() {
+  const [todos, dispatch] = useReducer(reducer, []);
+  const add = () => dispatch({ type: "add", text: "Write tests" });
+  return <button onClick={add}>{todos.length}</button>;
+}
+@@N action.text ==> payload travels with the action
+@@E
+function reducer(count, action) {
+  return count + action.amount;
+}
+
+function Stepper() {
+  const [count, dispatch] = useReducer(reducer, 0);
+  const add = (amount) => dispatch({ type: "step", amount });
+  return <button onClick={() => add(5)}>{count}</button>;
+}
+@@N { type: "step", amount } ==> shorthand property
+@@E
+function reducer(profile, action) {
+  return { ...profile, [action.key]: action.value };
+}
+
+function Profile() {
+  const [profile, dispatch] = useReducer(reducer, { city: "Oslo" });
+  const move = () => dispatch({ key: "city", value: "Bergen" });
+  return <button onClick={move}>{profile.city}</button>;
+}
+@@N [action.key] ==> computed property name
+@@C init-function | initial state function | 3 | Derives the initial state from an argument with an init function.
+@@E
+const init = (start) => ({ count: start });
+const reducer = (state, action) =>
+  action === "inc" ? { count: state.count + 1 } : state;
+
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, 5, init);
+  const inc = () => dispatch("inc");
+  return <button onClick={inc}>{state.count}</button>;
+}
+@@N reducer, 5, init ==> third argument builds the state
+@@E
+const init = (items) => items.map((name) => ({ name, done: false }));
+const reducer = (list, action) => (action === "clear" ? [] : list);
+
+function Checklist({ items }) {
+  const [list, dispatch] = useReducer(reducer, items, init);
+  const clear = () => dispatch("clear");
+  return <button onClick={clear}>{list.length}</button>;
+}
+@@N items, init ==> init receives items
+@@E
+const init = () => ({ laps: [] });
+const reducer = (state, action) => ({
+  ...state,
+  laps: [...state.laps, action.time],
+});
+
+function Stopwatch() {
+  const [state, dispatch] = useReducer(reducer, null, init);
+  const lap = () => dispatch({ time: Date.now() });
+  return <button onClick={lap}>{state.laps.length}</button>;
+}
+@@N null, init ==> the argument can be null
+@@T custom-hooks | custom hooks
+@@C extracting-logic | extracting logic | 2 | Extracts stateful logic into a function whose name starts with use.
+@@E
+function useToggle(initial = false) {
+  const [on, setOn] = useState(initial);
+  const toggle = () => setOn((v) => !v);
+  return [on, toggle];
+}
+
+function Panel() {
+  const [open, toggle] = useToggle();
+  return <button onClick={toggle}>{open ? "Close" : "Open"}</button>;
+}
+@@N useState ==> imports from react assumed
+@@N useToggle ==> the use prefix marks a hook
+@@E
+function useCounter(start = 0) {
+  const [count, setCount] = useState(start);
+  const increment = () => setCount((c) => c + 1);
+  return { count, increment };
+}
+
+function Likes() {
+  const { count, increment } = useCounter(10);
+  return <button onClick={increment}>{count} likes</button>;
+}
+@@N return { count, increment } ==> a hook can return an object
+@@E
+function useWindowWidth() {
+  const [width, setWidth] = useState(0);
+  useEffect(() => {
+    const update = () => setWidth(window.innerWidth);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return width;
+}
+@@N return width ==> hands the value to callers
+@@C persisted-state | persisting state | 2 | Saves state to web storage and restores it on load.
+@@E
+function useLocalStorage(key, initial) {
+  const [value, setValue] = useState(() => {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : initial;
+  });
+  useEffect(() => {
+    localStorage.setItem(key, JSON.stringify(value));
+  }, [key, value]);
+  return [value, setValue];
+}
+@@N JSON.parse(saved) ==> restores the stored value
+@@E
+function useStoredTheme() {
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem("theme") ?? "light"
+  );
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  return [theme, setTheme];
+}
+@@N ?? "light" ==> fallback when nothing is saved
+@@E
+function useSessionState(key, fallback) {
+  const [value, setValue] = useState(() => {
+    const raw = sessionStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  });
+  const save = (next) => {
+    sessionStorage.setItem(key, JSON.stringify(next));
+    setValue(next);
+  };
+  return [value, save];
+}
+@@N save ==> writes storage and state together
+@@C effect-hooks | hooks with effects | 3 | Wraps an effect and its state in a hook that components can reuse.
+@@E
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then(setData);
+  }, [url]);
+  return data;
+}
+@@N [url] ==> refetches when the url changes
+@@E
+function useDebounce(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
+@@N clearTimeout(id) ==> restarts the wait on each change
+@@E
+function useOnlineStatus() {
+  const subscribe = (notify) => {
+    window.addEventListener("online", notify);
+    window.addEventListener("offline", notify);
+    return () => {
+      window.removeEventListener("online", notify);
+      window.removeEventListener("offline", notify);
+    };
+  };
+  return useSyncExternalStore(subscribe, () => navigator.onLine);
+}
+@@N useSyncExternalStore ==> subscribes to a browser store
+@@T forms-controlled-inputs | forms & controlled inputs
+@@C controlled-inputs | controlled inputs | 1 | Binds an input to state so React controls its value.
+@@E
+function NameField() {
+  const [name, setName] = useState("");
+  return (
+    <input value={name} onChange={(e) => setName(e.target.value)} />
+  );
+}
+@@N useState ==> imports from react assumed
+@@N value={name} ==> state drives the input
+@@N e.target.value ==> the text typed so far
+@@E
+function Bio() {
+  const [bio, setBio] = useState("");
+  return (
+    <>
+      <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+      <small>{bio.length} / 160</small>
+    </>
+  );
+}
+@@N bio.length ==> derived from state
+@@E
+function SizePicker() {
+  const [size, setSize] = useState("medium");
+  return (
+    <select value={size} onChange={(e) => setSize(e.target.value)}>
+      <option value="small">Small</option>
+      <option value="medium">Medium</option>
+      <option value="large">Large</option>
+    </select>
+  );
+}
+@@N <select value ==> value goes on the select
+@@C checkboxes-radios | checkboxes & radios | 2 | Reads checked state from checkboxes and radio buttons.
+@@E
+function Terms() {
+  const [agreed, setAgreed] = useState(false);
+  const toggle = (e) => setAgreed(e.target.checked);
+  return (
+    <label>
+      <input type="checkbox" checked={agreed} onChange={toggle} />
+      Accept terms
+    </label>
+  );
+}
+@@N e.target.checked ==> a boolean, not a string
+@@E
+function Shipping() {
+  const [mode, setMode] = useState("standard");
+  const pick = (e) => setMode(e.target.value);
+  return (
+    <fieldset onChange={pick}>
+      <legend>Speed: {mode}</legend>
+      <input type="radio" name="speed" value="standard" />
+      <input type="radio" name="speed" value="express" />
+    </fieldset>
+  );
+}
+@@N onChange={pick} ==> change events bubble up
+@@E
+function Newsletter() {
+  return (
+    <label>
+      <input type="checkbox" name="news" defaultChecked />
+      Send me updates
+    </label>
+  );
+}
+@@N defaultChecked ==> uncontrolled starting value
+@@C submitting-forms | submitting forms | 2 | Collects form fields and handles submission with preventDefault.
+@@E
+function Login() {
+  const [email, setEmail] = useState("");
+  const submit = (e) => { e.preventDefault(); console.log(email); };
+  return (
+    <form onSubmit={submit}>
+      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <button type="submit">Sign in</button>
+    </form>
+  );
+}
+@@N onSubmit ==> fires on enter or button click
+@@E
+function Contact() {
+  const submit = (event) => {
+    event.preventDefault();
+    console.log(Object.fromEntries(new FormData(event.currentTarget)));
+  };
+  return (
+    <form onSubmit={submit}>
+      <input name="message" />
+      <button>Send</button>
+    </form>
+  );
+}
+@@N new FormData ==> reads fields by name
+@@E
+function Comment() {
+  const [text, setText] = useState("");
+  const submit = (e) => { e.preventDefault(); setText(""); };
+  return (
+    <form onSubmit={submit}>
+      <input value={text} onChange={(e) => setText(e.target.value)} />
+      <button>Post</button>
+    </form>
+  );
+}
+@@N setText("") ==> clears the field after submit
+@@C form-actions | form actions | 3 | Passes an action to the form and reads its state with React 19 hooks.
+@@E
+function Subscribe() {
+  const [message, action] = useActionState(async (prev, formData) => {
+    return `Subscribed ${formData.get("email")}`;
+  }, "");
+  return (
+    <form action={action}>
+      <input name="email" />
+      <button>Join</button>
+      <p>{message}</p>
+    </form>
+  );
+}
+@@N action={action} ==> form action prop, react 19
+@@N prev ==> the last returned state
+@@E
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  const label = pending ? "Saving" : "Save";
+  return <button disabled={pending}>{label}</button>;
+}
+@@N useFormStatus ==> imported from react-dom
+@@N pending ==> true while the form submits
+@@E
+function Likes({ likes }) {
+  const [shown, addLike] = useOptimistic(likes, (n) => n + 1);
+  const like = async () => {
+    addLike();
+    await fetch("/api/like", { method: "POST" });
+  };
+  return (
+    <form action={like}>
+      <button>{shown}</button>
+    </form>
+  );
+}
+@@N useOptimistic ==> shows the update before it lands
+@@T suspense-data-loading | Suspense & data loading
+@@C suspense-fallbacks | Suspense fallbacks | 1 | Shows a fallback while a child suspends, then swaps in the real content.
+@@E
+function Reviews({ reviewsPromise }) {
+  const reviews = use(reviewsPromise);
+  return <p>{reviews.length} reviews</p>;
+}
+
+function Product({ reviewsPromise }) {
+  return (
+    <Suspense fallback={<p>Loading reviews</p>}>
+      <Reviews reviewsPromise={reviewsPromise} />
+    </Suspense>
+  );
+}
+@@N Suspense ==> imports from react assumed
+@@N fallback= ==> shown while the child waits
+@@E
+function Page({ children }) {
+  return (
+    <Suspense fallback={<p>Loading page</p>}>
+      <h1>Account</h1>
+      <Suspense fallback={<p>Loading orders</p>}>{children}</Suspense>
+    </Suspense>
+  );
+}
+@@N <Suspense fallback={<p>Loading orders ==> inner boundary loads separately
+@@E
+function Skeleton() {
+  return <div className="skeleton" aria-busy="true" />;
+}
+
+function Feed({ children }) {
+  return <Suspense fallback={<Skeleton />}>{children}</Suspense>;
+}
+@@N fallback={<Skeleton />} ==> any element can be the fallback
+@@C lazy-components | lazy components | 2 | Loads a component code on demand with lazy and a dynamic import.
+@@E
+const Settings = lazy(() => import("./Settings"));
+
+function App() {
+  return (
+    <Suspense fallback={<p>Loading</p>}>
+      <Settings />
+    </Suspense>
+  );
+}
+@@N import("./Settings") ==> separate chunk loaded on demand
+@@E
+const Editor = lazy(() =>
+  import("./editor").then((m) => ({ default: m.Editor }))
+);
+
+function Notes() {
+  return (
+    <Suspense fallback={null}>
+      <Editor />
+    </Suspense>
+  );
+}
+@@N { default: m.Editor } ==> lazy needs a default export
+@@E
+const Modal = lazy(() => import("./Modal"));
+
+function Toolbar() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Suspense fallback={null}>
+      <button onClick={() => setOpen(true)}>Export</button>
+      {open && <Modal />}
+    </Suspense>
+  );
+}
+@@N {open && <Modal />} ==> code loads on first open
+@@C use-hook | the use hook | 2 | Reads a promise with use so the component suspends until it resolves.
+@@E
+function Comments({ commentsPromise }) {
+  const comments = use(commentsPromise);
+  return (
+    <ul>
+      {comments.map((c) => <li key={c.id}>{c.text}</li>)}
+    </ul>
+  );
+}
+@@N use(commentsPromise) ==> suspends until resolved
+@@E
+const userPromise = fetch("/api/user").then((res) => res.json());
+
+function Greeting() {
+  const user = use(userPromise);
+  return <h1>Hello, {user.name}</h1>;
+}
+@@N userPromise ==> created outside the component
+@@E
+function Profile({ userPromise }) {
+  return <p>{use(userPromise).name}</p>;
+}
+
+function App() {
+  const [promise] = useState(() => Promise.resolve({ name: "Ada" }));
+  return (
+    <Suspense fallback={<p>Loading</p>}>
+      <Profile userPromise={promise} />
+    </Suspense>
+  );
+}
+@@N useState(() => ==> keeps one promise across renders
+@@C transitions | transitions | 2 | Marks a state update as non-urgent with useTransition to keep the UI responsive.
+@@E
+function Tabs() {
+  const [tab, setTab] = useState("home");
+  const [isPending, startTransition] = useTransition();
+  const select = (next) => startTransition(() => setTab(next));
+  return (
+    <button onClick={() => select("reports")}>
+      {isPending ? "Loading" : tab}
+    </button>
+  );
+}
+@@N isPending ==> true while the transition runs
+@@E
+function Saver() {
+  const [isPending, startTransition] = useTransition();
+  const save = () => {
+    startTransition(async () => {
+      await fetch("/api/save", { method: "POST" });
+    });
+  };
+  return <button onClick={save} disabled={isPending}>Save</button>;
+}
+@@N async () => ==> async transitions, react 19
+@@E
+function Filter({ onChange }) {
+  const handle = (e) => {
+    const value = e.target.value;
+    startTransition(() => onChange(value));
+  };
+  return <input onChange={handle} />;
+}
+@@N startTransition ==> standalone version without pending
+@@C deferred-values | deferred values | 3 | Defers a value with useDeferredValue so slow children lag behind the input.
+@@E
+function Search({ results }) {
+  const [query, setQuery] = useState("");
+  const deferred = useDeferredValue(query);
+  return (
+    <>
+      <input value={query} onChange={(e) => setQuery(e.target.value)} />
+      <p>{results.length} results for {deferred}</p>
+    </>
+  );
+}
+@@N deferred ==> trails behind query
+@@E
+function Preview({ text }) {
+  const deferred = useDeferredValue(text);
+  return <p>{deferred.toUpperCase()}</p>;
+}
+@@N useDeferredValue(text) ==> low priority copy of text
+@@E
+function Chart({ range }) {
+  const shown = useDeferredValue(range, "7d");
+  return <p>Showing {shown}</p>;
+}
+@@N "7d" ==> value used on the first render

@@ -34,6 +34,18 @@
   --pg-java: light-dark(#9A5A1F, #E0A06A);
   --pg-dart: light-dark(#007786, #4FD3E6);
   --pg-powershell: light-dark(#2C4A7C, #8DA7D6);
+  --pg-html: light-dark(#616B2E, #98A848);
+  --pg-css: light-dark(#227730, #35B64A);
+  --pg-git: light-dark(#865F27, #CA9449);
+  --pg-react: light-dark(#A84860, #CE8D9D);
+  --pg-django: light-dark(#BF227D, #E779B9);
+  --pg-fastapi: light-dark(#3D7515, #65C322);
+  --pg-express: light-dark(#A4467D, #CD89B0);
+  --pg-solid: light-dark(#1C67BD, #6FA3DD);
+  --pg-dockerfile: light-dark(#A64E30, #D68A71);
+  --pg-angular: light-dark(#CB1D17, #E8837F);
+  --pg-svelte: light-dark(#B14611, #E2885C);
+  --pg-vue: light-dark(#0F755D, #2DB393);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -57,3 +69,15 @@ body[data-pg="bash"] { --pg: var(--pg-bash); }
 body[data-pg="java"] { --pg: var(--pg-java); }
 body[data-pg="dart"] { --pg: var(--pg-dart); }
 body[data-pg="powershell"] { --pg: var(--pg-powershell); }
+body[data-pg="html"] { --pg: var(--pg-html); }
+body[data-pg="css"] { --pg: var(--pg-css); }
+body[data-pg="git"] { --pg: var(--pg-git); }
+body[data-pg="react"] { --pg: var(--pg-react); }
+body[data-pg="django"] { --pg: var(--pg-django); }
+body[data-pg="fastapi"] { --pg: var(--pg-fastapi); }
+body[data-pg="express"] { --pg: var(--pg-express); }
+body[data-pg="solid"] { --pg: var(--pg-solid); }
+body[data-pg="dockerfile"] { --pg: var(--pg-dockerfile); }
+body[data-pg="angular"] { --pg: var(--pg-angular); }
+body[data-pg="svelte"] { --pg: var(--pg-svelte); }
+body[data-pg="vue"] { --pg: var(--pg-vue); }

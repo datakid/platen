@@ -1,0 +1,3 @@
+Verified with vue 3.5.45 (latest stable on npm, 7 Nov 2026; 3.6 is still only rc), @vue/compiler-sfc, Node 22; meta.json and examples use 3.5. Rosters and pigment are my own since the spec has none.
+All 135 examples were compiled with compiler-sfc (script setup, templates, scoped and v-bind styles, TypeScript), server-rendered with vue/server-renderer, and mounted in jsdom 31 where every button, input, select, checkbox and form was exercised: no errors or Vue warnings. lexer.mjs passed a reference tokenizer smoke test.
+Unverified: fetch was stubbed and transitions were not timed; imports from vue are assumed where a topic's first concept says so, and composable examples were run through a probe component rather than a full app.

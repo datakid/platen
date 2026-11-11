@@ -1,0 +1,846 @@
+@@T from-base-images | from & base images
+@@C from-tags | version tags | 1 | Starts an image from a base image pinned to a version tag.
+@@E
+FROM python:3.12-slim
+WORKDIR /app
+@@N python:3.12-slim ==> language version and variant
+@@E
+FROM node:22-alpine
+WORKDIR /app
+@@N alpine ==> small musl based variant
+@@E
+FROM ubuntu:24.04
+RUN apt-get update
+@@N 24.04 ==> a fixed release, not latest
+@@C from-scratch | scratch image | 2 | Starts from the empty scratch image to ship a single static binary.
+@@E
+FROM scratch
+COPY server /server
+ENTRYPOINT ["/server"]
+@@N scratch ==> empty image with no shell
+@@E
+FROM scratch
+COPY --chmod=755 api /api
+CMD ["/api"]
+@@N --chmod=755 ==> sets the executable bit
+@@E
+FROM scratch
+ADD rootfs.tar.xz /
+CMD ["/bin/sh"]
+@@N ADD rootfs.tar.xz / ==> unpacks into the root
+@@C from-platform | platform flag | 2 | Selects the target architecture of a base image with the --platform flag.
+@@E
+FROM --platform=linux/amd64 node:22-alpine
+WORKDIR /app
+@@N --platform=linux/amd64 ==> forces one architecture
+@@E
+FROM --platform=$BUILDPLATFORM golang:1.23 AS build
+WORKDIR /src
+@@N $BUILDPLATFORM ==> the machine doing the build
+@@E
+FROM --platform=linux/arm64 debian:bookworm-slim
+RUN apt-get update
+@@N linux/arm64 ==> os and architecture pair
+@@C from-alias | stage aliases | 1 | Names a stage with AS so later stages and flags can refer to it.
+@@E
+FROM golang:1.23 AS build
+WORKDIR /src
+@@N AS build ==> the stage name
+@@E
+FROM node:22-alpine AS deps
+COPY package.json package-lock.json ./
+RUN npm ci
+@@N AS deps ==> reused by later stages
+@@E
+FROM python:3.12-slim AS base
+ENV PYTHONUNBUFFERED=1
+@@N AS base ==> other stages start from it
+@@T run-layers | RUN & layers
+@@C run-basics | RUN commands | 1 | Runs a command during the build and saves the result as a new layer.
+@@E
+FROM ubuntu:24.04
+RUN apt-get update
+@@N RUN ==> executes at build time
+@@E
+FROM node:22-alpine
+RUN npm install -g pnpm@9
+@@N -g ==> installs globally in the image
+@@E
+FROM python:3.12-slim
+RUN pip install --no-cache-dir requests==2.32.3
+@@N --no-cache-dir ==> keeps the layer small
+@@C run-chaining | chained commands | 1 | Chains commands with && so one layer holds the install and its cleanup.
+@@E
+FROM debian:bookworm-slim
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists
+@@N && ==> stops at the first failure
+@@N rm -rf /var/lib/apt/lists ==> cleanup in the same layer
+@@E
+FROM alpine:3.20
+RUN apk add --no-cache git openssh-client
+@@N --no-cache ==> no package index left behind
+@@E
+FROM python:3.12-slim
+RUN pip install --no-cache-dir flask gunicorn \
+  && useradd --create-home app
+@@N \ ==> continues the instruction
+@@C run-cache-mount | cache mounts | 2 | Keeps package caches between builds with a BuildKit cache mount.
+@@E
+FROM python:3.12-slim
+RUN --mount=type=cache,target=/root/.cache/pip \
+  pip install -r requirements.txt
+@@N type=cache ==> survives between builds
+@@N target=/root/.cache/pip ==> the pip download cache
+@@E
+FROM node:22-alpine
+RUN --mount=type=cache,target=/root/.npm \
+  npm ci
+@@N target=/root/.npm ==> the npm download cache
+@@E
+FROM golang:1.23
+RUN --mount=type=cache,target=/go/pkg/mod \
+  go build ./...
+@@N target=/go/pkg/mod ==> the module cache
+@@C run-heredoc | heredocs | 3 | Writes a multi-line script into one RUN step with a heredoc.
+@@E
+FROM debian:bookworm-slim
+RUN <<EOF
+apt-get update
+apt-get install -y --no-install-recommends curl
+rm -rf /var/lib/apt/lists
+EOF
+@@N <<EOF ==> the body runs as one script
+@@E
+FROM alpine:3.20
+RUN <<EOF
+set -e
+adduser -D app
+mkdir -p /data
+chown app /data
+EOF
+@@N set -e ==> stop at the first failing line
+@@E
+FROM python:3.12-slim
+RUN python3 <<EOF
+import sys
+print(sys.version)
+EOF
+@@N python3 <<EOF ==> the body goes to python
+@@T copy-add | COPY & ADD
+@@C copy-basics | copy files | 1 | Copies files from the build context into the image.
+@@E
+FROM nginx:1.27-alpine
+COPY nginx.conf /etc/nginx/nginx.conf
+@@N COPY ==> source from the build context
+@@E
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt ./
+COPY src/ ./src/
+@@N ./src/ ==> trailing slash marks a directory
+@@E
+FROM node:22-alpine
+COPY package*.json ./
+COPY . .
+@@N package*.json ==> wildcard match
+@@E
+FROM alpine:3.20
+COPY <<EOF /etc/app.conf
+listen = 8080
+log = stdout
+EOF
+@@N <<EOF ==> inline file content
+@@C copy-chown | ownership and mode | 2 | Sets owner and permissions on copied files with --chown and --chmod.
+@@E
+FROM node:22-alpine
+COPY --chown=node:node . /home/node/app
+@@N --chown=node:node ==> user and group of the files
+@@E
+FROM debian:bookworm-slim
+COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
+@@N --chmod=755 ==> executable without a separate step
+@@E
+FROM python:3.12-slim
+RUN useradd --create-home app
+COPY --chown=app:app src/ /home/app/src/
+@@N app:app ==> user must already exist
+@@C copy-from | copy from a stage | 2 | Copies build output from an earlier stage or another image with --from.
+@@E
+FROM golang:1.23 AS build
+RUN go build -o /out/server .
+FROM alpine:3.20
+COPY --from=build /out/server /usr/local/bin/server
+@@N --from=build ==> name of the earlier stage
+@@E
+FROM nginx:1.27-alpine
+COPY --from=node:22-alpine /usr/local/bin/node /usr/local/bin/node
+@@N --from=node:22-alpine ==> an external image works too
+@@E
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /usr/local/bin/uv
+@@N /uv ==> path inside the source image
+@@C add-sources | ADD sources | 2 | Unpacks local archives and fetches remote sources with ADD.
+@@E
+FROM alpine:3.20
+ADD rootfs.tar.gz /
+@@N rootfs.tar.gz ==> local archives are unpacked
+@@E
+FROM debian:bookworm-slim
+ADD --chmod=644 https://example.com/ca.pem /etc/ssl/ca.crt
+@@N https://example.com/ca.pem ==> fetched at build time
+@@E
+FROM alpine:3.20
+ADD https://github.com/example/tools.git#v1.2 /opt/tools
+@@N #v1.2 ==> git tag to check out
+@@T workdir-env-arg | WORKDIR, ENV, ARG
+@@C workdir | working directory | 1 | Sets the directory that later instructions run in and creates it when missing.
+@@E
+FROM node:22-alpine
+WORKDIR /app
+COPY . .
+RUN npm ci
+@@N WORKDIR /app ==> created if it does not exist
+@@E
+FROM python:3.12-slim
+WORKDIR /srv/api
+COPY . .
+CMD ["python", "main.py"]
+@@N WORKDIR /srv/api ==> also where cmd starts
+@@E
+FROM golang:1.23
+WORKDIR /src
+WORKDIR cmd
+RUN pwd
+@@N WORKDIR cmd ==> relative to the previous one
+@@C env | environment variables | 1 | Defines environment variables that persist into the running container.
+@@E
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1 \
+  PYTHONDONTWRITEBYTECODE=1
+@@N PYTHONUNBUFFERED=1 ==> one instruction, two variables
+@@E
+FROM node:22-alpine
+ENV NODE_ENV=production
+ENV PORT=3000
+@@N NODE_ENV=production ==> visible to the running process
+@@E
+FROM debian:bookworm-slim
+ENV APP_HOME=/opt/app
+WORKDIR $APP_HOME
+@@N $APP_HOME ==> expanded from the variable
+@@C arg | build arguments | 1 | Declares a build-time variable that is absent from the running container.
+@@E
+FROM node:22-alpine
+ARG NODE_ENV=development
+RUN echo "$NODE_ENV" > /build-env
+@@N ARG ==> exists only during the build
+@@E
+FROM python:3.12-slim
+ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
+@@N ENV APP_VERSION=$APP_VERSION ==> copies it into the runtime
+@@E
+FROM alpine:3.20
+ARG USER_ID=1000
+RUN adduser -D -u $USER_ID app
+@@N USER_ID=1000 ==> default if none is given
+@@C arg-before-from | ARG before FROM | 2 | Declares an ARG ahead of FROM so the base image tag can be chosen at build time.
+@@E
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim
+@@N ${PYTHON_VERSION} ==> used inside the from line
+@@E
+ARG NODE_VERSION=22
+FROM node:${NODE_VERSION}-alpine
+ARG NODE_VERSION
+@@N ARG NODE_VERSION ==> redeclared to use inside the stage
+@@E
+ARG BASE=alpine:3.20
+FROM ${BASE}
+RUN apk add --no-cache curl
+@@N FROM ${BASE} ==> the whole image can vary
+@@T cmd-vs-entrypoint | CMD vs ENTRYPOINT
+@@C cmd-default | default command | 1 | Sets the default command that runs when the container starts without arguments.
+@@E
+FROM node:22-alpine
+CMD ["node", "server.js"]
+@@N CMD ==> replaced by any run arguments
+@@E
+FROM python:3.12-slim
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "app:app"]
+@@N 0.0.0.0:8000 ==> listen on all interfaces
+@@E
+FROM nginx:1.27-alpine
+CMD ["nginx", "-g", "daemon off;"]
+@@N daemon off; ==> keeps nginx in the foreground
+@@C entrypoint-fixed | fixed executable | 1 | Fixes the executable so arguments given at run time are appended to it.
+@@E
+FROM alpine:3.20
+ENTRYPOINT ["ping"]
+@@N ENTRYPOINT ==> run arguments are appended
+@@E
+FROM python:3.12-slim
+ENTRYPOINT ["python", "-m", "http.server"]
+@@N "http.server" ==> arguments become the port
+@@E
+FROM golang:1.23
+WORKDIR /src
+ENTRYPOINT ["go", "test"]
+@@N ["go", "test"] ==> container acts like a command
+@@C entrypoint-cmd | ENTRYPOINT with CMD | 2 | Pairs ENTRYPOINT with CMD so CMD supplies the default arguments.
+@@E
+FROM alpine:3.20
+ENTRYPOINT ["ping"]
+CMD ["-c", "3", "localhost"]
+@@N CMD ==> default arguments only
+@@E
+FROM python:3.12-slim
+ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver", "0.0.0.0:8000"]
+@@N runserver ==> replaced by run arguments
+@@E
+FROM node:22-alpine
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["node", "server.js"]
+@@N /entrypoint.sh ==> receives cmd as its arguments
+@@C entrypoint-init | init process | 2 | Wraps the main process in an init binary such as tini to forward signals.
+@@E
+FROM node:22-alpine
+RUN apk add --no-cache tini
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "server.js"]
+@@N "--" ==> ends the tini options
+@@E
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends tini
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["sleep", "infinity"]
+@@N /usr/bin/tini ==> reaps zombie processes
+@@E
+FROM alpine:3.20
+ADD --chmod=755 https://example.com/tini /tini
+ENTRYPOINT ["/tini", "--"]
+@@N --chmod=755 ==> makes the download executable
+@@T expose-user | EXPOSE & USER
+@@C expose-ports | exposed ports | 1 | Documents which port the container listens on.
+@@E
+FROM node:22-alpine
+EXPOSE 3000
+@@N EXPOSE ==> documents the port, does not publish it
+@@E
+FROM postgres:16
+EXPOSE 5432
+@@N 5432 ==> default postgres port
+@@E
+FROM nginx:1.27-alpine
+EXPOSE 80 443
+@@N 80 443 ==> several ports in one line
+@@E
+FROM alpine:3.20
+EXPOSE 53/udp
+@@N /udp ==> protocol after the slash
+@@C user-nonroot | non-root user | 1 | Drops root by creating an account and switching to it with USER.
+@@E
+FROM debian:bookworm-slim
+RUN useradd --create-home --shell /bin/bash app
+USER app
+WORKDIR /home/app
+@@N USER app ==> later steps run as this user
+@@E
+FROM alpine:3.20
+RUN addgroup -S app && adduser -S app -G app
+USER app
+@@N -S ==> system account with no password
+@@E
+FROM node:22-alpine
+USER node
+WORKDIR /home/node/app
+@@N USER node ==> account already in the image
+@@C user-numeric | numeric ids | 2 | Pins a numeric uid and gid so ownership matches mounted volumes.
+@@E
+FROM alpine:3.20
+RUN addgroup -g 10001 app && adduser -D -u 10001 -G app app
+USER 10001:10001
+@@N 10001:10001 ==> uid and gid
+@@E
+FROM gcr.io/distroless/static-debian12
+COPY server /server
+USER 65532:65532
+ENTRYPOINT ["/server"]
+@@N 65532:65532 ==> the nonroot account in distroless
+@@E
+FROM python:3.12-slim
+RUN groupadd --gid 1000 app \
+  && useradd --uid 1000 --gid app app
+USER 1000
+@@N USER 1000 ==> numeric ids need no passwd lookup
+@@C user-switch | switching users | 2 | Switches users during the build to run privileged steps before unprivileged ones.
+@@E
+FROM node:22-alpine
+USER root
+RUN apk add --no-cache tini
+USER node
+@@N USER root ==> back to root for the install
+@@E
+FROM python:3.12-slim
+RUN useradd --create-home app
+RUN apt-get update && apt-get install -y --no-install-recommends libpq5
+USER app
+@@N USER app ==> last user wins at run time
+@@E
+FROM alpine:3.20
+RUN adduser -D app
+USER app
+RUN id -un > /home/app/whoami
+USER root
+@@N RUN id -un ==> runs as app
+@@T multi-stage-builds | multi-stage builds
+@@C two-stage | build and runtime | 1 | Builds in a full image and ships only the result in a small runtime image.
+@@E
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY . .
+RUN CGO_ENABLED=0 go build -o /out/api ./cmd/api
+
+FROM alpine:3.20
+COPY --from=build /out/api /usr/local/bin/api
+ENTRYPOINT ["api"]
+@@N AS build ==> compiler stays in this stage
+@@N COPY --from=build ==> only the binary moves on
+@@E
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+@@N /app/dist ==> build output copied across
+@@E
+FROM python:3.12 AS build
+RUN pip wheel --wheel-dir /wheels gunicorn==23.0.0
+
+FROM python:3.12-slim
+COPY --from=build /wheels /wheels
+RUN pip install --no-index --find-links=/wheels gunicorn
+@@N --no-index ==> installs only from the wheels
+@@C stage-reuse | shared base stage | 2 | Branches several stages from one shared base stage.
+@@E
+FROM node:22-alpine AS base
+WORKDIR /app
+COPY package*.json ./
+FROM base AS deps
+RUN npm ci --omit=dev
+FROM base AS dev
+RUN npm ci
+@@N FROM base AS deps ==> inherits workdir and files
+@@E
+FROM python:3.12-slim AS base
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+FROM base AS api
+CMD ["python", "api.py"]
+FROM base AS worker
+CMD ["python", "worker.py"]
+@@N ENV PYTHONUNBUFFERED=1 ==> shared by both stages
+@@E
+FROM debian:bookworm-slim AS tools
+RUN apt-get update && apt-get install -y --no-install-recommends curl jq
+FROM tools AS fetch
+RUN curl -fsS https://example.com/data.json | jq . > /data.json
+@@N FROM tools AS fetch ==> builds on an earlier stage
+@@C test-stage | test stages | 2 | Runs the test suite in its own stage so a failure stops the build.
+@@E
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY . .
+RUN go build -o /out/api .
+FROM build AS test
+RUN go test ./...
+FROM alpine:3.20
+COPY --from=build /out/api /usr/local/bin/api
+@@N FROM build AS test ==> extends the build stage
+@@N go test ./... ==> fails the build on error
+@@E
+FROM python:3.12-slim AS base
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+FROM base AS test
+COPY . .
+RUN pytest -q
+@@N AS test ==> built only when targeted
+@@E
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY . .
+RUN npm ci
+FROM build AS lint
+RUN npm run lint
+@@N npm run lint ==> separate stage for checks
+@@C scratch-final | minimal final stage | 3 | Ends a build with scratch or distroless so the shipped image holds only the binary.
+@@E
+FROM rust:1.82 AS build
+WORKDIR /src
+COPY . .
+RUN cargo build --release
+FROM gcr.io/distroless/cc-debian12
+COPY --from=build /src/target/release/api /api
+CMD ["/api"]
+@@N distroless/cc-debian12 ==> libc but no shell
+@@E
+FROM golang:1.23 AS build
+COPY . /src
+RUN cd /src && CGO_ENABLED=0 go build -o /api
+FROM scratch
+COPY --from=build /api /api
+ENTRYPOINT ["/api"]
+@@N CGO_ENABLED=0 ==> static binary, no libc needed
+@@E
+FROM node:22 AS build
+WORKDIR /app
+COPY . .
+RUN npm ci --omit=dev
+FROM gcr.io/distroless/nodejs22-debian12
+COPY --from=build /app /app
+CMD ["/app/server.js"]
+@@N nodejs22-debian12 ==> runtime only, no npm
+@@T layer-caching-dockerignore | layer caching & .dockerignore
+@@C manifest-first | manifest first | 1 | Copies dependency manifests before source so the install layer stays cached.
+@@E
+FROM node:22-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+@@N COPY package.json ==> changes rarely
+@@N COPY . . ==> changes on every edit
+@@E
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+@@N requirements.txt ==> install reused until this changes
+@@E
+FROM golang:1.23
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+@@N go.mod go.sum ==> modules cached separately
+@@C dockerignore-basics | ignore patterns | 1 | Excludes files from the build context with one pattern per line in .dockerignore.
+@@E
+node_modules
+.git
+*.log
+@@N node_modules ==> never sent to the daemon
+@@N *.log ==> wildcard pattern
+@@E
+__pycache__
+*.pyc
+.venv
+.env
+@@N .env ==> keeps secrets out of the image
+@@E
+dist
+coverage
+Dockerfile
+.dockerignore
+@@N Dockerfile ==> can be ignored without harm
+@@C dockerignore-negation | negated patterns | 2 | Restores a file with an exclamation prefix after a broad pattern excluded it.
+@@E
+*.md
+!README.md
+@@N !README.md ==> exception to the rule above
+@@E
+notes-*
+!notes-final.txt
+@@N !notes-final.txt ==> one file kept from the group
+@@E
+*.test.js
+!critical.test.js
+@@N *.test.js ==> pattern for test files
+@@C cache-order | instruction order | 2 | Orders instructions from least to most frequently changed to keep layers cached.
+@@E
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends curl
+COPY config/ /etc/app/
+COPY bin/ /opt/app/bin/
+@@N RUN apt-get ==> slow and stable, so first
+@@N COPY bin/ ==> changes often, so last
+@@E
+FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=1
+RUN pip install --no-cache-dir gunicorn==23.0.0
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY src/ src/
+@@N gunicorn==23.0.0 ==> pinned tool installed first
+@@E
+FROM alpine:3.20
+RUN apk add --no-cache build-base
+ARG GIT_SHA
+RUN echo "$GIT_SHA" > /revision
+@@N ARG GIT_SHA ==> declared late to keep earlier layers
+@@T healthcheck | HEALTHCHECK
+@@C healthcheck-cmd | probe command | 1 | Marks the container unhealthy when a probe command exits with a failure.
+@@E
+FROM nginx:1.27-alpine
+HEALTHCHECK CMD wget -q --spider http://localhost/ || exit 1
+@@N exit 1 ==> reports unhealthy
+@@E
+FROM postgres:16
+HEALTHCHECK CMD pg_isready -U postgres || exit 1
+@@N pg_isready ==> ships with the postgres image
+@@E
+FROM python:3.12-slim
+HEALTHCHECK CMD python -c \
+  "import urllib.request as u; u.urlopen('http://localhost:8000')"
+@@N python -c ==> no curl needed in slim images
+@@C healthcheck-options | probe timing | 2 | Tunes the probe with interval, timeout, start period and retries.
+@@E
+FROM node:22-alpine
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -q --spider http://localhost:3000/ || exit 1
+@@N --interval=30s ==> time between probes
+@@N --retries=3 ==> failures before unhealthy
+@@E
+FROM alpine:3.20
+HEALTHCHECK --start-period=40s --interval=10s \
+  CMD nc -z localhost 8000 || exit 1
+@@N --start-period=40s ==> grace time while booting
+@@E
+FROM nginx:1.27-alpine
+HEALTHCHECK --timeout=2s \
+  CMD wget -q --spider http://localhost/ || exit 1
+@@N --timeout=2s ==> a slow probe counts as failed
+@@C healthcheck-exec | exec form probes | 2 | Runs the probe directly from a JSON array and reads its exit code.
+@@E
+FROM alpine:3.20
+HEALTHCHECK CMD ["/bin/healthcheck"]
+@@N ["/bin/healthcheck"] ==> exit 0 means healthy
+@@E
+FROM golang:1.23
+HEALTHCHECK --timeout=2s CMD ["/app", "ping"]
+@@N "ping" ==> a flag handled by the app itself
+@@E
+FROM debian:bookworm-slim
+HEALTHCHECK CMD test -f /tmp/ready || exit 1
+@@N test -f ==> healthy once the file exists
+@@C healthcheck-none | disabling checks | 3 | Turns off a health check inherited from the base image with HEALTHCHECK NONE.
+@@E
+FROM nginx:1.27-alpine
+HEALTHCHECK NONE
+@@N NONE ==> drops the inherited check
+@@E
+FROM postgres:16
+HEALTHCHECK NONE
+EXPOSE 5432
+@@N HEALTHCHECK NONE ==> base image probe removed
+@@E
+FROM python:3.12-slim
+HEALTHCHECK NONE
+CMD ["python", "worker.py"]
+@@N worker.py ==> a process with no network port
+@@T volume | VOLUME
+@@C volume-declare | mount points | 1 | Declares a path that holds data outside the container layers.
+@@E
+FROM redis:7-alpine
+VOLUME /data
+@@N VOLUME /data ==> data survives container removal
+@@E
+FROM nginx:1.27-alpine
+VOLUME /var/cache/nginx
+@@N /var/cache/nginx ==> cache kept outside the layers
+@@E
+FROM python:3.12-slim
+WORKDIR /app
+VOLUME /app/uploads
+@@N /app/uploads ==> user files stay out of the image
+@@C volume-lists | multiple paths | 2 | Declares several mount points with a space separated list or a JSON array.
+@@E
+FROM alpine:3.20
+VOLUME ["/data", "/logs"]
+@@N ["/data", "/logs"] ==> json array form
+@@E
+FROM debian:bookworm-slim
+VOLUME /var/lib/app /var/log/app
+@@N /var/lib/app /var/log/app ==> space separated form
+@@E
+FROM mysql:8.4
+VOLUME ["/var/lib/mysql"]
+@@N /var/lib/mysql ==> where mysql stores its data
+@@C volume-prepare | preparing the path | 2 | Creates and chowns the directory before VOLUME because later changes are discarded.
+@@E
+FROM alpine:3.20
+RUN mkdir /data && chown 1000:1000 /data
+VOLUME /data
+@@N chown 1000:1000 ==> done before the volume line
+@@E
+FROM node:22-alpine
+RUN mkdir -p /home/node/uploads && chown node:node /home/node/uploads
+VOLUME /home/node/uploads
+@@N chown node:node ==> volume keeps this owner
+@@E
+FROM debian:bookworm-slim
+RUN mkdir -p /srv/data
+COPY seed.json /srv/data/seed.json
+VOLUME /srv/data
+@@N COPY seed.json ==> seeds a new volume
+@@C run-mounts | build mounts | 3 | Mounts secrets, sources or temporary space into one RUN step without keeping them.
+@@E
+FROM node:22-alpine
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
+  npm ci
+@@N type=secret ==> never written to a layer
+@@E
+FROM golang:1.23
+RUN --mount=type=bind,source=.,target=/src \
+  go build -o /out/api /src
+@@N type=bind ==> context files visible for this step
+@@E
+FROM python:3.12-slim
+RUN --mount=type=tmpfs,target=/tmp \
+  pip wheel --wheel-dir /wheels gunicorn==23.0.0
+@@N type=tmpfs ==> scratch space in memory
+@@T labels-build-arguments | labels & build arguments
+@@C label-pairs | label pairs | 1 | Attaches key and value metadata to an image with LABEL.
+@@E
+FROM alpine:3.20
+LABEL maintainer="platform@example.com"
+@@N LABEL ==> metadata stored in the image
+@@E
+FROM python:3.12-slim
+LABEL version="1.4.0" description="Orders API"
+@@N version="1.4.0" ==> several pairs in one line
+@@E
+FROM node:22-alpine
+LABEL com.example.team="payments"
+@@N com.example.team ==> reverse domain keeps keys unique
+@@C label-oci | OCI annotations | 2 | Uses the org.opencontainers.image keys that registries and tools read.
+@@E
+FROM alpine:3.20
+LABEL org.opencontainers.image.source="https://github.com/acme/orders"
+@@N image.source ==> links the image to its repository
+@@E
+FROM alpine:3.20
+LABEL org.opencontainers.image.title="orders" \
+  org.opencontainers.image.licenses="MIT"
+@@N image.licenses ==> spdx identifier
+@@E
+FROM alpine:3.20
+LABEL org.opencontainers.image.version="1.4.0" \
+  org.opencontainers.image.vendor="Acme"
+@@N image.version ==> release of the software
+@@C label-from-arg | labels from arguments | 2 | Fills labels from ARG values so each build records its own version and commit.
+@@E
+FROM alpine:3.20
+ARG VERSION=dev
+LABEL org.opencontainers.image.version=$VERSION
+@@N $VERSION ==> value from the build
+@@E
+FROM alpine:3.20
+ARG GIT_SHA
+LABEL org.opencontainers.image.revision=$GIT_SHA
+@@N image.revision ==> commit the image was built from
+@@E
+FROM alpine:3.20
+ARG BUILD_DATE
+LABEL org.opencontainers.image.created=$BUILD_DATE
+@@N image.created ==> rfc 3339 timestamp
+@@C build-arg-defaults | argument defaults | 2 | Gives an ARG a default that a --build-arg flag can override at build time.
+@@E
+FROM python:3.12-slim
+ARG LOG_LEVEL=info
+ENV LOG_LEVEL=$LOG_LEVEL
+@@N LOG_LEVEL=info ==> used when no flag is given
+@@E
+FROM node:22-alpine
+ARG PORT=8080
+EXPOSE $PORT
+@@N EXPOSE $PORT ==> expanded from the argument
+@@E
+ARG NODE_VERSION=22
+FROM node:$NODE_VERSION-alpine
+WORKDIR /app
+@@N NODE_VERSION=22 ==> global default for the base tag
+@@T shell-vs-exec-form | shell vs exec form
+@@C shell-form | shell form | 1 | Runs the command through sh -c so variables and pipes work.
+@@E
+FROM alpine:3.20
+CMD echo "home is $HOME"
+@@N $HOME ==> expanded by the shell
+@@E
+FROM debian:bookworm-slim
+RUN ls /etc | wc -l > /count
+@@N | ==> pipes need a shell
+@@E
+FROM python:3.12-slim
+ENV PORT=8000
+CMD python -m http.server $PORT
+@@N $PORT ==> read when the container starts
+@@C exec-form | exec form | 1 | Runs the executable directly from a JSON array with no shell involved.
+@@E
+FROM node:22-alpine
+CMD ["node", "server.js"]
+@@N ["node", "server.js"] ==> json array, double quotes
+@@E
+FROM python:3.12-slim
+ENTRYPOINT ["python", "-m", "http.server", "8000"]
+@@N "8000" ==> each argument is its own string
+@@E
+FROM debian:bookworm-slim
+RUN ["/bin/bash", "-c", "echo build > /stamp"]
+@@N /bin/bash ==> a shell chosen explicitly
+@@C exec-signals | signal handling | 2 | Delivers stop signals straight to the process when it runs in exec form.
+@@E
+FROM node:22-alpine
+CMD ["node", "server.js"]
+@@N CMD [ ==> node receives sigterm directly
+@@E
+FROM node:22-alpine
+CMD node server.js
+@@N CMD node ==> sh is pid 1 and may drop signals
+@@E
+FROM node:22-alpine
+CMD exec node server.js
+@@N exec ==> replaces the shell with node
+@@C shell-instruction | SHELL instruction | 2 | Changes the default shell used by the shell form of later instructions.
+@@E
+FROM ubuntu:24.04
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -fsSL https://example.com/x | tar -xz -C /opt
+@@N pipefail ==> a failed curl fails the pipe
+@@E
+FROM alpine:3.20
+RUN apk add --no-cache bash
+SHELL ["/bin/bash", "-c"]
+RUN echo $BASH_VERSION
+@@N SHELL ==> bash used from here on
+@@E
+FROM debian:bookworm-slim
+SHELL ["/bin/sh", "-eu", "-c"]
+RUN echo "ready"
+@@N -eu ==> exit on errors and unset variables
+@@C shell-in-exec | shell inside exec | 2 | Wraps an exec form command in sh -c when it needs variable expansion.
+@@E
+FROM alpine:3.20
+ENV GREETING=hello
+CMD ["sh", "-c", "echo $GREETING"]
+@@N "sh", "-c" ==> expansion happens in sh
+@@E
+FROM node:22-alpine
+ENV PORT=3000
+ENTRYPOINT ["sh", "-c", "exec node server.js --port $PORT"]
+@@N exec node ==> node still becomes pid 1
+@@E
+FROM alpine:3.20
+ENV GREETING=hello
+CMD ["echo", "$GREETING"]
+@@N "$GREETING" ==> printed literally, not expanded
