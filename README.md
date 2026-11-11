@@ -23,6 +23,7 @@ Run it with any static server from this folder, for example `python3 -m http.ser
 - Proof view: opens after the last variant of a concept. Numerals, expanded tape with the wpm line, plate thumbnails with error dots, hesitation table, token-class accuracy, next concept, again, drill.
 - Settings: every row cycles on click, Enter or the arrow keys. Export json, import json (merge with an inline confirmation), reset (type reset to confirm).
 - Command palette: Ctrl or Cmd plus K. Fuzzy search over languages, topics and concepts, plus commands such as theme dark, font 20, drill python, sprint python 60.
+- Language picker: Ctrl or Cmd plus L, or the language chip in the header. Type to filter (short codes and aliases such as `ts`, `js`, `cs`, `docker` work), the previous language is preselected so `ctrl+l` then Enter flips back, Enter resumes where you left off in that language, Shift+Enter opens its contents. Rows show learned concepts out of total and the version.
 - Index: language list with a progress strip per language (new, seen, learned), and a per-language table of contents with dotted leaders and best wpm.
 - Below 760px or on touch-only devices the typing view is read-only with a keyboard note.
 
@@ -39,11 +40,11 @@ Run it with any static server from this folder, for example `python3 -m http.ser
 
 ## Keys
 
-`esc` restart plate · `enter` next after finish · `ctrl ← →` previous or next plate · `ctrl+k` palette · `ctrl+,` settings · `tab` indent unit when auto-indent skip is off.
+`esc` restart plate · `enter` next after finish · `ctrl ← →` previous or next plate · `ctrl+k` palette · `ctrl+l` language picker · `ctrl+,` settings · `tab` indent unit when auto-indent skip is off.
 
 ## Storage
 
-One key, `platen:v1`, written debounced (500ms) and on `visibilitychange`. Shape: `v`, `settings`, `cursor`, `last` (the session behind the proof view), `plates`, `units`, `sessions` (last 500). Plate ids are `lang/topic/concept/variantIndex`. A corrupt value is copied to `platen:v1:corrupt` before defaults are used. Migrations go in `migrations` in `js/store.js`.
+One key, `platen:v1`, written debounced (500ms) and on `visibilitychange`. Shape: `v`, `settings`, `cursor`, `where` (last position per language), `last` (the session behind the proof view), `plates`, `units`, `sessions` (last 500). Plate ids are `lang/topic/concept/variantIndex`. A corrupt value is copied to `platen:v1:corrupt` before defaults are used. Migrations go in `migrations` in `js/store.js`.
 
 ## Content format
 

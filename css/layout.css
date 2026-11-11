@@ -18,6 +18,10 @@
 .mark .bar { display: inline-block; width: 2px; height: 1em; margin-left: 4px; background: var(--pg); }
 body[data-view="index"] .mark .bar { animation: blink 1.2s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
+.lang { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .06em; }
+.lang:hover { color: var(--ink); }
+.lang .sq { width: 8px; height: 8px; background: var(--pg); }
+.lang.none .sq { background: none; box-shadow: inset 0 0 0 1px var(--rule-2); }
 .crumb { flex: 1; min-width: 0; display: flex; gap: 8px; color: var(--ink-3); white-space: nowrap; overflow: hidden; }
 .crumb i { font-style: normal; color: var(--rule-2); }
 .crumb a:hover { color: var(--ink); }
