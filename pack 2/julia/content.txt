@@ -1,0 +1,1029 @@
+@@T variables-types | variables & types
+@@C variables | variables and assignment | 1 | Binds names to values without declarations.
+@@E
+city = "Oslo"
+visits = 0
+visits += 1
+println("$city: $visits")
+@@N += ==> shorthand for visits + 1
+@@E
+price = 9.99
+quantity = 3
+total = price * quantity
+println(total)
+@@E
+a, b = 1, 2
+a, b = b, a
+println(a, " ", b)
+@@N a, b = b, a ==> swaps without a temp
+@@C types | types | 1 | Inspects the types of numbers, strings and collections with typeof and isa.
+@@E
+println(typeof(42))
+println(typeof(3.14))
+println(typeof("text"))
+println(typeof(true))
+@@N typeof ==> concrete type of a value
+@@E
+x = 42
+println(x isa Int)
+println(x isa Number)
+println(typeof(1//2))
+@@N isa ==> type test
+@@N 1//2 ==> exact rational
+@@E
+println(typeof(1:3))
+println(typeof([1, 2]))
+println(typeof('a'))
+@@N 'a' ==> a Char, not a String
+@@C conversion | conversion and arithmetic | 1 | Converts between types and applies the numeric operators.
+@@E
+println(parse(Int, "42") + 1)
+println(parse(Float64, "3.5") * 2)
+println(string(7) * "!")
+@@N parse ==> string to number
+@@N * ==> joins strings
+@@E
+println(7 / 2)
+println(div(7, 2))
+println(7 % 2)
+println(2^10)
+@@N / ==> always a float
+@@N div ==> integer division
+@@E
+println(Int(3.0))
+println(Float64(3))
+println(round(Int, 2.7))
+println(tryparse(Int, "x"))
+@@N tryparse ==> nothing on failure
+@@C constants-and-annotations | constants and type annotations | 2 | Declares constants and restricts the type of a variable.
+@@E
+const MAX_USERS = 100
+const APP_NAME = "billing"
+println(MAX_USERS, " ", APP_NAME)
+@@N const ==> binding cannot change type
+@@E
+count::Int = 0
+count += 1
+println(count)
+@@N ::Int ==> variable stays an Int
+@@E
+x::Float64 = 3
+println(x)
+@@N x::Float64 = 3 ==> converted to 3.0
+@@T strings | strings
+@@C interpolation | interpolation | 1 | Embeds values and expressions in strings with a dollar sign.
+@@E
+name = "ada"
+println("Hello, $name")
+println("Sum: $(2 + 3)")
+@@N $name ==> variable
+@@N $(2 + 3) ==> any expression
+@@E
+item = "tea"
+qty = 3
+println("$qty x $(item)s")
+@@N $(item) ==> parentheses end the name
+@@E
+price = 4.5
+println("Price: $price EUR")
+println("Escaped: \$price")
+@@N \$ ==> literal dollar sign
+@@C literals-and-concatenation | multiline, raw and concatenation | 2 | Writes multiline and raw strings and joins strings with star and caret.
+@@E
+poem = """
+first line
+second line"""
+println(poem)
+@@N """ ==> spans several lines
+@@E
+path = raw"C:\temp\logs"
+println(path)
+@@N raw"C: ==> no escapes
+@@E
+greeting = "Hello" * ", " * "world"
+println(greeting)
+println("ab"^3)
+@@N * ==> concatenation
+@@N ^ ==> repetition
+@@C string-functions | string functions | 1 | Handles trimming, splitting and searching with standard string functions.
+@@E
+title = "  Quarterly Report  "
+println(strip(title))
+println(uppercase(strip(title)))
+@@N strip ==> removes outer whitespace
+@@E
+csv = "ada,grace,linus"
+names = split(csv, ",")
+println(join(names, " | "))
+@@N split ==> vector of substrings
+@@E
+file = "report.final.pdf"
+println(endswith(file, ".pdf"))
+println(startswith(file, "report"))
+println(file[1:6])
+@@N file[1:6] ==> slice by index
+@@E
+text = "red apple, red car"
+println(replace(text, "red" => "green"))
+println(occursin("apple", text))
+println(findfirst("apple", text))
+@@N => ==> pair of old and new
+@@C chars-and-indexing | characters and indexing | 1 | Reads characters by index and loops over a string.
+@@E
+word = "julia"
+println(word[1])
+println(word[end])
+println(length(word))
+@@N word[1] ==> indexing starts at one
+@@N end ==> last index
+@@E
+for c in "abc"
+    println(c, " ", Int(c))
+end
+@@N Int(c) ==> character code
+@@E
+println(reverse("stream"))
+println(collect("abc"))
+println(isuppercase('A'))
+@@C regex-and-formatting | regex and formatting | 2 | Matches patterns with regex literals and formats numbers with Printf.
+@@E
+using Printf
+@printf("%s has %d items\n", "cart", 3)
+println(@sprintf("%.2f", 3.14159))
+@@N @printf ==> c-style formatting
+@@E
+m = match(r"(\d+)-(\d+)", "call 555-1234")
+println(m.captures)
+@@N r"(\d+) ==> regex literal
+@@E
+println(occursin(r"^\w+@\w+\.com$", "ada@example.com"))
+println(replace("a1b22", r"\d+" => "#"))
+@@T arrays-ranges | arrays & ranges
+@@C creating-arrays | creating arrays | 1 | Builds vectors with literals and constructors.
+@@E
+scores = [90, 72, 85]
+println(scores[1])
+println(length(scores))
+@@N scores[1] ==> first element
+@@E
+zeros_row = zeros(3)
+fills = fill("x", 2)
+println(zeros_row, fills)
+@@N fill ==> repeats one value
+@@E
+names = ["ada", "grace"]
+push!(names, "linus")
+println(names)
+@@N push! ==> bang means it mutates
+@@C modifying-arrays | adding and removing | 1 | Grows and shrinks vectors at either end or at an index.
+@@E
+items = [1, 2, 3]
+push!(items, 4)
+pop!(items)
+pushfirst!(items, 0)
+println(items)
+@@N pop! ==> removes the last element
+@@E
+names = ["ada", "grace", "linus"]
+deleteat!(names, 2)
+insert!(names, 1, "kay")
+println(names)
+@@N insert! ==> before the given index
+@@E
+queue = [1, 2, 3]
+first_item = popfirst!(queue)
+append!(queue, [9, 8])
+println(first_item, " ", queue)
+@@N append! ==> adds many elements
+@@C ranges-and-slicing | ranges and slicing | 1 | Generates sequences with colons and slices vectors by range.
+@@E
+println(collect(1:5))
+println(collect(0:2:10))
+println(collect(10:-3:1))
+@@N 0:2:10 ==> start, step, stop
+@@E
+v = [10, 20, 30, 40]
+println(v[2:3])
+println(v[end])
+println(v[[1, 4]])
+@@N v[[1, 4]] ==> pick by index list
+@@E
+println(range(0, 1, length=5))
+println(sum(1:100))
+@@N range ==> fixed number of points
+@@C matrices | matrices | 2 | Builds two-dimensional arrays and indexes rows and columns.
+@@E
+m = [1 2 3; 4 5 6]
+println(size(m))
+println(m[2, 3])
+println(m[:, 2])
+@@N ; ==> starts a new row
+@@N m[:, 2] ==> whole column
+@@E
+a = [1 2; 3 4]
+b = [5 6; 7 8]
+println(a * b)
+@@N * ==> matrix product
+@@E
+m = reshape(1:6, 2, 3)
+println(m)
+println(sum(m, dims=1))
+@@N dims=1 ==> sums down each column
+@@C sorting-searching | sorting and searching | 1 | Orders vectors and finds elements and extremes.
+@@E
+nums = [3, 1, 2]
+println(sort(nums))
+println(sort(nums, rev=true))
+println(findfirst(==(1), nums))
+@@N ==(1) ==> partially applied equality
+@@E
+words = ["pear", "fig", "apple"]
+println(sort(words, by=length))
+println(maximum(length, words))
+@@N by=length ==> sort key
+@@E
+nums = [3, 8, 1, 9]
+println(argmax(nums))
+println(extrema(nums))
+println(3 in nums)
+@@N argmax ==> index of the maximum
+@@T dict-tuple-set | Dict, Tuple, Set
+@@C dicts | Dict | 1 | Maps keys to values with Dict and the pair operator.
+@@E
+stock = Dict("apple" => 4, "pear" => 0)
+stock["plum"] = 7
+println(stock["apple"])
+@@N => ==> key to value
+@@E
+ages = Dict(:ada => 36, :linus => 54)
+println(get(ages, :grace, 0))
+println(haskey(ages, :ada))
+@@N get ==> default for missing keys
+@@N :ada ==> symbol key
+@@E
+prices = Dict("tea" => 2.5)
+prices["cake"] = 4.0
+delete!(prices, "tea")
+println(prices)
+@@C iterating-dicts | iterating dictionaries | 2 | Loops over pairs, keys and values and builds new dictionaries.
+@@E
+ages = Dict("ada" => 36, "linus" => 54)
+for (name, age) in ages
+    println("$name: $age")
+end
+@@N (name, age) ==> destructures each pair
+@@E
+prices = Dict("tea" => 2.5, "cake" => 4.0)
+println(sort(collect(keys(prices))))
+println(sum(values(prices)))
+@@N keys ==> lazy view of the keys
+@@E
+stock = Dict("a" => 1, "b" => 0)
+println(filter(p -> p.second > 0, stock))
+println(Dict(k => v * 2 for (k, v) in stock))
+@@N p.second ==> the value of a pair
+@@C tuples | tuples | 1 | Groups a fixed number of values, optionally with names.
+@@E
+point = (3, 4)
+println(point[1])
+x, y = point
+println(x + y)
+@@N x, y = point ==> unpacks the tuple
+@@E
+user = (name="ada", age=36)
+println(user.name)
+println(keys(user))
+@@N (name="ada" ==> named tuple
+@@E
+function min_max(v)
+    return minimum(v), maximum(v)
+end
+low, high = min_max([3, 1, 2])
+println(low, " ", high)
+@@N return minimum(v), maximum(v) ==> returns a tuple
+@@C sets | Set | 1 | Keeps unique values and combines sets.
+@@E
+tags = Set(["julia", "web"])
+push!(tags, "julia")
+push!(tags, "cli")
+println(length(tags))
+@@N push! ==> ignores duplicates
+@@E
+a = Set([1, 2, 3])
+b = Set([3, 4])
+println(intersect(a, b))
+println(union(a, b))
+@@E
+seen = Set{Int}()
+println(push!(seen, 7))
+println(7 in seen)
+@@N Set{Int}() ==> empty typed set
+@@T functions-multiple-dispatch | functions & multiple dispatch
+@@C defining-functions | defining functions | 1 | Defines functions with a block or the compact assignment form.
+@@E
+function square(n)
+    return n * n
+end
+println(square(4))
+@@N function ==> block form
+@@E
+area(w, h) = w * h
+println(area(3, 4))
+@@N area(w, h) = ==> one-line form
+@@E
+function volume(w, h, d)
+    w * h * d
+end
+println(volume(2, 3, 4))
+@@N w * h * d ==> returned implicitly
+@@C optional-keyword | optional, keyword and variadic arguments | 2 | Gives arguments defaults, names them after a semicolon or collects extras.
+@@E
+function connect(host, port=80)
+    return "$host:$port"
+end
+println(connect("example.com"))
+@@N port=80 ==> optional positional
+@@E
+function price(base; tax=0.2, discount=0)
+    return base * (1 + tax) - discount
+end
+println(price(100, discount=5))
+@@N ; ==> keywords follow
+@@E
+function total(values...)
+    return sum(values)
+end
+println(total(1, 2, 3))
+@@N values... ==> collects into a tuple
+@@C multiple-dispatch | multiple dispatch | 2 | Chooses a method from the types of all arguments.
+@@E
+describe(x::Int) = "integer $x"
+describe(x::String) = "text $x"
+describe(x::Float64) = "float $x"
+println(describe(1), ", ", describe("a"))
+@@N x::Int ==> method for integers
+@@E
+area(r::Number) = 3.14159 * r^2
+area(w::Number, h::Number) = w * h
+println(area(2), " ", area(2, 3))
+@@N area(r::Number) ==> one argument
+@@N area(w::Number, h::Number) ==> two arguments
+@@E
+combine(a::Int, b::Int) = a + b
+combine(a::String, b::String) = a * b
+println(combine(1, 2), combine("a", "b"))
+@@C anonymous-functions | anonymous functions and closures | 2 | Writes unnamed functions with arrows and returns functions from functions.
+@@E
+double = x -> x * 2
+println(double(4))
+println(map(x -> x^2, 1:4))
+@@N -> ==> anonymous function
+@@E
+function make_adder(n)
+    return x -> x + n
+end
+add5 = make_adder(5)
+println(add5(10))
+@@N n ==> captured by the closure
+@@E
+nums = [3, 1, 2]
+println(sort(nums, by=x -> -x))
+println(filter(iseven, 1:10))
+@@C do-blocks-pipes | do blocks and pipes | 3 | Passes multiline anonymous functions with do and chains calls with the pipe.
+@@E
+result = map([1, 2, 3]) do x
+    x * 10
+end
+println(result)
+@@N do ==> block becomes the first argument
+@@E
+open("out.txt", "w") do io
+    println(io, "hello")
+end
+println(read("out.txt", String))
+rm("out.txt")
+@@N open("out.txt", "w") do io ==> closes the file after
+@@E
+nums = [4, 9, 16]
+println(nums |> sum |> sqrt)
+@@N |> ==> feeds the result forward
+@@T control-flow-comprehensions | control flow & comprehensions
+@@C conditionals | conditionals | 1 | Branches with if, elseif, else, the ternary operator and short-circuit forms.
+@@E
+temperature = 28
+if temperature > 25
+    println("warm")
+elseif temperature > 10
+    println("mild")
+else
+    println("cold")
+end
+@@N elseif ==> one word
+@@E
+score = 72
+println(score >= 60 ? "pass" : "fail")
+@@N ? "pass" ==> ternary operator
+@@E
+x = 5
+x > 3 && println("big")
+x < 3 || println("not small")
+@@N && ==> runs the right side if true
+@@N || ==> runs the right side if false
+@@C loops | for and while loops | 1 | Repeats code over ranges, collections and conditions.
+@@E
+for i in 1:3
+    println(i)
+end
+@@E
+for (i, name) in enumerate(["ada", "grace"])
+    println("$i: $name")
+end
+@@N enumerate ==> index and element
+@@E
+function countdown(n)
+    while n > 0
+        println(n)
+        n -= 1
+    end
+end
+countdown(3)
+@@C break-continue | break, continue and nested loops | 1 | Skips or stops iterations and nests loops in one statement.
+@@E
+for i in 1:10
+    i == 3 && continue
+    i > 5 && break
+    println(i)
+end
+@@N continue ==> next iteration
+@@E
+for i in 1:2, j in 1:2
+    println(i, j)
+end
+@@N i in 1:2, j in 1:2 ==> nested loops in one line
+@@E
+function first_multiple(k)
+    n = 0
+    while true
+        n += 1
+        n % k == 0 && break
+    end
+    return n
+end
+println(first_multiple(7))
+@@C comprehensions | comprehensions and generators | 2 | Builds arrays and lazy sequences from a loop expression.
+@@E
+squares = [n^2 for n in 1:5]
+println(squares)
+@@N [n^2 for n in 1:5] ==> array comprehension
+@@E
+evens = [n for n in 1:10 if iseven(n)]
+println(evens)
+@@N if ==> filters elements
+@@E
+table = [i * j for i in 1:3, j in 1:3]
+println(table)
+println(sum(n^2 for n in 1:4))
+@@N for i in 1:3, j in 1:3 ==> two-dimensional result
+@@T structs-mutability | structs & mutability
+@@C immutable-structs | immutable structs | 1 | Groups typed fields in a struct whose values cannot change.
+@@E
+struct Point
+    x::Float64
+    y::Float64
+end
+p = Point(3.0, 4.0)
+println(p.x)
+@@N struct ==> immutable by default
+@@N ::Float64 ==> field type
+@@E
+struct User
+    name::String
+    age::Int
+end
+ada = User("ada", 36)
+println(ada)
+@@E
+struct Rectangle
+    width::Float64
+    height::Float64
+end
+area(r::Rectangle) = r.width * r.height
+println(area(Rectangle(3, 4)))
+@@N Rectangle(3, 4) ==> converts to Float64
+@@C mutable-structs | mutable structs | 1 | Allows field changes with mutable struct and rejects them otherwise.
+@@E
+mutable struct Counter
+    value::Int
+end
+c = Counter(0)
+c.value += 1
+println(c.value)
+@@N mutable ==> fields can be assigned
+@@E
+mutable struct Account
+    owner::String
+    balance::Float64
+end
+acc = Account("ada", 100)
+acc.balance -= 30
+println(acc)
+@@E
+struct Frozen
+    x::Int
+end
+f = Frozen(1)
+try
+    f.x = 2
+catch e
+    println(typeof(e))
+end
+@@N f.x = 2 ==> throws on immutable structs
+@@C constructors | constructors | 2 | Validates or defaults fields with inner and outer constructors.
+@@E
+struct Port
+    value::Int
+    function Port(value)
+        1 <= value <= 65535 || error("invalid port")
+        new(value)
+    end
+end
+println(Port(8080).value)
+@@N new ==> builds the instance
+@@E
+Base.@kwdef struct Config
+    host::String = "localhost"
+    port::Int = 80
+end
+println(Config(port=8080))
+@@N @kwdef ==> keyword constructor with defaults
+@@E
+struct Circle
+    r::Float64
+end
+Circle() = Circle(1.0)
+println(Circle().r)
+@@N Circle() ==> outer constructor
+@@C methods-and-show | methods, show and operators | 2 | Adds behaviour to types with methods and extends Base functions.
+@@E
+struct Point
+    x::Int
+    y::Int
+end
+Base.show(io::IO, p::Point) = print(io, "($(p.x), $(p.y))")
+println(Point(1, 2))
+@@N Base.show ==> controls printing
+@@E
+struct Money
+    cents::Int
+end
+Base.:+(a::Money, b::Money) = Money(a.cents + b.cents)
+println((Money(5) + Money(7)).cents)
+@@N Base.:+ ==> extends the plus operator
+@@E
+struct Temp
+    c::Float64
+end
+tofahrenheit(t::Temp) = t.c * 9 / 5 + 32
+println(tofahrenheit(Temp(100)))
+@@T abstract-parametric-types | abstract & parametric types
+@@C abstract-types | abstract types | 1 | Declares a supertype with abstract type and subtypes it with the less-than-colon operator.
+@@E
+abstract type Animal end
+struct Dog <: Animal end
+struct Cat <: Animal end
+speak(::Dog) = "woof"
+speak(::Cat) = "meow"
+println(speak(Dog()))
+@@N <: ==> is a subtype of
+@@N ::Dog ==> unnamed argument
+@@E
+abstract type Shape end
+struct Circle <: Shape
+    r::Float64
+end
+struct Square <: Shape
+    side::Float64
+end
+area(c::Circle) = 3.14159 * c.r^2
+area(s::Square) = s.side^2
+println(area(Square(2)))
+@@E
+println(Int <: Number)
+println(supertype(Int))
+println(Float64 <: AbstractFloat)
+@@N supertype ==> parent in the hierarchy
+@@C parametric-types | parametric types | 2 | Parameterises a struct over the types of its fields.
+@@E
+struct Box{T}
+    value::T
+end
+println(Box(42))
+println(Box("text"))
+@@N {T} ==> type parameter
+@@E
+struct Pair{A, B}
+    first::A
+    second::B
+end
+p = Pair(1, "one")
+println(typeof(p))
+@@E
+struct Stack{T}
+    items::Vector{T}
+end
+s = Stack{Int}([1, 2])
+push!(s.items, 3)
+println(s.items)
+@@N Stack{Int} ==> explicit parameter
+@@C parametric-methods | parametric methods and bounds | 2 | Writes methods over type parameters with where and bounds.
+@@E
+firstof(v::Vector{T}) where T = v[1]
+println(firstof([5, 6]))
+@@N where T ==> introduces a type variable
+@@E
+largest(xs::Vector{T}) where T <: Real = maximum(xs)
+println(largest([3, 9, 2]))
+@@N T <: Real ==> upper bound
+@@E
+struct Wrapper{T<:Number}
+    value::T
+end
+println(Wrapper(2.5))
+@@C unions-and-nothing | unions and nothing | 2 | Accepts several types with Union and models absence with nothing.
+@@E
+function describe(x::Union{Int, String})
+    return x isa Int ? "number" : "text"
+end
+println(describe(1), describe("a"))
+@@N Union ==> either type
+@@E
+value = nothing
+println(isnothing(value))
+println(something(value, 0))
+@@N something ==> first non-nothing value
+@@E
+println(typeof(1) == Int)
+println(isa(1.0, AbstractFloat))
+println(typeof([1.5]))
+@@T broadcasting | broadcasting
+@@C dot-operators | dot operators | 1 | Applies an operator to every element with a leading dot.
+@@E
+prices = [5.0, 12.5, 8.0]
+println(prices .* 2)
+println(prices .+ 1)
+@@N .* ==> element-wise multiply
+@@E
+x = [1, 2, 3]
+println(x .^ 2)
+println(x .> 1)
+@@E
+a = [1, 2, 3]
+b = [10, 20, 30]
+println(a .+ b)
+println(a .* b)
+@@C broadcasting-functions | broadcasting functions | 1 | Calls a function on every element with a trailing dot.
+@@E
+println(sqrt.([4, 9, 16]))
+println(uppercase.(["a", "b"]))
+@@N sqrt. ==> broadcasts the call
+@@E
+f(x) = x^2 + 1
+println(f.(1:4))
+@@E
+println(round.(Int, [1.4, 2.6]))
+println(length.(["tea", "cake"]))
+@@C shapes-and-fusion | shapes, fusion and in-place updates | 2 | Expands dimensions and fuses operations with the at-dot macro, then updates in place.
+@@E
+col = [1, 2, 3]
+row = [10 20]
+println(col .+ row)
+@@N col .+ row ==> column and row make a grid
+@@E
+x = [1.0, 2.0, 3.0]
+y = @. 2x^2 + 3x + 1
+println(y)
+@@N @. ==> dots every operation
+@@E
+v = [1, 2, 3]
+v .= v .* 2
+println(v)
+@@N .= ==> writes into v
+@@C map-and-reduce | map, reduce and mapreduce | 2 | Compares map with broadcasting and folds with reduce.
+@@E
+println(map(x -> x * 2, [1, 2, 3]))
+println([1, 2, 3] .* 2)
+@@N map ==> same result, explicit function
+@@E
+println(mapreduce(x -> x^2, +, 1:4))
+println(reduce(+, 1:4))
+@@N mapreduce ==> map then fold
+@@E
+println(collect(zip([1, 2], ["a", "b"])))
+println(map((a, b) -> a * b, [1, 2], [3, 4]))
+@@N zip ==> pairs elements
+@@T macros-basics | macros basics
+@@C using-macros | using built-in macros | 1 | Calls macros with an at sign to inspect, assert and time code.
+@@E
+x = 5
+@show x
+@assert x > 0
+println("ok")
+@@N @show ==> prints name and value
+@@N @assert ==> errors when false
+@@E
+t = @elapsed sum(1:1000)
+println(t >= 0)
+@@N @elapsed ==> seconds taken
+@@E
+using Test
+@test 1 + 1 == 2
+@@N @test ==> from the Test library
+@@C inspecting-macros | timing and expanding | 2 | Times expressions and shows what a macro call expands to.
+@@E
+@time sum(1:1_000_000)
+@@N @time ==> prints time and allocations
+@@E
+println(@macroexpand @assert true)
+@@N @macroexpand ==> shows the generated code
+@@E
+using Test
+@testset "arithmetic" begin
+    @test 2 * 3 == 6
+    @test 7 % 2 == 1
+end
+@@N @testset ==> groups tests
+@@C defining-macros | defining macros | 3 | Writes macros that return code to be compiled in place of the call.
+@@E
+macro twice(expr)
+    return quote
+        $(esc(expr))
+        $(esc(expr))
+    end
+end
+@twice println("hi")
+@@N macro ==> receives unevaluated code
+@@N esc ==> keeps the caller's scope
+@@E
+macro square(x)
+    return :($(esc(x))^2)
+end
+println(@square(4))
+@@E
+macro hello()
+    return :(println("hello"))
+end
+@hello
+@@C expressions-and-quoting | expressions and quoting | 3 | Represents code as data with quote and evaluates it with eval.
+@@E
+ex = :(1 + 2)
+println(eval(ex))
+println(typeof(ex))
+@@N :(1 + 2) ==> quoted expression
+@@E
+ex = quote
+    a = 1
+    a + 1
+end
+println(eval(ex))
+@@N quote ==> multi-line expression
+@@E
+x = 10
+ex = :($x + 1)
+println(ex)
+println(eval(ex))
+@@N $x ==> splices in the value
+@@T modules-packages | modules & packages
+@@C modules | modules | 1 | Groups definitions in a module and brings them in with using.
+@@E
+module Geometry
+export area
+area(r) = 3.14159 * r^2
+end
+using .Geometry
+println(area(2))
+@@N export ==> names exposed by using
+@@N .Geometry ==> module in this file
+@@E
+module Shop
+const TAX = 0.2
+price(base) = base * (1 + TAX)
+end
+println(Shop.price(100))
+@@N Shop.price ==> qualified access
+@@E
+module Util
+export clamp01
+clamp01(x) = clamp(x, 0, 1)
+end
+import .Util: clamp01
+println(clamp01(3))
+@@C standard-library | using the standard library | 1 | Loads standard library modules with using and import.
+@@E
+using Statistics
+println(mean([1, 2, 3]))
+println(std([1, 2, 3]))
+@@N using ==> brings exports into scope
+@@E
+using Dates
+d = Date(2024, 3, 15)
+println(d + Day(10))
+@@E
+import Random
+Random.seed!(1)
+println(rand(1:10) in 1:10)
+@@N import ==> names stay qualified
+@@C extending-and-selecting | selecting and extending names | 2 | Imports single names and extends functions from Base.
+@@E
+using LinearAlgebra: dot
+println(dot([1, 2], [3, 4]))
+@@N : dot ==> only this name
+@@E
+import Base: length
+struct Playlist
+    songs::Vector{String}
+end
+length(p::Playlist) = length(p.songs)
+println(length(Playlist(["a", "b"])))
+@@N import Base: length ==> allows adding methods
+@@E
+using Printf: @printf
+@printf("%5.2f\n", 3.14159)
+@@C nested-modules | nested modules and scope | 2 | Nests modules and reports the current module.
+@@E
+module Outer
+module Inner
+name() = string(@__MODULE__)
+end
+end
+println(Outer.Inner.name())
+@@N @__MODULE__ ==> current module
+@@E
+println(@__MODULE__)
+println(parentmodule(sum))
+@@N parentmodule ==> where a function lives
+@@E
+module Config
+export setting
+setting = 3
+end
+using .Config
+println(setting)
+@@T error-handling | error handling
+@@C try-catch | try and catch | 1 | Handles exceptions with try, catch and an optional bound variable.
+@@E
+try
+    parse(Int, "abc")
+catch e
+    println("failed: ", typeof(e))
+end
+@@N catch e ==> binds the exception
+@@E
+try
+    sqrt(-1)
+catch e
+    println(e isa DomainError)
+end
+@@E
+result = try
+    div(10, 0)
+catch
+    0
+end
+println(result)
+@@N try ==> is an expression
+@@C throwing | throw and error | 1 | Raises errors with error, throw and custom exception types.
+@@E
+function withdraw(balance, amount)
+    amount > balance && throw(ArgumentError("insufficient funds"))
+    return balance - amount
+end
+println(withdraw(100, 30))
+@@N throw ==> raises an exception object
+@@E
+struct NotFound <: Exception
+    id::Int
+end
+try
+    throw(NotFound(7))
+catch e
+    println("missing ", e.id)
+end
+@@N <: Exception ==> custom exception type
+@@E
+function check(x)
+    x < 0 && error("negative value")
+    return x
+end
+println(check(3))
+@@N error ==> raises an ErrorException
+@@C finally-rethrow | finally and rethrow | 2 | Runs cleanup with finally and passes errors on with rethrow.
+@@E
+try
+    println("work")
+finally
+    println("cleanup")
+end
+@@N finally ==> always runs
+@@E
+try
+    try
+        error("inner")
+    catch e
+        rethrow()
+    end
+catch e
+    println(e.msg)
+end
+@@N rethrow ==> keeps the original error
+@@E
+try
+    throw(DomainError(-1, "bad input"))
+catch e
+    println(sprint(showerror, e))
+end
+@@N showerror ==> readable message
+@@C safe-alternatives | assertions and safe lookups | 2 | Avoids exceptions with assertions, defaults and tryparse.
+@@E
+@assert 1 + 1 == 2 "math works"
+println("passed")
+@@N @assert ==> optional message
+@@E
+d = Dict("a" => 1)
+println(get(d, "b", nothing))
+println(get(() -> 0, d, "b"))
+@@N get(() -> 0 ==> lazy default
+@@E
+println(tryparse(Int, "12"))
+println(tryparse(Int, "x"))
+@@T iterators | iterators
+@@C iterating-collections | iterating collections | 1 | Loops over arrays, dictionaries and strings with for.
+@@E
+for x in [10, 20, 30]
+    println(x)
+end
+@@E
+for (k, v) in Dict("a" => 1)
+    println(k, "=", v)
+end
+@@N (k, v) ==> unpacks each pair
+@@E
+for (i, c) in enumerate("abc")
+    println(i, c)
+end
+@@C zip-and-iterators | zip and the Iterators module | 2 | Combines and slices sequences with zip and Iterators helpers.
+@@E
+for (a, b) in zip([1, 2, 3], ["x", "y", "z"])
+    println(a, b)
+end
+@@N zip ==> stops at the shortest
+@@E
+println(collect(Iterators.take(1:10, 3)))
+println(collect(Iterators.drop(1:5, 3)))
+@@N Iterators.take ==> first n items
+@@E
+println(collect(Iterators.partition(1:6, 2)))
+println(collect(Iterators.product(1:2, 3:4)))
+@@N partition ==> chunks of two
+@@C custom-iterators | custom iterators | 3 | Makes a type iterable by defining Base.iterate.
+@@E
+struct Squares
+    n::Int
+end
+Base.iterate(s::Squares, i=1) = i > s.n ? nothing : (i^2, i + 1)
+Base.length(s::Squares) = s.n
+println(collect(Squares(4)))
+@@N nothing ==> signals the end
+@@N (i^2, i + 1) ==> value and next state
+@@E
+struct Countdown
+    from::Int
+end
+function Base.iterate(c::Countdown, state=c.from)
+    state < 1 && return nothing
+    return (state, state - 1)
+end
+for n in Countdown(3)
+    println(n)
+end
+@@E
+struct Evens
+    limit::Int
+end
+function Base.iterate(e::Evens, n=0)
+    n > e.limit ? nothing : (n, n + 2)
+end
+Base.length(e::Evens) = div(e.limit, 2) + 1
+println(collect(Evens(6)))
+@@C generators-lazy | generators and lazy sequences | 2 | Produces values on demand with generators and Iterators.
+@@E
+gen = (n^2 for n in 1:5)
+println(sum(gen))
+println(first(gen))
+@@N (n^2 for n in 1:5) ==> lazy generator
+@@E
+println(collect(Iterators.filter(iseven, 1:10)))
+println(collect(Iterators.map(x -> x * 2, 1:3)))
+@@E
+cycled = Iterators.cycle([1, 2])
+println(collect(Iterators.take(cycled, 5)))
+@@N cycle ==> repeats forever

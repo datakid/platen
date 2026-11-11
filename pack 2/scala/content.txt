@@ -1,0 +1,1015 @@
+@@T val-var-types | val, var & types
+@@C val-and-var | val and var | 1 | Binds names to immutable values with val and mutable ones with var.
+@@E
+val city = "Oslo"
+var visits = 0
+visits += 1
+println(s"$city: $visits")
+@@N val ==> cannot be reassigned
+@@N var ==> can be reassigned
+@@E
+val price = 9.99
+val quantity = 3
+val total = price * quantity
+println(total)
+@@E
+val (a, b) = (1, 2)
+val Array(x, y) = Array(10, 20)
+println(a + b + x + y)
+@@N val (a, b) ==> destructures a tuple
+@@C types-and-inference | types and inference | 1 | Lets the compiler infer types or states them after a colon.
+@@E
+val count: Int = 42
+val ratio: Double = 0.75
+val flag: Boolean = true
+val letter: Char = 'k'
+println((count, ratio, flag, letter))
+@@N : Int ==> explicit type
+@@E
+val big: Long = 3_000_000_000L
+val small: Byte = 127
+val f: Float = 1.5f
+println(big + small + f)
+@@N 3_000_000_000L ==> a Long literal
+@@E
+println(7 / 2)
+println(7 / 2.0)
+println(7 % 2)
+println(math.pow(2, 10))
+@@N 7 / 2 ==> integer division
+@@C numeric-conversion | numeric conversion | 1 | Converts between numbers and strings with explicit methods.
+@@E
+println("42".toInt + 1)
+println("3.5".toDouble * 2)
+println(7.toString + "!")
+println("x1".toIntOption)
+@@N toIntOption ==> returns None on bad input
+@@E
+println(3.7.toInt)
+println(3.toDouble)
+println(math.round(2.5))
+println(Int.MaxValue)
+@@N toInt ==> truncates
+@@E
+val n = 300
+println(n.toByte)
+println(n.toChar.toInt)
+println(BigInt(2).pow(70))
+@@N BigInt ==> arbitrary precision
+@@C lazy-and-aliases | lazy val, aliases and Any | 2 | Delays evaluation with lazy val and names types with type aliases.
+@@E
+lazy val expensive = { println("computing"); 42 }
+println("before")
+println(expensive)
+@@N lazy val ==> computed on first use
+@@E
+type UserId = Int
+val id: UserId = 7
+println(id)
+@@N type ==> alias for Int
+@@E
+val missing: Option[Int] = None
+val anything: Any = "text"
+println((missing, anything))
+@@N Any ==> supertype of everything
+@@T strings-interpolation | strings & interpolation
+@@C interpolators | string interpolation | 1 | Embeds values in strings with the s, f and raw prefixes.
+@@E
+val name = "ada"
+println(s"Hello, $name")
+println(s"Sum: ${2 + 3}")
+@@N s"Hello, $name" ==> interpolation
+@@N ${2 + 3} ==> any expression
+@@E
+val item = "tea"
+val qty = 3
+println(s"$qty x ${item}s")
+@@E
+val price = 4.5
+println(f"Price: $price%.2f EUR")
+println(raw"no\tescape")
+@@N f"Price ==> printf-style format
+@@N raw"no ==> no escape processing
+@@C multiline-concatenation | multiline strings and concatenation | 2 | Writes multiline text in triple quotes and joins or repeats strings.
+@@E
+val poem = """first line
+second line"""
+println(poem)
+@@N """ ==> may span lines
+@@E
+val text = """
+  |one
+  |two
+  """.stripMargin
+println(text)
+@@N stripMargin ==> removes up to the pipe
+@@E
+println("ab" * 3)
+println("Hello" + ", " + "world")
+@@C string-methods | string methods | 1 | Handles trimming, splitting and searching with standard string methods.
+@@E
+val title = "  Quarterly Report  "
+println(title.trim)
+println(title.trim.toUpperCase)
+@@N trim ==> removes outer whitespace
+@@E
+val csv = "ada,grace,linus"
+val names = csv.split(",")
+println(names.mkString(" | "))
+@@N mkString ==> joins with a separator
+@@E
+val file = "report.final.pdf"
+println(file.endsWith(".pdf"))
+println(file.startsWith("report"))
+println(file.take(6))
+@@N take ==> first six characters
+@@E
+val text = "red apple, red car"
+println(text.replace("red", "green"))
+println(text.indexOf("apple"))
+println(text.contains("car"))
+@@C chars-and-regex | characters and regex | 2 | Reads characters and matches text with regular expressions.
+@@E
+val word = "scala"
+println(word(0))
+println(word.last)
+println(word.length)
+@@N word(0) ==> index with parentheses
+@@E
+println("banana".count(_ == 'a'))
+println("stream".reverse)
+println("abc".map(_.toUpper))
+@@N _ == 'a' ==> placeholder lambda
+@@E
+val Pattern = """(\d+)-(\d+)""".r
+"call 555-1234" match
+  case Pattern(a, b) => println(s"$a / $b")
+  case _ => println("no match")
+@@N .r ==> compiles a regex
+@@E
+println("a1b22".replaceAll("\\d+", "#"))
+println("2024-01-15".matches("\\d{4}-\\d{2}-\\d{2}"))
+@@T collections | collections
+@@C lists | lists | 1 | Stores ordered immutable values in a List.
+@@E
+val scores = List(90, 72, 85)
+println(scores.head)
+println(scores.tail)
+println(scores.length)
+@@N head ==> first element
+@@N tail ==> everything else
+@@E
+val nums = List(1, 2, 3)
+println(0 :: nums)
+println(nums :+ 4)
+println(nums ++ List(7, 8))
+@@N :: ==> prepend
+@@N :+ ==> append
+@@E
+println(List.fill(3)("x"))
+println(List.range(0, 5))
+println((1 to 5).toList)
+@@C vectors-and-mutable | vectors, arrays and buffers | 1 | Indexes sequences quickly and changes arrays and buffers in place.
+@@E
+import scala.collection.mutable.ArrayBuffer
+val buf = ArrayBuffer(1, 2)
+buf += 3
+buf.remove(0)
+println(buf)
+@@N ArrayBuffer ==> mutable and growable
+@@E
+val v = Vector(1, 2, 3)
+println(v.updated(1, 20))
+println(v(2))
+@@N updated ==> new vector, one change
+@@E
+val arr = Array(3, 1, 2)
+arr(0) = 9
+println(arr.sorted.mkString(","))
+@@N arr(0) = ==> arrays are mutable
+@@C maps | maps | 1 | Associates keys with values in an immutable Map.
+@@E
+val stock = Map("apple" -> 4, "pear" -> 0)
+println(stock("apple"))
+println(stock.getOrElse("plum", 0))
+@@N -> ==> builds a pair
+@@N getOrElse ==> default for missing keys
+@@E
+val prices = Map("tea" -> 2.5)
+val more = prices + ("cake" -> 4.0)
+println(more)
+println(more.removed("tea"))
+@@N + ==> returns a new map
+@@E
+val ages = Map("ada" -> 36, "linus" -> 54)
+for (name, age) <- ages do println(s"$name: $age")
+@@N (name, age) ==> destructures each entry
+@@C sets-and-tuples | sets and tuples | 1 | Keeps unique values in sets and groups mixed values in tuples.
+@@E
+val tags = Set("scala", "jvm", "scala")
+println(tags.size)
+println(tags + "web")
+@@N Set ==> duplicates removed
+@@E
+val a = Set(1, 2, 3)
+val b = Set(3, 4)
+println(a & b)
+println(a | b)
+println(a -- b)
+@@N & ==> intersection
+@@N | ==> union
+@@E
+val pair = ("ada", 36)
+println(pair._1)
+val (name, age) = pair
+println(s"$name $age")
+@@N pair._1 ==> first element
+@@C transforming | map, filter and fold | 2 | Transforms and summarises collections with higher-order methods.
+@@E
+val nums = List(1, 2, 3, 4)
+println(nums.map(_ * 2))
+println(nums.filter(_ % 2 == 0))
+@@N _ * 2 ==> placeholder lambda
+@@E
+println(List(3, 5, 7).sum)
+println(List(3, 5, 7).foldLeft(0)(_ + _))
+println(List(3, 5, 7).reduce(_ max _))
+@@N foldLeft(0) ==> starts from zero
+@@E
+val words = List("apple", "avocado", "banana")
+println(words.groupBy(_.head))
+println(words.sortBy(_.length))
+println(words.partition(_.startsWith("a")))
+@@N groupBy ==> map of key to list
+@@T functions-lambdas | functions & lambdas
+@@C defining-functions | defining functions | 1 | Defines methods with typed parameters and an expression body.
+@@E
+def square(n: Int): Int = n * n
+println(square(4))
+@@N = ==> body is an expression
+@@E
+def greet(name: String, greeting: String = "Hello"): String =
+  s"$greeting, $name"
+println(greet("ada"))
+@@N = "Hello" ==> default argument
+@@E
+def area(w: Double, h: Double): Double =
+  val result = w * h
+  result
+println(area(3, 4))
+@@N val result ==> block without braces
+@@C named-and-varargs | named arguments and varargs | 2 | Names arguments at the call site and accepts repeated parameters.
+@@E
+def connect(host: String, port: Int = 80): String = s"$host:$port"
+println(connect(port = 8080, host = "example.com"))
+@@N port = ==> named argument
+@@E
+def total(values: Int*): Int = values.sum
+println(total(1, 2, 3))
+@@N Int* ==> repeated parameter
+@@E
+def tags(names: String*): String = names.mkString(",")
+val all = List("a", "b")
+println(tags(all*))
+@@N all* ==> spreads a sequence
+@@C lambdas | lambdas and higher-order functions | 1 | Writes anonymous functions and passes them to other functions.
+@@E
+val double = (n: Int) => n * 2
+println(double(4))
+println(List(1, 2, 3).map(double))
+@@N => ==> lambda arrow
+@@E
+def apply(n: Int, f: Int => Int): Int = f(n)
+println(apply(4, _ + 1))
+@@N Int => Int ==> function type
+@@E
+val add: (Int, Int) => Int = _ + _
+println(add(2, 3))
+println(List(3, 1, 2).sortWith(_ > _))
+@@C currying-closures | currying and closures | 2 | Splits parameter lists and captures surrounding variables.
+@@E
+def add(a: Int)(b: Int): Int = a + b
+val addFive = add(5)
+println(addFive(10))
+@@N (a: Int)(b: Int) ==> two parameter lists
+@@E
+def makeCounter(): () => Int =
+  var count = 0
+  () => { count += 1; count }
+val counter = makeCounter()
+counter()
+println(counter())
+@@N count ==> captured and updated
+@@E
+val rate = 0.2
+val withTax = (price: Double) => price * (1 + rate)
+println(withTax(40))
+@@C by-name-recursion | by-name parameters and recursion | 3 | Delays argument evaluation and writes tail-recursive functions.
+@@E
+def twice(action: => Unit): Unit =
+  action
+  action
+twice(println("hi"))
+@@N => Unit ==> evaluated at each use
+@@E
+import scala.annotation.tailrec
+@tailrec
+def sum(n: Int, acc: Int = 0): Int =
+  if n == 0 then acc else sum(n - 1, acc + n)
+println(sum(100))
+@@N @tailrec ==> compiler checks the loop
+@@E
+def fib(n: Int): Int =
+  if n < 2 then n else fib(n - 1) + fib(n - 2)
+println(fib(10))
+@@T case-classes | case classes
+@@C declaring-case-classes | declaring case classes | 1 | Creates immutable data classes with generated members.
+@@E
+case class User(name: String, age: Int)
+val ada = User("ada", 36)
+println(ada)
+@@N case class ==> generates toString and more
+@@N User("ada" ==> no new needed
+@@E
+case class Point(x: Int, y: Int)
+val p = Point(1, 2)
+println(p.x + p.y)
+@@E
+case class Product(sku: String, price: Double, stock: Int = 0)
+println(Product("A1", 9.5))
+@@N stock: Int = 0 ==> default value
+@@C copy-and-equality | copy and equality | 1 | Copies instances with changes and compares them by value.
+@@E
+case class User(name: String, age: Int)
+val ada = User("ada", 36)
+println(ada.copy(age = 37))
+@@N copy ==> new instance, changed fields
+@@E
+case class Point(x: Int, y: Int)
+println(Point(1, 2) == Point(1, 2))
+println(Point(1, 2).hashCode == Point(1, 2).hashCode)
+@@N == ==> compares fields
+@@E
+case class Order(id: Int, total: Double)
+val first = Order(1, 9.5)
+val second = first.copy(id = 2)
+println(List(first, second))
+@@C methods-and-companions | methods and companions | 2 | Adds methods to case classes and factory functions to companion objects.
+@@E
+case class Rectangle(w: Double, h: Double):
+  def area: Double = w * h
+println(Rectangle(3, 4).area)
+@@N : ==> starts the class body
+@@E
+case class Temperature(celsius: Double)
+object Temperature:
+  def fromF(f: Double): Temperature = Temperature((f - 32) * 5 / 9)
+println(Temperature.fromF(212))
+@@N object ==> companion of the class
+@@E
+case class Money(cents: Int):
+  def +(other: Money): Money = Money(cents + other.cents)
+println(Money(5) + Money(7))
+@@N def + ==> operator method
+@@C destructuring | destructuring and collections | 2 | Unpacks case classes and processes lists of them.
+@@E
+case class Point(x: Int, y: Int)
+val Point(a, b) = Point(3, 4)
+println(a + b)
+@@N Point(a, b) ==> pattern on the left
+@@E
+case class User(name: String, age: Int)
+val users = List(User("ada", 36), User("grace", 30))
+println(users.map(_.name))
+println(users.sortBy(_.age).head)
+@@E
+case class Item(name: String, qty: Int)
+val items = List(Item("pen", 3), Item("ink", 1))
+println(items.map(i => i.qty).sum)
+println(items.maxBy(_.qty))
+@@T pattern-matching | pattern matching
+@@C match-expressions | match expressions | 1 | Selects a result by matching a value against cases.
+@@E
+val code = 404
+val msg = code match
+  case 200 => "ok"
+  case 404 => "not found"
+  case _ => "other"
+println(msg)
+@@N match ==> is an expression
+@@N _ ==> wildcard
+@@E
+def describe(x: Any): String = x match
+  case i: Int => s"int $i"
+  case s: String => s"string $s"
+  case _ => "other"
+println(describe(5))
+@@N i: Int ==> type pattern
+@@E
+val n = 5
+n match
+  case x if x < 0 => println("negative")
+  case 0 => println("zero")
+  case _ => println("positive")
+@@N if x < 0 ==> guard
+@@C destructuring-patterns | destructuring patterns | 1 | Matches tuples, lists and case classes by their shape.
+@@E
+val pair = (1, "one")
+pair match
+  case (n, s) => println(s"$n=$s")
+@@E
+val list = List(1, 2, 3)
+list match
+  case Nil => println("empty")
+  case head :: tail => println(s"$head then $tail")
+@@N head :: tail ==> list pattern
+@@E
+case class Point(x: Int, y: Int)
+Point(0, 5) match
+  case Point(0, y) => println(s"on y axis at $y")
+  case Point(x, y) => println(s"$x,$y")
+@@C alternatives-binders | alternatives and binders | 2 | Combines cases with a pipe, names matched values with at and adds guards.
+@@E
+val day = "sat"
+day match
+  case "sat" | "sun" => println("weekend")
+  case _ => println("weekday")
+@@N | ==> alternative patterns
+@@E
+val list = List(1, 2, 3)
+list match
+  case all @ (first :: _) => println(s"$first of $all")
+  case Nil => println("empty")
+@@N all @ ==> binds the whole value
+@@E
+val score = 85
+val grade = score match
+  case s if s >= 90 => "A"
+  case s if s >= 80 => "B"
+  case _ => "C"
+println(grade)
+@@C extractors | extractors and type patterns | 3 | Defines custom patterns with unapply and matches by runtime type.
+@@E
+object Even:
+  def unapply(n: Int): Boolean = n % 2 == 0
+5 match
+  case Even() => println("even")
+  case _ => println("odd")
+@@N unapply ==> makes a pattern
+@@E
+object Email:
+  def unapply(s: String): Option[(String, String)] =
+    s.split("@") match
+      case Array(user, host) => Some((user, host))
+      case _ => None
+"ada@example.com" match
+  case Email(user, host) => println(s"$user at $host")
+  case _ => println("invalid")
+@@E
+val items: List[Any] = List(1, "two", 3.0)
+for item <- items do
+  item match
+    case i: Int => println(s"int $i")
+    case s: String => println(s"string $s")
+    case d: Double => println(s"double $d")
+@@T traits-classes | traits & classes
+@@C classes | classes | 1 | Defines classes with constructor parameters, fields and methods.
+@@E
+class Counter:
+  private var value = 0
+  def increment(): Unit = value += 1
+  def current: Int = value
+val c = Counter()
+c.increment()
+println(c.current)
+@@N private ==> hidden from outside
+@@N Counter() ==> no new needed
+@@E
+class User(val name: String, var age: Int)
+val ada = User("ada", 36)
+ada.age += 1
+println(s"${ada.name} ${ada.age}")
+@@N val name ==> public read-only field
+@@E
+class Rectangle(width: Double, height: Double):
+  def area: Double = width * height
+println(Rectangle(3, 4).area)
+@@N width ==> plain parameter, not a field
+@@C traits | traits | 1 | Declares abstract and concrete members that classes mix in.
+@@E
+trait Greeter:
+  def greet(name: String): String
+class Formal extends Greeter:
+  def greet(name: String): String = s"Good day, $name"
+println(Formal().greet("ada"))
+@@N trait ==> interface with optional code
+@@E
+trait Logging:
+  def log(msg: String): Unit = println(s"[log] $msg")
+class Service extends Logging
+Service().log("started")
+@@N def log ==> concrete method in a trait
+@@E
+trait Shape:
+  def area: Double
+  def describe: String = s"area $area"
+class Square(side: Double) extends Shape:
+  def area: Double = side * side
+println(Square(2).describe)
+@@C inheritance | inheritance and override | 2 | Extends classes, overrides members and calls super.
+@@E
+class Animal:
+  def speak: String = "..."
+class Dog extends Animal:
+  override def speak: String = "woof"
+println(Dog().speak)
+@@N override ==> required keyword
+@@E
+abstract class Vehicle(val wheels: Int)
+class Bike extends Vehicle(2)
+println(Bike().wheels)
+@@N extends Vehicle(2) ==> passes the argument
+@@E
+class Employee(val name: String):
+  def describe: String = s"employee $name"
+class Manager(name: String) extends Employee(name):
+  override def describe: String = s"manager ${super.describe}"
+println(Manager("ada").describe)
+@@C objects-composition | objects and mixin composition | 2 | Creates singletons, factories and classes that mix in several traits.
+@@E
+object Config:
+  val name = "app"
+  def debug: Boolean = false
+println(Config.name)
+@@N object ==> singleton
+@@E
+class User private (val name: String)
+object User:
+  def apply(name: String): User = new User(name)
+println(User("ada").name)
+@@N private ==> only the companion can construct
+@@E
+trait Walks:
+  def walk: String = "walking"
+trait Swims:
+  def swim: String = "swimming"
+class Duck extends Walks, Swims
+println(Duck().walk + " " + Duck().swim)
+@@N extends Walks, Swims ==> several traits
+@@T enums-adts | enums & ADTs
+@@C enums | enums | 1 | Declares a fixed set of values with enum.
+@@E
+enum Color:
+  case Red, Green, Blue
+println(Color.Red)
+println(Color.values.toList)
+@@N case ==> lists the values
+@@N values ==> all cases
+@@E
+enum Level(val value: Int):
+  case Low extends Level(1)
+  case High extends Level(10)
+println(Level.High.value)
+@@N Level(val value: Int) ==> enum with a field
+@@E
+enum Direction:
+  case North, South
+  def opposite: Direction = this match
+    case North => South
+    case South => North
+println(Direction.North.opposite)
+@@C algebraic-types | algebraic data types | 2 | Models data as enums whose cases carry values.
+@@E
+enum Shape:
+  case Circle(r: Double)
+  case Rect(w: Double, h: Double)
+println(Shape.Circle(2.0))
+@@N Circle(r: Double) ==> case with a payload
+@@E
+enum Expr:
+  case Num(n: Int)
+  case Add(l: Expr, r: Expr)
+println(Expr.Add(Expr.Num(1), Expr.Num(2)))
+@@N Add(l: Expr, r: Expr) ==> recursive case
+@@E
+enum Result[+T]:
+  case Ok(value: T)
+  case Err(message: String)
+println(Result.Ok(42))
+@@N [+T] ==> generic enum
+@@C matching-adts | matching on ADTs | 2 | Evaluates data by matching each case of an enum.
+@@E
+enum Shape:
+  case Circle(r: Double)
+  case Square(s: Double)
+def area(shape: Shape): Double = shape match
+  case Shape.Circle(r) => 3.14159 * r * r
+  case Shape.Square(s) => s * s
+println(area(Shape.Square(3)))
+@@N match ==> exhaustiveness is checked
+@@E
+enum Expr:
+  case Num(n: Int)
+  case Add(l: Expr, r: Expr)
+def eval(e: Expr): Int = e match
+  case Expr.Num(n) => n
+  case Expr.Add(l, r) => eval(l) + eval(r)
+println(eval(Expr.Add(Expr.Num(1), Expr.Num(2))))
+@@E
+enum Light:
+  case Red, Green
+def action(l: Light): String = l match
+  case Light.Red => "stop"
+  case Light.Green => "go"
+println(action(Light.Green))
+@@C sealed-and-utilities | sealed traits and enum utilities | 2 | Closes a hierarchy with sealed and reads enum names and positions.
+@@E
+sealed trait Animal
+case class Dog(name: String) extends Animal
+case class Cat(name: String) extends Animal
+def sound(a: Animal): String = a match
+  case Dog(_) => "woof"
+  case Cat(_) => "meow"
+println(sound(Dog("rex")))
+@@N sealed ==> subtypes known in this file
+@@E
+enum Planet:
+  case Mercury, Venus
+println(Planet.valueOf("Venus"))
+println(Planet.Venus.ordinal)
+@@N valueOf ==> case by name
+@@N ordinal ==> position
+@@E
+enum Status:
+  case Active, Closed
+println(Status.values.map(_.toString).mkString(", "))
+@@T option-either-try | Option, Either, Try
+@@C option | Option | 1 | Represents a possibly missing value with Some and None.
+@@E
+val some: Option[Int] = Some(5)
+val none: Option[Int] = None
+println((some, none))
+@@N Some ==> a present value
+@@N None ==> no value
+@@E
+val users = Map("ada" -> 36)
+println(users.get("ada"))
+println(users.get("linus"))
+@@N get ==> returns an Option
+@@E
+def firstEven(xs: List[Int]): Option[Int] = xs.find(_ % 2 == 0)
+println(firstEven(List(1, 3, 4)))
+@@C option-operations | working with Option | 1 | Transforms and unwraps options with map, flatMap and getOrElse.
+@@E
+val value: Option[Int] = Some(3)
+println(value.map(_ + 1))
+println(value.getOrElse(0))
+println(value.filter(_ > 5))
+@@N getOrElse ==> default for None
+@@E
+val a = Some(2)
+val b = Some(3)
+println(a.flatMap(x => b.map(y => x * y)))
+@@N flatMap ==> chains optional steps
+@@E
+println(Option.empty[String].orElse(Some("fallback")))
+println(Some(5).fold("none")(n => s"got $n"))
+@@N fold ==> one result for each case
+@@C either | Either | 1 | Returns a result or an error with Right and Left.
+@@E
+def parse(s: String): Either[String, Int] =
+  s.toIntOption.toRight(s"not a number: $s")
+println(parse("42"))
+println(parse("x"))
+@@N toRight ==> turns an Option into Either
+@@E
+def divide(a: Int, b: Int): Either[String, Int] =
+  if b == 0 then Left("division by zero") else Right(a / b)
+println(divide(10, 2))
+println(divide(1, 0))
+@@N Left ==> conventionally the error
+@@E
+val result: Either[String, Int] = Right(5)
+println(result.map(_ * 2))
+println(result.fold(e => s"error $e", v => s"value $v"))
+@@C try | Try | 2 | Wraps code that may throw in Success or Failure.
+@@E
+import scala.util.Try
+println(Try("42".toInt))
+println(Try("x".toInt).isFailure)
+@@N Try ==> captures exceptions
+@@E
+import scala.util.{Try, Success, Failure}
+Try(10 / 0) match
+  case Success(v) => println(v)
+  case Failure(e) => println(s"failed: ${e.getMessage}")
+@@N Failure(e) ==> holds the exception
+@@E
+import scala.util.Try
+println(Try("x".toInt).getOrElse(0))
+println(Try(1 / 0).recover { case _: ArithmeticException => -1 })
+@@N recover ==> turns a failure into a value
+@@T for-comprehensions | for-comprehensions
+@@C for-loops | for loops | 1 | Loops over ranges and collections with for and do.
+@@E
+for n <- 1 to 3 do println(n)
+@@N 1 to 3 ==> inclusive range
+@@E
+val names = List("ada", "grace")
+for (name, i) <- names.zipWithIndex do println(s"$i: $name")
+@@N zipWithIndex ==> pairs with positions
+@@E
+for
+  x <- 1 to 2
+  y <- List("a", "b")
+do println(s"$x$y")
+@@N y <- List ==> nested loops
+@@C yield | yield and filters | 1 | Builds a new collection from generators and conditions.
+@@E
+val squares = for n <- 1 to 5 yield n * n
+println(squares)
+@@N yield ==> collects the results
+@@E
+val evens = for n <- 1 to 10 if n % 2 == 0 yield n
+println(evens)
+@@N if ==> filter inside the loop
+@@E
+val pairs = for
+  x <- List(1, 2)
+  y <- List("a", "b")
+yield (x, y)
+println(pairs)
+@@C for-with-options | for with Option, Either and Try | 2 | Sequences Option, Either and Try values and stops at the first failure.
+@@E
+val a = Some(2)
+val b = Some(3)
+val sum = for
+  x <- a
+  y <- b
+yield x + y
+println(sum)
+@@N yield x + y ==> every step succeeded
+@@E
+def parse(s: String): Either[String, Int] = s.toIntOption.toRight("bad")
+val r = for
+  a <- parse("4")
+  b <- parse("x")
+yield a + b
+println(r)
+@@N b <- parse("x") ==> first failure wins
+@@E
+import scala.util.Try
+val result = for
+  a <- Try("4".toInt)
+  b <- Try("5".toInt)
+yield a * b
+println(result)
+@@C definitions-and-guards | definitions and guards | 2 | Binds intermediate values and filters entries inside a for.
+@@E
+val result = for
+  n <- 1 to 5
+  square = n * n
+  if square > 5
+yield square
+println(result)
+@@N square = ==> local definition
+@@E
+val users = Map("ada" -> 36, "linus" -> 54)
+for (name, age) <- users if age > 40 do println(name)
+@@N if age > 40 ==> guard in the loop
+@@E
+val nested = List(List(1, 2), List(3))
+val flat = for
+  inner <- nested
+  n <- inner
+yield n * 10
+println(flat)
+@@T given-using | given & using
+@@C givens | given instances and using clauses | 2 | Provides contextual values with given and receives them with using.
+@@E
+given Int = 42
+def show(using n: Int): String = s"value $n"
+println(show)
+@@N given ==> contextual value
+@@N using ==> filled in by the compiler
+@@E
+trait Greeter:
+  def greet(name: String): String
+given Greeter with
+  def greet(name: String): String = s"Hello, $name"
+def welcome(name: String)(using g: Greeter): String = g.greet(name)
+println(welcome("ada"))
+@@N given Greeter with ==> anonymous instance
+@@E
+given String = "default"
+def label(using s: String): String = s.toUpperCase
+println(label)
+@@C summoning-ordering | summon and Ordering | 2 | Looks up givens with summon and sorts with Ordering instances.
+@@E
+println(summon[Ordering[Int]].compare(1, 2))
+@@N summon ==> fetches a given
+@@E
+def largest[T](xs: List[T])(using ord: Ordering[T]): T = xs.max
+println(largest(List(3, 9, 2)))
+@@E
+given Ordering[String] = Ordering.by(_.length)
+println(List("ccc", "a", "bb").sorted)
+@@N Ordering.by ==> order by a key
+@@C type-classes | type classes | 3 | Describes behaviour for many types with a trait and given instances.
+@@E
+trait Show[A]:
+  def show(a: A): String
+given Show[Int] with
+  def show(a: Int): String = s"int $a"
+def display[A](a: A)(using s: Show[A]): String = s.show(a)
+println(display(5))
+@@N Show[A] ==> behaviour per type
+@@E
+trait Monoid[A]:
+  def empty: A
+  def combine(x: A, y: A): A
+given Monoid[Int] with
+  def empty = 0
+  def combine(x: Int, y: Int) = x + y
+def fold[A](xs: List[A])(using m: Monoid[A]): A =
+  xs.foldLeft(m.empty)(m.combine)
+println(fold(List(1, 2, 3)))
+@@E
+trait Describe[A]:
+  extension (a: A) def describe: String
+given Describe[Boolean] with
+  extension (b: Boolean) def describe = if b then "yes" else "no"
+println(true.describe)
+@@N extension ==> method inside the type class
+@@C context-bounds | context bounds and explicit using | 2 | Shortens using clauses with context bounds and passes givens by hand.
+@@E
+def maxOf[T: Ordering](a: T, b: T): T = summon[Ordering[T]].max(a, b)
+println(maxOf(3, 8))
+@@N T: Ordering ==> context bound
+@@E
+import scala.math.Ordering.Implicits.infixOrderingOps
+def bigger[T: Ordering](a: T, b: T): Boolean = a > b
+println(bigger("b", "a"))
+@@E
+def run(using name: String): String = s"running $name"
+println(run(using "manual"))
+@@N using "manual" ==> explicit argument
+@@T extension-methods | extension methods
+@@C simple-extensions | simple extensions | 1 | Adds methods to existing types with extension.
+@@E
+extension (s: String)
+  def shout: String = s.toUpperCase + "!"
+println("hey".shout)
+@@N extension ==> adds methods to String
+@@E
+extension (n: Int)
+  def isEven: Boolean = n % 2 == 0
+  def squared: Int = n * n
+println(4.isEven)
+println(3.squared)
+@@E
+extension (d: Double)
+  def round2: Double = (d * 100).round / 100.0
+println(3.14159.round2)
+@@C generic-extensions | generic extensions | 2 | Writes extensions with type parameters.
+@@E
+extension [T](xs: List[T])
+  def second: Option[T] = xs.drop(1).headOption
+println(List(1, 2, 3).second)
+@@N [T] ==> works for any element type
+@@E
+extension [T](x: T)
+  def pipe[R](f: T => R): R = f(x)
+println(5.pipe(_ + 1))
+@@E
+extension (xs: List[Int])
+  def average: Double = xs.sum.toDouble / xs.length
+println(List(1, 2, 3, 4).average)
+@@N List[Int] ==> only for int lists
+@@C operators-and-custom | extensions on your own types | 2 | Adds operators and conversions to case classes.
+@@E
+case class Money(cents: Int)
+extension (m: Money)
+  def +(other: Money): Money = Money(m.cents + other.cents)
+println(Money(5) + Money(7))
+@@N def + ==> operator extension
+@@E
+case class Vec(x: Int, y: Int)
+extension (v: Vec)
+  def *(k: Int): Vec = Vec(v.x * k, v.y * k)
+println(Vec(1, 2) * 3)
+@@E
+case class Temp(c: Double)
+extension (t: Temp)
+  def toF: Double = t.c * 9 / 5 + 32
+println(Temp(100).toF)
+@@C grouped-extensions | grouped extensions and imports | 3 | Groups several methods in one extension and exports them from an object.
+@@E
+extension (s: String)
+  def isPalindrome: Boolean = s == s.reverse
+  def words: List[String] = s.split(" ").toList
+println("level".isPalindrome)
+println("a b c".words)
+@@N def words ==> shares the receiver
+@@E
+extension (xs: List[Int])
+  def sumBy(f: Int => Int): Int = xs.map(f).sum
+println(List(1, 2, 3).sumBy(_ * 10))
+@@E
+object Syntax:
+  extension (s: String) def twice: String = s + s
+import Syntax.*
+println("ab".twice)
+@@N import Syntax.* ==> brings the extension in
+@@T future | Future
+@@C creating-futures | creating futures | 1 | Starts asynchronous work with Future and waits with Await.
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val f = Future(6 * 7)
+println(Await.result(f, 1.second))
+@@N Future(6 ==> runs on the thread pool
+@@N Await.result ==> blocks for the value
+@@E
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+val done = Future.successful(1)
+val failed = Future.failed(new RuntimeException("boom"))
+println(done.isCompleted)
+@@N Future.successful ==> already completed
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val slow = Future { Thread.sleep(50); "done" }
+println(Await.result(slow, 2.seconds))
+@@C transforming-futures | transforming futures | 2 | Chains results with map, flatMap and for.
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val f = Future(2).map(_ + 1)
+println(Await.result(f, 1.second))
+@@N map ==> transforms the eventual value
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val total = for
+  a <- Future(1)
+  b <- Future(2)
+yield a + b
+println(Await.result(total, 1.second))
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val f = Future(10).flatMap(n => Future(n * 2))
+println(Await.result(f, 1.second))
+@@N flatMap ==> next step returns a Future
+@@C combining-futures | combining futures and handling errors | 2 | Collects several futures and recovers from failures.
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val all = Future.sequence(List(Future(1), Future(2)))
+println(Await.result(all, 1.second))
+@@N Future.sequence ==> list of futures to future of list
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val safe = Future(1 / 0).recover { case _: ArithmeticException => -1 }
+println(Await.result(safe, 1.second))
+@@N recover ==> value instead of a failure
+@@E
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+Future(10).onComplete(r => println(r))
+Thread.sleep(100)
+@@N onComplete ==> callback with a Try
+@@C promises-parallelism | promises and parallel futures | 3 | Completes futures by hand and runs independent futures in parallel.
+@@E
+import scala.concurrent.{Promise, Await}
+import scala.concurrent.duration.*
+val p = Promise[Int]()
+p.success(42)
+println(Await.result(p.future, 1.second))
+@@N Promise ==> a future you complete yourself
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val a = Future { Thread.sleep(50); 1 }
+val b = Future { Thread.sleep(50); 2 }
+val sum = for x <- a; y <- b yield x + y
+println(Await.result(sum, 2.seconds))
+@@N val b ==> started before the for
+@@E
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.*
+val results = Future.traverse(List(1, 2, 3))(n => Future(n * n))
+println(Await.result(results, 1.second))
+@@N traverse ==> map then sequence

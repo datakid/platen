@@ -1,0 +1,1303 @@
+@@T variables-null-safety | variables & null safety
+@@C var-and-types | var and typed variables | 1 | Declares variables with var, an explicit type or num.
+@@E
+var city = 'Oslo';
+var visits = 3;
+double ratio = visits / 4;
+@@N var ==> type inferred from the value
+@@N double ==> explicit type
+@@E
+String title = 'Report';
+int pages = 12;
+bool draft = true;
+@@N int ==> whole numbers
+@@E
+var scores = [90, 85, 77];
+var total = 0;
+num average = 84.5;
+@@N num ==> int or double
+@@C final-and-const | final and const | 1 | Creates variables that are assigned once with final or const.
+@@E
+final now = DateTime.now();
+const maxRetries = 3;
+@@N final ==> set once at runtime
+@@N const ==> fixed at compile time
+@@E
+final String owner = 'ada';
+const List<int> primes = [2, 3, 5, 7];
+@@N const List ==> deeply immutable list
+@@E
+const taxRate = 0.2;
+final price = 40.0;
+final total = price * (1 + taxRate);
+@@C nullable-types | nullable types | 2 | Marks values that may be absent by adding a question mark to the type.
+@@E
+String? nickname;
+nickname = 'ada';
+nickname = null;
+@@N String? ==> may hold null
+@@E
+int? age = int.tryParse('42');
+List<String>? tags;
+Map<String, int>? stock;
+@@N tryParse ==> returns null on bad input
+@@E
+String? lookup(Map<String, String> users, String id) {
+  return users[id];
+}
+@@N users[id] ==> map lookups are nullable
+@@C null-aware-operators | null-aware operators | 2 | Handles nullable values with ??, ?., ??= and the bang operator.
+@@E
+String? name;
+final label = name ?? 'guest';
+final size = name?.length;
+@@N ?? ==> fallback when null
+@@N ?. ==> skips the call on null
+@@E
+Map<String, int> counts = {};
+counts['a'] ??= 0;
+counts['a'] = counts['a']! + 1;
+@@N ??= ==> assigns only when null
+@@N ! ==> asserts non-null
+@@E
+int parse(String? raw) {
+  return int.parse(raw!);
+}
+@@N raw! ==> throws if raw is null
+@@T strings | strings
+@@C quotes-and-interpolation | quotes and interpolation | 1 | Builds strings with single or double quotes and embedded expressions.
+@@E
+final user = 'ada';
+final greeting = 'Hello, $user';
+final total = 'Sum: ${2 + 3}';
+@@N $user ==> simple variable
+@@N ${2 + 3} ==> any expression
+@@E
+final item = 'tea';
+final qty = 3;
+final line = '$qty x $item = ${qty * 4}';
+@@E
+final note = "It's ready";
+final path = 'C:\\temp\\logs';
+final tabbed = 'name\tcity';
+@@N \\ ==> escaped backslash
+@@N \t ==> tab character
+@@C multiline-and-raw | multiline and raw strings | 2 | Writes multiline, raw and adjacent string literals.
+@@E
+final poem = '''
+first line
+second line''';
+@@N ''' ==> spans several lines
+@@E
+final pattern = r'\d+\.\d+';
+final winPath = r'C:\temp\logs';
+@@N r' ==> raw, no escapes
+@@E
+final message = 'Order '
+    'shipped '
+    'today';
+@@N 'shipped ' ==> adjacent literals join
+@@C string-methods | common string methods | 1 | Transforms and inspects strings with built-in methods.
+@@E
+final title = '  Quarterly Report  ';
+final trimmed = title.trim();
+final upper = trimmed.toUpperCase();
+@@N trim ==> removes outer whitespace
+@@E
+final csv = 'ada,grace,linus';
+final names = csv.split(',');
+final joined = names.join(' | ');
+@@N split ==> returns a list
+@@E
+final file = 'report.final.pdf';
+final isPdf = file.endsWith('.pdf');
+final stem = file.substring(0, file.lastIndexOf('.'));
+@@N lastIndexOf ==> last match position
+@@E
+final id = '7'.padLeft(3, '0');
+final dashes = '-' * 10;
+final has = 'dart'.contains('ar');
+@@N padLeft ==> pads to a width
+@@C string-buffer | StringBuffer | 2 | Builds long strings efficiently with a StringBuffer.
+@@E
+final buffer = StringBuffer();
+buffer.write('id=');
+buffer.writeln(42);
+@@N writeln ==> adds a newline
+@@E
+final buffer = StringBuffer()
+  ..write('Total: ')
+  ..write(19.5)
+  ..write(' EUR');
+final text = buffer.toString();
+@@N .. ==> cascade on the same object
+@@E
+final parts = ['a', 'b', 'c'];
+final buffer = StringBuffer();
+buffer.writeAll(parts, '-');
+print(buffer);
+@@N writeAll ==> joins with a separator
+@@T list-map-set | List, Map, Set
+@@C lists | lists | 1 | Stores ordered items in a growable list.
+@@E
+final scores = [90, 72, 85];
+scores.add(60);
+final top = scores.first;
+@@N add ==> appends at the end
+@@E
+final names = <String>['ada', 'grace'];
+names.insert(0, 'linus');
+names.remove('grace');
+print(names.length);
+@@N <String> ==> explicit element type
+@@E
+final squares = List<int>.generate(5, (i) => i * i);
+final copy = [...squares];
+final last = squares.last;
+@@N generate ==> builds from the index
+@@C maps | maps | 1 | Associates keys with values in a map.
+@@E
+final stock = {'apple': 4, 'pear': 0};
+stock['plum'] = 7;
+final apples = stock['apple'];
+@@N stock['plum'] ==> adds or replaces a key
+@@E
+final prices = <String, double>{'tea': 2.5, 'cake': 4.0};
+prices.remove('tea');
+print(prices.containsKey('cake'));
+@@E
+final ages = {'ada': 36, 'linus': 54};
+for (final entry in ages.entries) {
+  print('${entry.key}: ${entry.value}');
+}
+@@N entries ==> key and value pairs
+@@C sets | sets | 1 | Keeps unique items in a set and combines sets with set operations.
+@@E
+final tags = <String>{'dart', 'web'};
+tags.add('dart');
+tags.add('cli');
+@@N add ==> ignores duplicates
+@@E
+final a = {1, 2, 3};
+final b = {3, 4};
+print(a.union(b));
+print(a.intersection(b));
+@@N union ==> items in either set
+@@E
+final seen = <int>{};
+for (final n in [4, 4, 7]) {
+  if (!seen.add(n)) print('repeat $n');
+}
+@@N seen.add ==> false when already present
+@@C collection-literals | collection if, for and spread | 2 | Builds collections with spread, if and for elements.
+@@E
+final base = [1, 2];
+final all = [...base, 3, 4];
+@@N ... ==> spread operator
+@@E
+final admin = true;
+final menu = ['home', if (admin) 'settings', 'help'];
+@@N if ==> conditional element
+@@E
+final names = ['ada', 'grace'];
+final tags = [for (final n in names) n.toUpperCase()];
+@@N for ==> loop inside a literal
+@@T functions-named-parameters | functions & named parameters
+@@C functions-and-arrows | functions and arrow syntax | 1 | Defines functions with block bodies or the arrow shorthand.
+@@E
+int square(int n) => n * n;
+@@N => ==> single expression body
+@@E
+double area(double w, double h) => w * h;
+bool isEven(int n) => n % 2 == 0;
+@@E
+String greet(String name) {
+  return 'Hello, $name';
+}
+@@N return ==> block body needs return
+@@C optional-positional | optional positional parameters | 2 | Makes trailing positional parameters optional with square brackets.
+@@E
+String join(String a, [String b = '', String c = '']) {
+  return '$a$b$c';
+}
+@@N [ ==> optional positional group
+@@E
+int add(int a, [int? b]) => a + (b ?? 0);
+@@N int? b ==> optional without a default
+@@E
+void log(String message, [String level = 'info']) {
+  print('[$level] $message');
+}
+@@C named-parameters | named and required parameters | 1 | Takes labelled arguments with braces, defaults and required.
+@@E
+void connect({required String host, int port = 80}) {
+  print('$host:$port');
+}
+@@N required ==> caller must pass it
+@@N port = 80 ==> default value
+@@E
+double price({required double base, double tax = 0.2}) {
+  return base * (1 + tax);
+}
+@@E
+void send(String to, {String? subject, bool urgent = false}) {
+  print('$to $subject $urgent');
+}
+@@N {String? subject ==> optional named
+@@C functions-as-values | functions as values | 2 | Stores and passes functions as first-class values.
+@@E
+final doubler = (int n) => n * 2;
+print(doubler(4));
+@@N (int n) => ==> anonymous function
+@@E
+List<int> apply(List<int> xs, int Function(int) f) {
+  return xs.map(f).toList();
+}
+@@N int Function(int) ==> function type
+@@E
+final names = ['ada', 'grace'];
+names.forEach((n) => print(n));
+final lengths = names.map((n) => n.length).toList();
+@@N map ==> lazy until toList
+@@T classes-constructors | classes & constructors
+@@C fields-and-methods | fields and methods | 1 | Groups state and behaviour in a class with fields and methods.
+@@E
+class Counter {
+  int value = 0;
+  void increment() => value++;
+}
+@@N value++ ==> mutates the field
+@@E
+class Rectangle {
+  double width = 0;
+  double height = 0;
+  double get area => width * height;
+}
+@@N get ==> computed property
+@@E
+class Temperature {
+  double celsius = 20;
+  double toFahrenheit() => celsius * 9 / 5 + 32;
+}
+@@C initializing-formals | initializing formals | 1 | Assigns fields directly from constructor parameters with this.
+@@E
+class User {
+  final String name;
+  final int age;
+  User(this.name, this.age);
+}
+@@N this.name ==> assigns the field
+@@E
+class Point {
+  final double x;
+  final double y;
+  const Point(this.x, this.y);
+}
+@@N const ==> allows compile-time instances
+@@E
+class Item {
+  final String sku;
+  final int qty;
+  Item({required this.sku, this.qty = 1});
+}
+@@N this.qty = 1 ==> named with default
+@@E
+class Circle {
+  final double radius;
+  final double area;
+  Circle(this.radius) : area = 3.14159 * radius * radius;
+}
+@@N : area ==> initializer list
+@@C named-constructors | named constructors | 2 | Adds alternative constructors with distinct names.
+@@E
+class Point {
+  final double x;
+  final double y;
+  Point(this.x, this.y);
+  Point.origin() : x = 0, y = 0;
+}
+@@N Point.origin ==> named constructor
+@@E
+class Color {
+  final int value;
+  Color(this.value);
+  Color.fromHex(String hex) : value = int.parse(hex, radix: 16);
+}
+@@N radix: 16 ==> parses hexadecimal
+@@E
+class Range {
+  final int start;
+  final int end;
+  Range(this.start, this.end);
+  Range.upTo(int end) : this(0, end);
+}
+@@N : this ==> redirects to another constructor
+@@C factory-constructors | factory constructors | 3 | Returns shared or computed instances with factory constructors.
+@@E
+class Logger {
+  static final Logger _instance = Logger._();
+  Logger._();
+  factory Logger() => _instance;
+}
+@@N Logger._ ==> private constructor
+@@N factory ==> may return an existing object
+@@E
+class Config {
+  final Map<String, String> values;
+  Config(this.values);
+  factory Config.empty() => Config({});
+}
+@@E
+class User {
+  final String name;
+  User(this.name);
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(json['name'] as String);
+  }
+}
+@@N as String ==> cast from dynamic
+@@T inheritance-mixins | inheritance & mixins
+@@C extends-and-super | extends and super | 1 | Reuses and overrides behaviour with extends and super.
+@@E
+class Animal {
+  void speak() => print('...');
+}
+class Dog extends Animal {
+  @override
+  void speak() => print('woof');
+}
+@@N extends ==> inherits members
+@@N @override ==> replaces the parent method
+@@E
+class Vehicle {
+  final int wheels;
+  Vehicle(this.wheels);
+}
+class Bike extends Vehicle {
+  Bike() : super(2);
+}
+@@N super(2) ==> calls the parent constructor
+@@E
+class Employee {
+  String describe() => 'employee';
+}
+class Manager extends Employee {
+  @override
+  String describe() => 'manager, ${super.describe()}';
+}
+@@C abstract-classes | abstract classes | 2 | Declares members that subclasses must implement.
+@@E
+abstract class Shape {
+  double area();
+}
+class Square extends Shape {
+  final double side;
+  Square(this.side);
+  @override
+  double area() => side * side;
+}
+@@N abstract ==> cannot be instantiated
+@@E
+abstract class Repository {
+  Future<String> load(String id);
+  void log(String message) => print(message);
+}
+@@N load ==> no body, must be overridden
+@@E
+abstract class Payment {
+  double get fee;
+  double total(double amount) => amount + fee;
+}
+@@N get fee ==> abstract getter
+@@C implements-interfaces | implements and interfaces | 2 | Promises an interface with implements and overrides every member.
+@@E
+abstract interface class Greeter {
+  String greet(String name);
+}
+class Formal implements Greeter {
+  @override
+  String greet(String name) => 'Good day, $name';
+}
+@@N interface ==> can only be implemented
+@@E
+class Printer {
+  void printLine(String s) => print(s);
+}
+class Quiet implements Printer {
+  @override
+  void printLine(String s) {}
+}
+@@N implements ==> no inherited code
+@@E
+class Version implements Comparable<Version> {
+  final int major;
+  Version(this.major);
+  @override
+  int compareTo(Version other) => major.compareTo(other.major);
+}
+@@C mixins | mixins | 2 | Shares behaviour across classes with mixins and with.
+@@E
+mixin Walker {
+  void walk() => print('walking');
+}
+class Robot with Walker {}
+@@N with ==> applies the mixin
+@@E
+mixin Logging {
+  void log(String message) => print('[log] $message');
+}
+class Service with Logging {
+  void run() => log('running');
+}
+@@E
+class Animal {}
+mixin Swimmer on Animal {
+  void swim() => print('swimming');
+}
+class Fish extends Animal with Swimmer {}
+@@N on Animal ==> restricts which classes can use it
+@@T future-async-await | Future & async/await
+@@C async-and-await | async functions and await | 1 | Writes asynchronous code that reads top to bottom with async and await.
+@@E
+Future<String> fetchName() async {
+  await Future.delayed(const Duration(seconds: 1));
+  return 'ada';
+}
+@@N async ==> wraps the result in a Future
+@@N await ==> pauses until completion
+@@E
+Future<int> total() async {
+  final a = await Future.value(2);
+  final b = await Future.value(3);
+  return a + b;
+}
+@@E
+Future<void> main() async {
+  final name = await Future.value('ada');
+  print(name);
+}
+@@N Future<void> ==> async main
+@@C creating-futures | creating futures | 2 | Creates futures that complete with a value, an error or a computation.
+@@E
+final ready = Future.value(42);
+final failed = Future<int>.error(StateError('no data'));
+@@N Future.value ==> already completed
+@@E
+final later = Future.delayed(
+  const Duration(milliseconds: 50),
+  () => 'done',
+);
+@@N delayed ==> completes after a pause
+@@E
+Future<int> compute() {
+  return Future(() => 6 * 7);
+}
+@@N Future( ==> runs the callback soon
+@@C future-errors | handling future errors | 2 | Catches failed futures with try, on and catchError.
+@@E
+Future<void> load() async {
+  try {
+    await Future.error(Exception('offline'));
+  } catch (e) {
+    print('failed: $e');
+  }
+}
+@@N catch ==> receives the thrown error
+@@E
+Future<int> parse(String raw) async {
+  try {
+    return int.parse(raw);
+  } on FormatException {
+    return -1;
+  } finally {
+    print('parsed');
+  }
+}
+@@N on FormatException ==> match one error type
+@@E
+Future<String> fetch() => Future.error(Exception('timeout'));
+final safe = fetch().catchError((e) => 'fallback');
+@@N catchError ==> handler value replaces failure
+@@C waiting-on-futures | running futures together | 2 | Starts several futures at once and waits for all of them.
+@@E
+Future<void> run() async {
+  final results = await Future.wait([
+    Future.value(1),
+    Future.value(2),
+  ]);
+  print(results);
+}
+@@N Future.wait ==> collects results in order
+@@E
+Future<void> run() async {
+  final a = Future.delayed(const Duration(seconds: 1), () => 1);
+  final b = Future.delayed(const Duration(seconds: 1), () => 2);
+  print(await a + await b);
+}
+@@N final b ==> starts before any await
+@@E
+Future<String> slow() {
+  return Future.delayed(const Duration(seconds: 5), () => 'ok');
+}
+final limited = slow().timeout(const Duration(seconds: 1));
+@@N timeout ==> fails after the duration
+@@T streams | Streams
+@@C creating-streams | creating streams | 1 | Produces a sequence of values over time with async* or stream constructors.
+@@E
+Stream<int> countTo(int n) async* {
+  for (var i = 1; i <= n; i++) {
+    yield i;
+  }
+}
+@@N async* ==> generator of a Stream
+@@N yield ==> emits one value
+@@E
+final letters = Stream.fromIterable(['a', 'b', 'c']);
+@@N fromIterable ==> stream from a list
+@@E
+final ticks = Stream.periodic(const Duration(seconds: 1), (i) => i);
+@@N periodic ==> emits at a fixed interval
+@@C consuming-streams | consuming streams | 1 | Reads stream events with await for or listen.
+@@E
+Future<void> main() async {
+  await for (final n in Stream.fromIterable([1, 2, 3])) {
+    print(n);
+  }
+}
+@@N await for ==> loops over events
+@@E
+final numbers = Stream.fromIterable([1, 2, 3]);
+final sub = numbers.listen(
+  print,
+  onDone: () => print('done'),
+);
+@@N listen ==> callback style
+@@E
+Future<int> sum(Stream<int> values) async {
+  var total = 0;
+  await for (final v in values) {
+    total += v;
+  }
+  return total;
+}
+@@C stream-transformations | stream transformations | 2 | Reshapes streams with map, where, take and toList.
+@@E
+final squares = Stream.fromIterable([1, 2, 3, 4]).map((n) => n * n);
+@@N map ==> transforms each event
+@@E
+final source = Stream.fromIterable([1, 2, 3, 4, 5, 6]);
+final evens = source.where((n) => n.isEven);
+@@N where ==> filters events
+@@E
+Future<List<int>> firstTwo(Stream<int> s) {
+  return s.take(2).toList();
+}
+@@N take ==> stops after two events
+@@C stream-controllers | StreamController | 3 | Pushes events into a stream by hand with a StreamController.
+@@E
+import 'dart:async';
+
+final controller = StreamController<String>();
+controller.add('first');
+controller.close();
+@@N StreamController ==> sink and stream pair
+@@E
+import 'dart:async';
+
+final events = StreamController<int>.broadcast();
+events.stream.listen((n) => print('a $n'));
+events.stream.listen((n) => print('b $n'));
+@@N broadcast ==> many listeners allowed
+@@E
+import 'dart:async';
+
+final log = StreamController<String>();
+log.stream.listen(print);
+log.add('started');
+log.addError(StateError('failed'));
+@@N addError ==> emits an error event
+@@T records-patterns | records & patterns
+@@C records | records | 1 | Bundles several values into a record with positional or named fields.
+@@E
+final point = (3, 4);
+final named = (name: 'ada', age: 36);
+@@N (3, 4) ==> positional record
+@@N name: ==> named field
+@@E
+(int, String) pair() => (1, 'one');
+@@N (int, String) ==> record type
+@@E
+final user = (name: 'grace', id: 7);
+print(user.name);
+print(user.id);
+@@N user.name ==> named field access
+@@C destructuring | destructuring | 2 | Unpacks records and collections into variables with patterns.
+@@E
+final (x, y) = (3, 4);
+print(x + y);
+@@N (x, y) ==> record pattern
+@@E
+final (:name, :age) = (name: 'ada', age: 36);
+print('$name is $age');
+@@N :name ==> binds a variable called name
+@@E
+final [first, second] = [10, 20];
+print(first + second);
+@@N [first, second] ==> list pattern
+@@C switch-patterns | switch with patterns | 2 | Matches on type, shape and value in a switch statement.
+@@E
+void show(Object value) {
+  switch (value) {
+    case (int a, int b):
+      print(a + b);
+    case String s:
+      print(s);
+    default:
+      print('other');
+  }
+}
+@@N (int a, int b) ==> record shape
+@@N String s ==> type test and bind
+@@E
+void check(int n) {
+  switch (n) {
+    case 0:
+      print('zero');
+    case > 0 && < 10:
+      print('digit');
+    default:
+      print('large or negative');
+  }
+}
+@@N > 0 && < 10 ==> relational patterns
+@@E
+void route(List<String> parts) {
+  switch (parts) {
+    case ['home']:
+      print('home');
+    case ['user', var id]:
+      print('user $id');
+  }
+}
+@@N var id ==> binds the second element
+@@C if-case-and-objects | if-case and object patterns | 3 | Tests and destructures values with if-case and object patterns.
+@@E
+void parse(Map<String, Object?> json) {
+  if (json case {'name': String name, 'age': int age}) {
+    print('$name $age');
+  }
+}
+@@N if (json case ==> pattern test in an if
+@@E
+class Point {
+  final int x;
+  final int y;
+  Point(this.x, this.y);
+}
+String place(Point p) => switch (p) {
+  Point(x: 0, y: 0) => 'origin',
+  Point(:var x) when x < 0 => 'left',
+  Point() => 'elsewhere',
+};
+@@N when ==> extra guard condition
+@@E
+void total(Object? v) {
+  if (v case int n when n > 100) {
+    print('big $n');
+  }
+}
+@@N int n ==> type pattern
+@@T enums-switch-expressions | enums & switch expressions
+@@C simple-enums | simple enums | 1 | Names a fixed set of constants with an enum.
+@@E
+enum Status { active, paused, closed }
+@@N enum ==> fixed set of values
+@@E
+enum Level { low, medium, high }
+final current = Level.medium;
+final all = Level.values;
+@@N values ==> list of every constant
+@@E
+enum Direction { north, east, south, west }
+void main() {
+  print(Direction.east.name);
+  print(Direction.east.index);
+}
+@@N name ==> constant as a string
+@@N index ==> zero-based position
+@@C enhanced-enums | enhanced enums | 2 | Gives enum constants fields, constructors and methods.
+@@E
+enum Planet {
+  earth(5.97),
+  mars(0.642);
+
+  const Planet(this.mass);
+  final double mass;
+}
+@@N earth(5.97) ==> constructor arguments
+@@E
+enum Coin {
+  penny(1),
+  dime(10);
+
+  final int cents;
+  const Coin(this.cents);
+  String get label => '$cents cents';
+}
+@@E
+enum Weekday {
+  mon, tue, wed;
+
+  bool get isFirst => this == Weekday.mon;
+}
+@@N ; ==> ends the constant list
+@@C switch-expressions | switch expressions | 1 | Returns a value from a switch expression with arrow cases.
+@@E
+enum Level { low, medium, high }
+String label(Level level) => switch (level) {
+  Level.low => 'ok',
+  Level.medium => 'watch',
+  Level.high => 'act',
+};
+@@N switch ==> expression, not statement
+@@N Level.high ==> exhaustive without default
+@@E
+int score(String grade) => switch (grade) {
+  'A' => 4,
+  'B' => 3,
+  _ => 0,
+};
+@@N _ ==> wildcard case
+@@E
+String describe(int n) => switch (n) {
+  0 => 'zero',
+  > 0 && < 10 => 'digit',
+  _ => 'big',
+};
+@@C sealed-classes | sealed classes | 3 | Closes a class hierarchy so switches can check every case.
+@@E
+sealed class Result {}
+class Ok extends Result {
+  final int value;
+  Ok(this.value);
+}
+class Failure extends Result {}
+int unwrap(Result r) => switch (r) {
+  Ok(:final value) => value,
+  Failure() => -1,
+};
+@@N sealed ==> subtypes known to the compiler
+@@E
+sealed class Event {}
+class Click extends Event {}
+class Key extends Event {
+  final String code;
+  Key(this.code);
+}
+String name(Event e) => switch (e) {
+  Click() => 'click',
+  Key(:final code) => 'key $code',
+};
+@@E
+sealed class Light {}
+class Red extends Light {}
+class Green extends Light {}
+String action(Light l) {
+  return switch (l) {
+    Red() => 'stop',
+    Green() => 'go',
+  };
+}
+@@N switch ==> compiler checks every case
+@@T extension-methods | extension methods
+@@C extending-types | extending built-in types | 2 | Adds methods to an existing type with an extension.
+@@E
+extension StringX on String {
+  bool get isBlank => trim().isEmpty;
+}
+@@N extension ==> adds members to String
+@@E
+extension on String {
+  String capitalized() {
+    if (isEmpty) return this;
+    return this[0].toUpperCase() + substring(1);
+  }
+}
+@@N extension on ==> unnamed extension
+@@E
+extension DurationX on int {
+  Duration get seconds => Duration(seconds: this);
+  Duration get minutes => Duration(minutes: this);
+}
+@@N this ==> the int being extended
+@@C extension-use | calling extensions | 2 | Calls extension members like ordinary members on the target type.
+@@E
+extension StringX on String {
+  String get initial => isEmpty ? '' : this[0];
+}
+final first = 'dart'.initial;
+@@N 'dart'.initial ==> used like a getter
+@@E
+extension IntX on int {
+  bool get isPositive => this > 0;
+}
+final yes = 5.isPositive;
+final no = (-2).isPositive;
+@@N (-2) ==> parentheses keep the sign
+@@E
+extension ListX on List<int> {
+  int get total => fold(0, (a, b) => a + b);
+}
+final sum = [1, 2, 3].total;
+@@N on List<int> ==> only applies to int lists
+@@C generic-and-nullable-extensions | generic and nullable extensions | 3 | Writes extensions with type parameters or on nullable types.
+@@E
+extension ListX<T> on List<T> {
+  T? get secondOrNull => length > 1 ? this[1] : null;
+}
+@@N <T> ==> works for any element type
+@@E
+extension on String? {
+  bool get isNullOrEmpty => this?.isEmpty ?? true;
+}
+@@N String? ==> receiver may be null
+@@E
+extension IterableX<T> on Iterable<T> {
+  List<T> toSortedList(int Function(T, T) compare) {
+    return toList()..sort(compare);
+  }
+}
+@@T generics | generics
+@@C generic-classes | generic classes | 2 | Parameterises a class over a type with angle brackets.
+@@E
+class Box<T> {
+  final T value;
+  Box(this.value);
+}
+@@N <T> ==> type parameter
+@@E
+class Stack<E> {
+  final List<E> _items = [];
+  void push(E item) => _items.add(item);
+  E pop() => _items.removeLast();
+}
+@@N _items ==> private to the library
+@@E
+class Pair<A, B> {
+  final A first;
+  final B second;
+  const Pair(this.first, this.second);
+}
+@@N <A, B> ==> two type parameters
+@@C generic-functions | generic functions | 2 | Writes functions that work for any type with a type parameter.
+@@E
+T firstOf<T>(List<T> items) => items.first;
+@@N firstOf<T> ==> type inferred from the call
+@@E
+T pick<T>(bool flag, T a, T b) => flag ? a : b;
+@@E
+List<R> mapAll<T, R>(List<T> xs, R Function(T) f) {
+  return xs.map(f).toList();
+}
+@@N R Function(T) ==> generic function type
+@@C bounded-types | bounded type parameters | 3 | Restricts a type parameter with extends.
+@@E
+T largest<T extends num>(List<T> xs) {
+  return xs.reduce((a, b) => a > b ? a : b);
+}
+@@N extends num ==> only numbers allowed
+@@E
+class Cache<T extends Comparable<T>> {
+  final List<T> items = [];
+  void add(T item) => items.add(item);
+}
+@@E
+double sum<T extends num>(Iterable<T> xs) {
+  return xs.fold(0.0, (a, b) => a + b);
+}
+@@T exceptions | exceptions
+@@C try-and-catch | try, on and catch | 1 | Handles errors with try, on and catch clauses.
+@@E
+try {
+  final n = int.parse('abc');
+  print(n);
+} on FormatException {
+  print('not a number');
+}
+@@N on ==> filters by type
+@@E
+try {
+  final items = <int>[];
+  print(items.first);
+} catch (e) {
+  print('error: $e');
+}
+@@N catch (e) ==> any thrown object
+@@E
+void risky() => throw ArgumentError('bad input');
+try {
+  risky();
+} on ArgumentError catch (e) {
+  print(e.message);
+} on Exception {
+  print('other');
+}
+@@N on ArgumentError catch ==> type plus variable
+@@C throwing | throwing exceptions | 1 | Signals a failure with throw and a standard error type.
+@@E
+void withdraw(double balance, double amount) {
+  if (amount > balance) {
+    throw ArgumentError('insufficient funds');
+  }
+}
+@@N throw ==> raises an error
+@@E
+int divide(int a, int b) {
+  if (b == 0) throw StateError('division by zero');
+  return a ~/ b;
+}
+@@N ~/ ==> integer division
+@@E
+void checkAge(int age) {
+  if (age < 0) throw RangeError.value(age, 'age');
+}
+@@C custom-exceptions | custom exceptions | 2 | Defines exception types by implementing Exception.
+@@E
+class ValidationException implements Exception {
+  final String message;
+  ValidationException(this.message);
+}
+@@N implements Exception ==> marks recoverable errors
+@@E
+class NotFound implements Exception {
+  final String id;
+  const NotFound(this.id);
+  @override
+  String toString() => 'NotFound: $id';
+}
+@@E
+class ApiError extends Error {
+  final int status;
+  ApiError(this.status);
+}
+@@N extends Error ==> programmer errors
+@@C finally-and-rethrow | finally and rethrow | 2 | Runs cleanup with finally and passes errors on with rethrow.
+@@E
+final out = StringBuffer();
+try {
+  out.write('data');
+} finally {
+  out.clear();
+}
+@@N finally ==> always runs
+@@E
+try {
+  int.parse('x');
+} catch (e) {
+  print('logging');
+  rethrow;
+}
+@@N rethrow ==> keeps the original stack
+@@E
+try {
+  int.parse('x');
+} catch (e, stack) {
+  print(e);
+  print(stack);
+}
+@@N stack ==> second catch parameter
+@@T statelesswidget | StatelessWidget
+@@C minimal-stateless | a minimal StatelessWidget | 1 | Describes fixed UI by overriding build in a StatelessWidget.
+@@E
+class Greeting extends StatelessWidget {
+  const Greeting({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Hello');
+  }
+}
+@@N StatelessWidget ==> needs package:flutter/material.dart
+@@N build ==> returns the widget tree
+@@E
+class Logo extends StatelessWidget {
+  const Logo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(Icons.flutter_dash);
+  }
+}
+@@E
+class Gap extends StatelessWidget {
+  const Gap({super.key});
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(height: 8);
+}
+@@C widget-parameters | widget parameters | 1 | Passes configuration into a widget through final constructor fields.
+@@E
+class SectionTitle extends StatelessWidget {
+  const SectionTitle({super.key, required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Text(text);
+}
+@@N required this.text ==> named argument
+@@E
+class CountBadge extends StatelessWidget {
+  const CountBadge({super.key, required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('$count new');
+  }
+}
+@@E
+class PriceTag extends StatelessWidget {
+  const PriceTag({super.key, required this.amount, this.unit = 'EUR'});
+  final double amount;
+  final String unit;
+
+  @override
+  Widget build(BuildContext context) => Text('$amount $unit');
+}
+@@C composing-widgets | composing widgets | 2 | Nests widgets with Column, Row, Padding and Center.
+@@E
+class Profile extends StatelessWidget {
+  const Profile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [Text('Ada'), Text('Engineer')],
+    );
+  }
+}
+@@N children ==> list of child widgets
+@@E
+class Rating extends StatelessWidget {
+  const Rating({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(children: [Icon(Icons.star), Text('4.5')]);
+  }
+}
+@@E
+class Welcome extends StatelessWidget {
+  const Welcome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Center(child: Text('Welcome')),
+    );
+  }
+}
+@@N child ==> single child widget
+@@C styling-widgets | styling text and boxes | 2 | Styles widgets with TextStyle, Container and colors.
+@@E
+class Heading extends StatelessWidget {
+  const Heading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text(
+      'Total',
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
+  }
+}
+@@N TextStyle ==> font size and weight
+@@E
+class NoteCard extends StatelessWidget {
+  const NoteCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      color: Colors.amber,
+      child: const Text('Note'),
+    );
+  }
+}
+@@E
+class Spaced extends StatelessWidget {
+  const Spaced({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [Text('One'), SizedBox(height: 8), Text('Two')],
+    );
+  }
+}
+@@N mainAxisAlignment ==> centres along the column
+@@T statefulwidget-setstate | StatefulWidget & setState
+@@C stateful-skeleton | StatefulWidget and State | 1 | Pairs a StatefulWidget with a State class that holds mutable fields.
+@@E
+class Counter extends StatefulWidget {
+  const Counter({super.key});
+  @override
+  State<Counter> createState() => _CounterState();
+}
+class _CounterState extends State<Counter> {
+  int count = 0;
+  @override
+  Widget build(BuildContext context) => Text('$count');
+}
+@@N StatefulWidget ==> needs package:flutter/material.dart
+@@N createState ==> creates the State object
+@@N int count ==> state lives in the State class
+@@E
+class Clock extends StatefulWidget {
+  const Clock({super.key});
+  @override
+  State<Clock> createState() => _ClockState();
+}
+class _ClockState extends State<Clock> {
+  String label = 'idle';
+  @override
+  Widget build(BuildContext context) => Text(label);
+}
+@@E
+class Likes extends StatefulWidget {
+  const Likes({super.key});
+  @override
+  State<Likes> createState() => _LikesState();
+}
+class _LikesState extends State<Likes> {
+  bool liked = false;
+  @override
+  Widget build(BuildContext context) => Text(liked ? 'liked' : 'like');
+}
+@@C set-state | updating with setState | 1 | Rebuilds the widget after a change by calling setState.
+@@E
+class Counter extends StatefulWidget {
+  @override
+  State<Counter> createState() => _CounterState();
+}
+class _CounterState extends State<Counter> {
+  int count = 0;
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: () => setState(() => count++),
+    child: Text('$count'),
+  );
+}
+@@N setState ==> schedules a rebuild
+@@N count++ ==> change inside the callback
+@@E
+class Toggle extends StatefulWidget {
+  @override
+  State<Toggle> createState() => _ToggleState();
+}
+class _ToggleState extends State<Toggle> {
+  bool on = false;
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: () => setState(() => on = !on),
+    child: Text(on ? 'on' : 'off'),
+  );
+}
+@@N !on ==> flips the boolean
+@@E
+class Todos extends StatefulWidget {
+  @override
+  State<Todos> createState() => _TodosState();
+}
+class _TodosState extends State<Todos> {
+  final items = <String>[];
+  @override
+  Widget build(BuildContext context) => TextButton(
+    onPressed: () => setState(() => items.add('task')),
+    child: Text('${items.length}'),
+  );
+}
+@@N items.add ==> mutates the list in place
+@@C lifecycle | initState and dispose | 2 | Sets up and releases resources in initState and dispose.
+@@E
+class Clock extends StatefulWidget {
+  @override
+  State<Clock> createState() => _ClockState();
+}
+class _ClockState extends State<Clock> {
+  int ticks = 0;
+  @override
+  void initState() { super.initState(); ticks = 1; }
+  @override
+  Widget build(BuildContext context) => Text('$ticks');
+}
+@@N initState ==> runs once before build
+@@N super.initState ==> call it first
+@@E
+class Search extends StatefulWidget {
+  @override
+  State<Search> createState() => _SearchState();
+}
+class _SearchState extends State<Search> {
+  final input = TextEditingController();
+  @override
+  void dispose() { input.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => const Text('search');
+}
+@@N dispose ==> release resources here
+@@N super.dispose ==> call it last
+@@E
+class Report extends StatefulWidget {
+  @override
+  State<Report> createState() => _ReportState();
+}
+class _ReportState extends State<Report> {
+  late final List<int> data;
+  @override
+  void initState() { super.initState(); data = [1, 2, 3]; }
+  @override
+  Widget build(BuildContext context) => Text('${data.length}');
+}
+@@N late final ==> assigned once in initState
+@@C widget-property | reading widget properties | 2 | Reads constructor arguments from the State class through widget.
+@@E
+class Greeter extends StatefulWidget {
+  const Greeter({super.key, required this.name});
+  final String name;
+  @override
+  State<Greeter> createState() => _GreeterState();
+}
+class _GreeterState extends State<Greeter> {
+  @override
+  Widget build(BuildContext context) => Text('Hi ${widget.name}');
+}
+@@N widget.name ==> reads the widget field
+@@E
+class Quantity extends StatefulWidget {
+  const Quantity({super.key, this.start = 0});
+  final int start;
+  @override
+  State<Quantity> createState() => _QuantityState();
+}
+class _QuantityState extends State<Quantity> {
+  late int value = widget.start;
+  @override
+  Widget build(BuildContext context) => Text('$value');
+}
+@@N late int ==> initialised on first use
+@@E
+class Panel extends StatefulWidget {
+  const Panel({super.key, required this.title});
+  final String title;
+  @override
+  State<Panel> createState() => _PanelState();
+}
+class _PanelState extends State<Panel> {
+  bool open = false;
+  @override
+  Widget build(BuildContext context) => Text(open ? widget.title : '-');
+}

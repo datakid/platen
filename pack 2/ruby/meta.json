@@ -1,0 +1,7 @@
+{
+  "name": "Ruby",
+  "short": "RB",
+  "version": "3.4",
+  "indent": 2,
+  "pigment": { "light": "#766532", "dark": "#B49B50" }
+}

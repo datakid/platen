@@ -1,0 +1,982 @@
+@@T values-types | values & types
+@@C values-and-signatures | values and type signatures | 1 | Names constant values and states their types with a double colon.
+@@E
+city :: String
+city = "Oslo"
+visits :: Int
+visits = 3
+main :: IO ()
+main = putStrLn (city ++ ": " ++ show visits)
+@@N :: ==> has the type
+@@N show ==> value to string
+@@E
+price :: Double
+price = 9.99
+quantity :: Int
+quantity = 3
+total :: Double
+total = price * fromIntegral quantity
+main = print total
+@@N fromIntegral ==> converts Int to Double
+@@E
+pair :: (Int, String)
+pair = (1, "one")
+main = print (fst pair, snd pair)
+@@N (Int, String) ==> tuple type
+@@C basic-types | basic types | 1 | Uses Int, Integer, Double, Char and Bool values.
+@@E
+main :: IO ()
+main = do
+  print (42 :: Int)
+  print (3.14 :: Double)
+  print 'x'
+  print True
+@@N :: Int ==> inline annotation
+@@E
+big :: Integer
+big = 2 ^ 100
+main = print big
+@@N Integer ==> no size limit
+@@E
+ratio :: Rational
+ratio = 3 / 4
+main = do
+  print ratio
+  print (maxBound :: Int)
+@@N Rational ==> exact fraction
+@@C numeric-conversion | numeric conversion | 1 | Converts between number types and divides integers explicitly.
+@@E
+main :: IO ()
+main = do
+  print (fromIntegral (7 :: Int) / 2 :: Double)
+  print (7 `div` 2)
+  print (7 `mod` 2)
+  print (truncate (3.7 :: Double) :: Int)
+@@N `div` ==> integer division
+@@N truncate ==> drops the fraction
+@@E
+main :: IO ()
+main = do
+  print (round (2.5 :: Double) :: Int)
+  print (ceiling (2.1 :: Double) :: Int)
+  print (floor (-2.1 :: Double) :: Int)
+@@N round ==> banker's rounding
+@@E
+main :: IO ()
+main = do
+  print (read "42" + 1 :: Int)
+  print (show 3.5)
+@@N read ==> string to value
+@@C tuples-and-aliases | tuples and type aliases | 1 | Groups values in tuples and gives types readable names.
+@@E
+type Point = (Double, Double)
+origin :: Point
+origin = (0, 0)
+main = print origin
+@@N type ==> alias, same type
+@@E
+type Name = String
+type Age = Int
+person :: (Name, Age)
+person = ("ada", 36)
+main = putStrLn (fst person ++ " " ++ show (snd person))
+@@E
+swap :: (a, b) -> (b, a)
+swap (x, y) = (y, x)
+main = print (swap (1, "one"))
+@@N a, b ==> any types
+@@T functions-currying | functions & currying
+@@C defining-functions | defining functions | 1 | Defines functions with a signature and an equation.
+@@E
+square :: Int -> Int
+square n = n * n
+main = print (square 4)
+@@N Int -> Int ==> takes Int, returns Int
+@@E
+area :: Double -> Double -> Double
+area w h = w * h
+main = print (area 3 4)
+@@N area w h ==> arguments separated by spaces
+@@E
+greet :: String -> String -> String
+greet greeting name = greeting ++ ", " ++ name
+main = putStrLn (greet "Hello" "ada")
+@@C partial-application | currying and partial application | 1 | Fixes some arguments of a function to get a new function.
+@@E
+add :: Int -> Int -> Int
+add a b = a + b
+addFive :: Int -> Int
+addFive = add 5
+main = print (addFive 10)
+@@N add 5 ==> partial application
+@@E
+main :: IO ()
+main = print (map (* 2) [1, 2, 3])
+@@N (* 2) ==> operator section
+@@E
+scale :: Double -> Double -> Double
+scale factor x = factor * x
+main = print (map (scale 1.5) [2, 4])
+@@C operators-sections | operators and sections | 2 | Uses operators as functions and wraps them in sections.
+@@E
+main :: IO ()
+main = do
+  print (map (+ 1) [1, 2, 3])
+  print (map (subtract 1) [1, 2, 3])
+  print (filter (> 2) [1, 2, 3, 4])
+@@N subtract ==> section for minus
+@@E
+(|>) :: a -> (a -> b) -> b
+x |> f = f x
+main = print ([1, 2, 3] |> map (* 2) |> sum)
+@@N (|>) ==> user-defined operator
+@@E
+main :: IO ()
+main = do
+  print (10 `div` 3)
+  print (div 10 3)
+  print ((`div` 3) 10)
+@@N `div` ==> function as infix
+@@C composition-lambdas | composition and lambdas | 2 | Chains functions with a dot and writes unnamed functions with a backslash.
+@@E
+inc :: Int -> Int
+inc = (+ 1)
+double :: Int -> Int
+double = (* 2)
+main = print ((double . inc) 5)
+@@N . ==> composes right to left
+@@E
+main :: IO ()
+main = print (map (\x -> x * x + 1) [1, 2, 3])
+@@N \x -> ==> lambda
+@@E
+main :: IO ()
+main = do
+  print (flip (-) 1 10)
+  print ((negate . abs) 5)
+  print (($ 4) (+ 1))
+@@N flip ==> swaps the arguments
+@@T lists-comprehensions | lists & comprehensions
+@@C list-basics | list basics | 1 | Builds lists with brackets, cons, append and ranges.
+@@E
+scores :: [Int]
+scores = [90, 72, 85]
+main = do
+  print (head scores)
+  print (length scores)
+@@N [Int] ==> list of Int
+@@E
+main :: IO ()
+main = do
+  print (1 : [2, 3])
+  print ([1, 2] ++ [3, 4])
+  print ([10, 20, 30] !! 1)
+@@N : ==> adds at the front
+@@N !! ==> index from zero
+@@E
+main :: IO ()
+main = do
+  print [1 .. 5]
+  print [0, 2 .. 10]
+  print (take 3 [10, 20 ..])
+@@N [0, 2 .. 10] ==> range with a step
+@@C list-functions | list functions | 1 | Reverses and slices lists and sums or searches them with Prelude functions.
+@@E
+main :: IO ()
+main = do
+  print (reverse [1, 2, 3])
+  print (sum [3, 5, 7])
+  print (maximum [3, 8, 1])
+@@E
+main :: IO ()
+main = do
+  print (take 2 "haskell")
+  print (drop 3 "haskell")
+  print (splitAt 2 [1, 2, 3, 4])
+@@N splitAt ==> pair of lists
+@@E
+main :: IO ()
+main = do
+  print (zip [1, 2, 3] "abc")
+  print (elem 3 [1, 2, 3])
+  print (null [])
+@@N zip ==> pairs up elements
+@@C comprehensions | list comprehensions | 2 | Builds lists from generators and conditions.
+@@E
+main :: IO ()
+main = print [n * n | n <- [1 .. 5]]
+@@N n <- ==> generator
+@@E
+main :: IO ()
+main = print [n | n <- [1 .. 10], even n]
+@@N even n ==> filter
+@@E
+main :: IO ()
+main = print [(x, y) | x <- [1, 2], y <- "ab"]
+@@N x <- [1, 2], y <- ==> all combinations
+@@C strings-as-lists | strings as lists | 1 | Treats strings as lists of characters.
+@@E
+main :: IO ()
+main = do
+  putStrLn (map succ "HAL")
+  putStrLn (reverse "stream")
+  print (words "red apple, red car")
+@@N map succ ==> next character
+@@E
+import Data.Char (toUpper)
+main = putStrLn (map toUpper "quiet")
+@@N import ==> brings toUpper into scope
+@@E
+main :: IO ()
+main = do
+  print (lines "a\nb\nc")
+  putStrLn (unwords ["a", "b"])
+  putStrLn (unlines ["x", "y"])
+@@T pattern-matching-guards | pattern matching & guards
+@@C function-patterns | patterns in functions | 1 | Selects an equation by matching the shape of the arguments.
+@@E
+isZero :: Int -> Bool
+isZero 0 = True
+isZero _ = False
+main = print (isZero 0)
+@@N 0 ==> literal pattern
+@@N _ ==> matches anything
+@@E
+describe :: [a] -> String
+describe [] = "empty"
+describe [_] = "one"
+describe _ = "many"
+main = putStrLn (describe "ab")
+@@N [_] ==> list with one element
+@@E
+first :: (a, b, c) -> a
+first (x, _, _) = x
+main = print (first (1, 'a', True))
+@@C guards | guards | 1 | Chooses a result with boolean conditions introduced by pipes.
+@@E
+grade :: Int -> Char
+grade n
+  | n >= 90 = 'A'
+  | n >= 80 = 'B'
+  | otherwise = 'C'
+main = print (grade 85)
+@@N | ==> guard
+@@N otherwise ==> always true
+@@E
+sign :: Int -> String
+sign n
+  | n < 0 = "negative"
+  | n == 0 = "zero"
+  | otherwise = "positive"
+main = putStrLn (sign (-3))
+@@E
+bmi :: Double -> Double -> String
+bmi w h
+  | v < 18.5 = "under"
+  | v < 25 = "normal"
+  | otherwise = "over"
+  where v = w / h ^ 2
+main = putStrLn (bmi 70 1.75)
+@@N where v ==> shared by all guards
+@@C case-expressions | case expressions | 1 | Matches a value against patterns inside an expression.
+@@E
+describe :: Int -> String
+describe n = case n of
+  0 -> "zero"
+  1 -> "one"
+  _ -> "many"
+main = putStrLn (describe 1)
+@@N case n of ==> pattern branches
+@@E
+firstOr :: a -> [a] -> a
+firstOr d xs = case xs of
+  [] -> d
+  (x : _) -> x
+main = print (firstOr 0 [])
+@@N (x : _) ==> head and ignored tail
+@@E
+main :: IO ()
+main = do
+  let pair = (3, "x")
+  case pair of
+    (0, _) -> putStrLn "zero"
+    (n, s) -> putStrLn (s ++ show n)
+@@C list-patterns | list patterns and as-patterns | 2 | Splits lists into head and tail and names the whole value with at.
+@@E
+sumList :: [Int] -> Int
+sumList [] = 0
+sumList (x : xs) = x + sumList xs
+main = print (sumList [1, 2, 3])
+@@N (x : xs) ==> head and tail
+@@E
+firstTwo :: [a] -> Maybe (a, a)
+firstTwo (x : y : _) = Just (x, y)
+firstTwo _ = Nothing
+main = print (firstTwo "abc")
+@@N x : y : _ ==> at least two elements
+@@E
+dup :: [a] -> [a]
+dup whole@(x : _) = x : whole
+dup [] = []
+main = print (dup "abc")
+@@N whole@ ==> names the entire list
+@@T where-let | where & let
+@@C where-clauses | where clauses | 1 | Defines helper values and functions after the main equation.
+@@E
+circleArea :: Double -> Double
+circleArea r = pi * r2
+  where r2 = r * r
+main = print (circleArea 2)
+@@N where ==> scope is the equation
+@@E
+hypotenuse :: Double -> Double -> Double
+hypotenuse a b = sqrt (sq a + sq b)
+  where sq x = x * x
+main = print (hypotenuse 3 4)
+@@N sq x ==> local function
+@@E
+stats :: [Double] -> (Double, Double)
+stats xs = (total, total / count)
+  where
+    total = sum xs
+    count = fromIntegral (length xs)
+main = print (stats [2, 4, 6])
+@@C let-expressions | let expressions | 1 | Binds names inside an expression or a do block.
+@@E
+main :: IO ()
+main = do
+  let x = 5
+      y = 6
+  print (x * y)
+@@N let x = 5 ==> no in keyword in do
+@@E
+volume :: Double -> Double -> Double -> Double
+volume w h d = let base = w * h in base * d
+main = print (volume 2 3 4)
+@@N let base = w * h in ==> expression form
+@@E
+main :: IO ()
+main = print (let a = 2; b = 3 in a ^ b)
+@@C scoping-with-guards | where, let and guards together | 2 | Shares bindings with guards and comprehensions.
+@@E
+classify :: Int -> String
+classify n
+  | r == 0 = "even"
+  | otherwise = "odd"
+  where r = n `mod` 2
+main = putStrLn (classify 7)
+@@E
+squares :: [Int]
+squares = [y | x <- [1 .. 4], let y = x * x, y > 3]
+main = print squares
+@@N let y ==> binding inside a comprehension
+@@E
+roots :: Double -> Double -> Double -> (Double, Double)
+roots a b c = (x1, x2)
+  where
+    d = sqrt (b * b - 4 * a * c)
+    x1 = (-b + d) / (2 * a)
+    x2 = (-b - d) / (2 * a)
+main = print (roots 1 (-3) 2)
+@@C local-helpers | local helper functions | 2 | Hides accumulator loops in where blocks.
+@@E
+sumTo :: Int -> Int
+sumTo n = go 0 n
+  where
+    go acc 0 = acc
+    go acc k = go (acc + k) (k - 1)
+main = print (sumTo 100)
+@@N go ==> conventional helper name
+@@E
+reverse' :: [a] -> [a]
+reverse' = go []
+  where
+    go acc [] = acc
+    go acc (x : xs) = go (x : acc) xs
+main = print (reverse' [1, 2, 3])
+@@E
+average :: [Double] -> Double
+average xs = total / fromIntegral n
+  where
+    total = sum xs
+    n = length xs
+main = print (average [1, 2, 3, 4])
+@@T data-types-records | data types & records
+@@C algebraic-types | algebraic data types | 1 | Declares types with several constructors using data.
+@@E
+data Color = Red | Green | Blue deriving (Show, Eq)
+main = print [Red, Blue]
+@@N | ==> separates constructors
+@@N deriving ==> generates instances
+@@E
+data Shape = Circle Double | Rect Double Double deriving Show
+area :: Shape -> Double
+area (Circle r) = pi * r * r
+area (Rect w h) = w * h
+main = print (area (Rect 3 4))
+@@N Rect Double Double ==> constructor with fields
+@@E
+data Direction = North | East | South | West
+  deriving (Show, Enum, Bounded)
+main = print [minBound .. maxBound :: Direction]
+@@N Enum, Bounded ==> allows ranges
+@@C record-syntax | record syntax | 1 | Names the fields of a constructor and reads or updates them by name.
+@@E
+data User = User { name :: String, age :: Int } deriving Show
+main = do
+  let ada = User { name = "ada", age = 36 }
+  print (name ada)
+@@N name ==> field is also a function
+@@E
+data Point = Point { px :: Double, py :: Double } deriving Show
+main = print (Point { px = 1, py = 2 })
+@@E
+data Config = Config { host :: String, port :: Int } deriving Show
+defaults :: Config
+defaults = Config { host = "localhost", port = 80 }
+main = print (defaults { port = 8080 })
+@@N defaults { port = 8080 } ==> copy with a change
+@@C parametric-types | parametric types and newtype | 2 | Parameterises types over other types and wraps one with newtype.
+@@E
+data Pair a b = Pair a b deriving Show
+main = print (Pair 1 "one")
+@@N a b ==> type parameters
+@@E
+newtype Age = Age Int deriving Show
+older :: Age -> Age
+older (Age n) = Age (n + 1)
+main = print (older (Age 36))
+@@N newtype ==> one constructor, one field
+@@E
+data Tree a = Leaf | Node (Tree a) a (Tree a)
+size :: Tree a -> Int
+size Leaf = 0
+size (Node l _ r) = size l + 1 + size r
+main = print (size (Node Leaf 'x' (Node Leaf 'y' Leaf)))
+@@N Tree a ==> recursive type
+@@C deriving-instances | deriving instances | 2 | Gets equality, ordering and parsing from deriving.
+@@E
+data Level = Low | Mid | High deriving (Show, Eq, Ord)
+main = print (Low < High, maximum [Low, High, Mid])
+@@N Ord ==> follows constructor order
+@@E
+data Suit = Hearts | Spades deriving (Show, Read, Eq)
+main = print (read "Spades" :: Suit)
+@@N Read ==> parses from a string
+@@E
+data Point = Point Int Int deriving (Show, Eq, Ord)
+main = print (compare (Point 1 2) (Point 1 3))
+@@T type-classes | type classes
+@@C using-classes | using standard classes | 1 | Relies on Show, Eq, Ord, Num and Read through constraints.
+@@E
+main :: IO ()
+main = do
+  print (show 42 ++ "!")
+  print (1 == 1, 'a' < 'b')
+  print (compare 3 5)
+@@N compare ==> returns LT, EQ or GT
+@@E
+main :: IO ()
+main = do
+  print (fromIntegral (3 :: Int) + 0.5 :: Double)
+  print (minimum [3, 1, 2])
+  print (read "42" + 1 :: Int)
+@@E
+describe :: (Show a, Ord a) => a -> a -> String
+describe a b = show (max a b)
+main = putStrLn (describe 3 9)
+@@N (Show a, Ord a) => ==> class constraints
+@@C defining-classes | defining classes | 2 | Declares a class with method signatures and implements it for types.
+@@E
+class Describable a where
+  describe :: a -> String
+instance Describable Bool where
+  describe True = "yes"
+  describe False = "no"
+main = putStrLn (describe True)
+@@N class ==> set of required functions
+@@N instance ==> implementation for a type
+@@E
+class Shape a where
+  area :: a -> Double
+data Square = Square Double
+instance Shape Square where
+  area (Square s) = s * s
+main = print (area (Square 3))
+@@E
+class Container f where
+  empty :: f a
+  insert :: a -> f a -> f a
+instance Container [] where
+  empty = []
+  insert = (:)
+main = print (insert 1 (insert 2 empty) :: [Int])
+@@N f a ==> class over type constructors
+@@C custom-instances | custom instances | 2 | Writes Show, Eq and Ord instances by hand.
+@@E
+data Point = Point Int Int
+instance Show Point where
+  show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
+main = print (Point 1 2)
+@@N show ==> used by print
+@@E
+data Color = Red | Green
+instance Eq Color where
+  Red == Red = True
+  Green == Green = True
+  _ == _ = False
+main = print (Red == Green)
+@@E
+data Version = Version Int Int deriving (Eq, Show)
+instance Ord Version where
+  compare (Version a b) (Version c d) = compare (a, b) (c, d)
+main = print (maximum [Version 1 2, Version 2 0])
+@@N compare ==> minimal definition
+@@C semigroup-monoid | defaults, Semigroup and Monoid | 3 | Provides default methods and combines values with the Semigroup and Monoid classes.
+@@E
+newtype Total = Total Int deriving Show
+instance Semigroup Total where
+  Total a <> Total b = Total (a + b)
+instance Monoid Total where
+  mempty = Total 0
+main = print (mconcat [Total 1, Total 2, Total 3])
+@@N <> ==> combines two values
+@@N mempty ==> the neutral value
+@@E
+class Greeter a where
+  greet :: a -> String
+  greet _ = "hello"
+data Robot = Robot
+instance Greeter Robot
+main = putStrLn (greet Robot)
+@@N greet _ = ==> default method
+@@E
+main :: IO ()
+main = do
+  print ([1, 2] <> [3])
+  print (mconcat ["ab", "cd"])
+  print (mempty :: String)
+@@T maybe-either | Maybe & Either
+@@C maybe-type | Maybe | 1 | Represents a value that may be missing with Just and Nothing.
+@@E
+safeDiv :: Int -> Int -> Maybe Int
+safeDiv _ 0 = Nothing
+safeDiv a b = Just (a `div` b)
+main = print (safeDiv 10 2, safeDiv 1 0)
+@@N Maybe Int ==> a Just number or Nothing
+@@E
+main :: IO ()
+main = do
+  print (lookup 2 [(1, "a"), (2, "b")])
+  print (lookup 9 [(1, "a")])
+@@N lookup ==> returns a Maybe
+@@E
+firstEven :: [Int] -> Maybe Int
+firstEven xs = case filter even xs of
+  [] -> Nothing
+  (x : _) -> Just x
+main = print (firstEven [1, 3, 4])
+@@C maybe-helpers | working with Maybe | 1 | Unwraps and transforms Maybe values with maybe, fromMaybe and fmap.
+@@E
+import Data.Maybe (fromMaybe)
+main = print (fromMaybe 0 (lookup 'x' [('a', 1)]))
+@@N fromMaybe ==> default for Nothing
+@@E
+main :: IO ()
+main = do
+  print (maybe "none" show (Just 3))
+  print (fmap (+ 1) (Just 2))
+  print (fmap (+ 1) Nothing)
+@@N maybe ==> case analysis as a function
+@@E
+import Data.Maybe (catMaybes)
+main = print (catMaybes [Just 1, Nothing, Just 3])
+@@N catMaybes ==> drops Nothing values
+@@C either-type | Either | 1 | Returns a result or an error value with Right and Left.
+@@E
+parseAge :: Int -> Either String Int
+parseAge n
+  | n < 0 = Left "negative"
+  | otherwise = Right n
+main = print (parseAge 5, parseAge (-1))
+@@N Left ==> conventionally the error
+@@N Right ==> the success value
+@@E
+main :: IO ()
+main = do
+  print (either length (* 2) (Left "abc" :: Either String Int))
+  print (either length (* 2) (Right 4 :: Either String Int))
+@@N either ==> handles both sides
+@@E
+divide :: Double -> Double -> Either String Double
+divide _ 0 = Left "division by zero"
+divide a b = Right (a / b)
+main = print (divide 1 0)
+@@C chaining | chaining with bind and do | 2 | Sequences computations that may fail with the bind operator and do blocks.
+@@E
+safeDiv :: Int -> Int -> Maybe Int
+safeDiv _ 0 = Nothing
+safeDiv a b = Just (a `div` b)
+main = print (safeDiv 100 5 >>= safeDiv 60)
+@@N >>= ==> passes the value on if Just
+@@E
+calc :: Maybe Int
+calc = do
+  a <- Just 6
+  b <- Just 7
+  return (a * b)
+main = print calc
+@@N a <- ==> unwraps or short-circuits
+@@E
+validate :: Int -> Either String Int
+validate n = do
+  a <- if n > 0 then Right n else Left "must be positive"
+  b <- if even a then Right a else Left "must be even"
+  return (a + b)
+main = print (validate 4, validate 3)
+@@N Left "must be positive" ==> a Left stops the chain
+@@T map-filter-fold | map, filter, fold
+@@C map-filter | map and filter | 1 | Transforms and selects list elements with higher-order functions.
+@@E
+main :: IO ()
+main = do
+  print (map (* 2) [1, 2, 3])
+  print (filter even [1 .. 10])
+@@N map ==> applies to every element
+@@N filter ==> keeps matches
+@@E
+main :: IO ()
+main = print (map length ["tea", "cake", "jam"])
+@@E
+main :: IO ()
+main = print (takeWhile (< 10) (map (^ 2) [1 ..]))
+@@N takeWhile ==> stops at the first miss
+@@C folds | folds | 1 | Reduces a list to one value with foldr, foldl and foldl'.
+@@E
+main :: IO ()
+main = do
+  print (foldr (+) 0 [1, 2, 3])
+  print (foldl (-) 10 [1, 2, 3])
+@@N foldr ==> folds from the right
+@@N foldl ==> folds from the left
+@@E
+count :: [a] -> Int
+count = foldr (\_ n -> n + 1) 0
+main = print (count "haskell")
+@@N \_ n ==> ignores the element
+@@E
+import Data.List (foldl')
+main = print (foldl' (+) 0 [1 .. 100000])
+@@N foldl' ==> strict, avoids thunks
+@@C zipping-iterating | zip, zipWith and iterate | 2 | Combines lists pairwise and generates sequences from a function.
+@@E
+main :: IO ()
+main = print (zipWith (+) [1, 2, 3] [10, 20, 30])
+@@N zipWith ==> combines with a function
+@@E
+main :: IO ()
+main = print (takeWhile (< 100) (iterate (* 2) 1))
+@@N iterate ==> infinite sequence
+@@E
+main :: IO ()
+main = do
+  print (zip3 [1, 2] "ab" [True, False])
+  print (unzip [(1, 'a'), (2, 'b')])
+@@C data-list | sorting and grouping with Data.List | 2 | Orders and deduplicates lists and groups or partitions them with Data.List.
+@@E
+import Data.List (sort, sortBy, nub)
+import Data.Ord (comparing)
+main = do
+  print (sort [3, 1, 2])
+  print (sortBy (comparing negate) [3, 1, 2])
+  print (nub [1, 1, 2])
+@@N comparing ==> sort key
+@@E
+import Data.List (group, sort)
+main = print (map (\g -> (head g, length g)) (group (sort "banana")))
+@@N group ==> runs of equal elements
+@@E
+import Data.List (partition, isPrefixOf)
+main = do
+  print (partition even [1 .. 6])
+  print ("ha" `isPrefixOf` "haskell")
+@@T functors-monads-basics | functors & monads basics
+@@C functors | Functor and fmap | 2 | Maps a function over values inside a container with fmap.
+@@E
+main :: IO ()
+main = do
+  print (fmap (+ 1) [1, 2, 3])
+  print (fmap length (Just "abc"))
+  print ((+ 1) <$> Just 2)
+@@N <$> ==> infix fmap
+@@E
+data Box a = Box a deriving Show
+instance Functor Box where
+  fmap f (Box x) = Box (f x)
+main = print (fmap (* 2) (Box 21))
+@@N instance Functor ==> defines fmap
+@@E
+main :: IO ()
+main = do
+  print (fmap (* 2) (3, 4))
+  print (fmap show (Right 5 :: Either String Int))
+@@N fmap (* 2) (3, 4) ==> changes the second part
+@@C applicative | Applicative | 2 | Applies functions inside containers with pure and the apply operator.
+@@E
+main :: IO ()
+main = do
+  print (Just (+ 3) <*> Just 4)
+  print ((+) <$> Just 1 <*> Just 2)
+  print (pure 5 :: Maybe Int)
+@@N <*> ==> applies a wrapped function
+@@E
+main :: IO ()
+main = print ((,) <$> [1, 2] <*> "ab")
+@@N (,) ==> pair constructor as a function
+@@E
+add3 :: Maybe Int -> Maybe Int -> Maybe Int -> Maybe Int
+add3 a b c = (\x y z -> x + y + z) <$> a <*> b <*> c
+main = print (add3 (Just 1) (Just 2) Nothing)
+@@C monad-bind | Monad and bind | 2 | Chains dependent steps with the bind operator.
+@@E
+half :: Int -> Maybe Int
+half n = if even n then Just (n `div` 2) else Nothing
+main = print (Just 20 >>= half >>= half)
+@@N >>= ==> feeds the result onward
+@@E
+main :: IO ()
+main = print ([1, 2, 3] >>= \x -> [x, x * 10])
+@@N [1, 2, 3] >>= ==> list monad is flat map
+@@E
+pairs :: [(Int, Char)]
+pairs = do
+  n <- [1, 2]
+  c <- "ab"
+  return (n, c)
+main = print pairs
+@@C monad-helpers | mapM, sequence and when | 3 | Runs and combines monadic actions with sequence, mapM and replicateM.
+@@E
+main :: IO ()
+main = do
+  print (sequence [Just 1, Just 2])
+  print (sequence [Just 1, Nothing])
+  print (mapM (\x -> if x > 0 then Just x else Nothing) [1, 2])
+@@N sequence ==> list of actions to action of list
+@@E
+import Control.Monad (forM_, when)
+main = forM_ [1, 2, 3] $ \i -> when (odd i) (print i)
+@@N when ==> runs only if true
+@@E
+import Control.Monad (replicateM, zipWithM_)
+main = do
+  print (replicateM 2 "ab")
+  zipWithM_ (\i s -> putStrLn (show i ++ s)) [1 ..] ["a", "b"]
+@@N replicateM ==> all combinations
+@@T io-do-notation | IO & do notation
+@@C printing | printing output | 1 | Writes text and values to standard output.
+@@E
+main :: IO ()
+main = do
+  putStrLn "Hello"
+  putStr "no newline"
+  putStrLn ""
+  print (1 + 2)
+@@N putStr ==> no trailing newline
+@@N print ==> show then putStrLn
+@@E
+main :: IO ()
+main = do
+  let name = "ada"
+  putStrLn ("Hello, " ++ name)
+@@E
+main :: IO ()
+main = mapM_ putStrLn ["a", "b", "c"]
+@@N mapM_ ==> runs an action per element
+@@C reading-input | reading input | 1 | Reads lines from standard input and converts them.
+@@E
+main :: IO ()
+main = do
+  name <- getLine
+  putStrLn ("Hello, " ++ name)
+@@N <- ==> runs the action, binds the result
+@@E
+main :: IO ()
+main = do
+  line <- getLine
+  let n = read line :: Int
+  print (n * 2)
+@@N let ==> pure binding inside do
+@@E
+main :: IO ()
+main = do
+  contents <- getContents
+  print (length (lines contents))
+@@N getContents ==> all of stdin, lazily
+@@C do-control | control flow in do blocks | 1 | Mixes pure bindings, conditionals and loops inside do blocks.
+@@E
+main :: IO ()
+main = do
+  let xs = [1, 2, 3]
+  let total = sum xs
+  putStrLn ("total: " ++ show total)
+@@E
+main :: IO ()
+main = do
+  r <- return 5
+  if r > 3
+    then putStrLn "big"
+    else putStrLn "small"
+@@N return ==> wraps a value, does not exit
+@@E
+import Control.Monad (forM_, when)
+main = do
+  forM_ [1 .. 3] $ \i -> do
+    when (even i) $ putStrLn "even"
+    print i
+@@N forM_ ==> loop over a list
+@@C files-exceptions | files and exceptions | 2 | Reads and writes files and catches errors with try.
+@@E
+main :: IO ()
+main = do
+  writeFile "notes.txt" "first\nsecond\n"
+  text <- readFile "notes.txt"
+  putStr text
+@@N writeFile ==> replaces the file
+@@E
+main :: IO ()
+main = do
+  appendFile "log.txt" "start\n"
+  appendFile "log.txt" "end\n"
+  readFile "log.txt" >>= putStr
+@@N appendFile ==> adds to the end
+@@E
+import Control.Exception
+main = do
+  r <- try (evaluate (1 `div` 0)) :: IO (Either ArithException Int)
+  print r
+@@N try ==> an Either instead of a crash
+@@N evaluate ==> forces the computation
+@@T modules-imports | modules & imports
+@@C importing | importing names | 1 | Brings selected functions into scope from library modules.
+@@E
+import Data.Char (toUpper, isDigit)
+main = do
+  putStrLn (map toUpper "quiet")
+  print (filter isDigit "a1b2")
+@@N (toUpper, isDigit) ==> import list
+@@E
+import Data.List (sort, nub)
+main = print (sort (nub [3, 1, 3, 2]))
+@@E
+import Data.Maybe
+main = print (fromMaybe 0 Nothing, isJust (Just 1))
+@@N import Data.Maybe ==> no list imports all
+@@C qualified-imports | qualified imports | 1 | Imports a module under a prefix to avoid name clashes.
+@@E
+import qualified Data.Map as Map
+main = print (Map.toList (Map.fromList [(1, "a"), (2, "b")]))
+@@N qualified ==> names need a prefix
+@@N as Map ==> short alias
+@@E
+import qualified Data.Set as Set
+main = print (Set.member 3 (Set.fromList [1, 2, 3]))
+@@E
+import qualified Data.Char as C
+main = putStrLn (map C.toUpper "shout")
+@@C hiding-and-operators | hiding names and importing operators | 2 | Hides clashing names and imports operators in parentheses.
+@@E
+import Prelude hiding (lookup)
+lookup :: Int -> String
+lookup n = "item " ++ show n
+main = putStrLn (lookup 3)
+@@N hiding ==> excludes a Prelude name
+@@E
+import Data.List hiding (insert)
+insert :: Int -> [Int] -> [Int]
+insert x xs = x : xs
+main = print (insert 1 [2])
+@@E
+import Data.Function ((&))
+main = print ([1, 2, 3] & map (* 2) & sum)
+@@N ((&)) ==> operator in the import list
+@@C module-headers | module headers and exports | 2 | Declares a module and lists the names it exports.
+@@E
+module Main (main) where
+greet :: String -> String
+greet name = "Hello, " ++ name
+main :: IO ()
+main = putStrLn (greet "ada")
+@@N (main) ==> export list
+@@E
+module Main where
+import Data.List (intercalate)
+main :: IO ()
+main = putStrLn (intercalate ", " ["a", "b"])
+@@E
+module Geometry (Shape (..), area) where
+data Shape = Square Double | Circle Double
+area :: Shape -> Double
+area (Square s) = s * s
+area (Circle r) = pi * r * r
+@@N Shape (..) ==> type and all constructors
+@@T lazy-evaluation | lazy evaluation
+@@C lazy-basics | lazy basics | 1 | Evaluates expressions only when their values are needed.
+@@E
+main :: IO ()
+main = print (take 3 [1 ..])
+@@N [1 ..] ==> infinite list
+@@E
+main :: IO ()
+main = print (fst (1, undefined))
+@@N undefined ==> never evaluated
+@@E
+main :: IO ()
+main = print (length [undefined, undefined])
+@@N length ==> counts without forcing elements
+@@C infinite-structures | infinite lists | 2 | Defines endless lists and consumes a finite part.
+@@E
+naturals :: [Integer]
+naturals = [0 ..]
+main = print (takeWhile (< 5) naturals)
+@@E
+fibs :: [Integer]
+fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+main = print (take 10 fibs)
+@@N fibs ==> defined in terms of itself
+@@E
+primes :: [Int]
+primes = sieve [2 ..]
+  where sieve (p : xs) = p : sieve [x | x <- xs, x `mod` p /= 0]
+main = print (take 5 primes)
+@@C short-circuiting | laziness in practice | 2 | Skips unused work with short-circuit operators and conditionals.
+@@E
+main :: IO ()
+main = print (True || undefined)
+@@N || ==> right side not evaluated
+@@E
+safeHead :: [a] -> Maybe a
+safeHead xs = if null xs then Nothing else Just (head xs)
+main = print (safeHead ([] :: [Int]))
+@@E
+expensive :: Int
+expensive = sum [1 .. 10000000]
+main = print (if False then expensive else 0)
+@@N expensive ==> never computed
+@@C strictness | forcing evaluation | 3 | Forces values early with seq, strict folds and bang patterns.
+@@E
+import Data.List (foldl')
+main = print (foldl' (+) 0 [1 .. 1000000])
+@@E
+main :: IO ()
+main = do
+  let x = 1 + 2 :: Int
+  x `seq` putStrLn "forced"
+@@N seq ==> evaluates the first argument
+@@E
+mean :: [Double] -> Double
+mean xs = go 0 0 xs
+  where
+    go !s !n [] = s / fromIntegral (n :: Int)
+    go !s !n (y : ys) = go (s + y) (n + 1) ys
+main = print (mean [1, 2, 3, 4])
+@@N !s ==> bang pattern forces s

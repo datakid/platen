@@ -1,0 +1,930 @@
+@@T scalars-strings | scalars & strings
+@@C scalars | scalars and assignment | 1 | Stores single values in variables that start with a dollar sign.
+@@E
+my $name = "ada";
+my $age = 36;
+my $pi = 3.14159;
+print "$name is $age\n";
+@@N my ==> declares a lexical variable
+@@N $name ==> sigil marks a scalar
+@@E
+my $count = 10;
+$count += 5;
+$count++;
+print "$count\n";
+@@E
+my $sum = "5" + 3;
+my $joined = 5 . 3;
+print "$sum $joined\n";
+@@N + ==> numeric addition
+@@N . ==> string concatenation
+@@C quoting-interpolation | quoting and interpolation | 1 | Expands variables in double quotes and keeps single quotes literal.
+@@E
+my $user = "ada";
+print "Hello, $user\n";
+print 'Hello, $user\n', "\n";
+@@N "Hello, $user\n" ==> interpolates
+@@N 'Hello, $user\n' ==> literal text
+@@E
+my @items = ("tea", "cake");
+my %price = (tea => 2.5);
+print "Items: @items, tea costs $price{tea}\n";
+@@N @items ==> joins with spaces
+@@E
+my $n = 3;
+print "Total: ${n}th\n";
+print "Math: @{[ $n * 2 ]}\n";
+@@N @{[ $n * 2 ]} ==> evaluates an expression
+@@E
+my $n = 3;
+print q(single 'quoted' text), "\n";
+print qq(double "quoted" $n), "\n";
+@@N q(single ==> custom single quotes
+@@N qq(double ==> custom double quotes
+@@C string-operators | string operators | 1 | Joins text, repeats it and compares strings with dedicated operators.
+@@E
+my $greeting = "Hello" . ", " . "world";
+print "$greeting\n";
+print "ab" x 3, "\n";
+@@N x ==> repetition
+@@E
+my $s = "abc";
+$s .= "def";
+print length($s), " ", uc($s), "\n";
+@@N .= ==> appends in place
+@@E
+print "apple" lt "banana" ? "yes" : "no", "\n";
+print "a" eq "a" ? "same\n" : "diff\n";
+@@N lt ==> string comparison
+@@N eq ==> string equality
+@@C undef-defined | undef, defined and chomp | 1 | Tests for missing values and removes trailing newlines.
+@@E
+my $line = "text\n";
+chomp($line);
+print "[$line]\n";
+@@N chomp ==> removes one newline
+@@E
+my $x;
+print defined($x) ? "set" : "undef", "\n";
+$x //= "default";
+print "$x\n";
+@@N //= ==> assigns if undefined
+@@E
+my $value = 0;
+my $name = $value || "fallback";
+my $kept = $value // "fallback";
+print "$name $kept\n";
+@@N || ==> falls back on any false value
+@@N // ==> falls back only on undef
+@@T arrays-hashes | arrays & hashes
+@@C arrays | arrays | 1 | Stores ordered lists in variables that start with an at sign.
+@@E
+my @scores = (90, 72, 85);
+print "$scores[0] $scores[-1]\n";
+print scalar(@scores), "\n";
+@@N $scores[0] ==> element uses a dollar sign
+@@N scalar(@scores) ==> number of elements
+@@E
+my @names = qw(ada grace linus);
+push @names, "kay";
+my $last = pop @names;
+print "@names $last\n";
+@@N qw(ada ==> list of words
+@@E
+my @nums = (3, 1, 2);
+unshift @nums, 0;
+my $first = shift @nums;
+print "$first: @nums\n";
+@@N unshift ==> adds at the front
+@@C slices-functions | slices and list functions | 1 | Selects parts of arrays and sorts, reverses or splices them.
+@@E
+my @v = (10, 20, 30, 40);
+print "@v[1, 2]\n";
+print "@v[1 .. 3]\n";
+print "last index $#v\n";
+@@N @v[1, 2] ==> array slice
+@@N $#v ==> last index
+@@E
+my @words = qw(pear fig apple);
+print join(", ", sort @words), "\n";
+print join(", ", reverse @words), "\n";
+@@E
+my @list = (1 .. 5);
+my @part = splice(@list, 1, 2);
+print "@part | @list\n";
+@@N splice ==> removes and returns elements
+@@C hashes | hashes | 1 | Maps string keys to values in variables that start with a percent sign.
+@@E
+my %stock = (apple => 4, pear => 0);
+$stock{plum} = 7;
+print "$stock{apple}\n";
+@@N %stock ==> whole hash
+@@N $stock{plum} ==> one value
+@@E
+my %prices = (tea => 2.5, cake => 4);
+delete $prices{tea};
+print exists $prices{cake} ? "has cake\n" : "no cake\n";
+@@N exists ==> tests for a key
+@@E
+my %age = (ada => 36, linus => 54);
+for my $name (sort keys %age) {
+    print "$name: $age{$name}\n";
+}
+@@N keys ==> list of keys
+@@C hash-idioms | hash slices and counting | 2 | Extracts several values, inverts hashes and counts occurrences.
+@@E
+my %h = (a => 1, b => 2, c => 3);
+my @vals = @h{qw(a c)};
+print "@vals\n";
+@@N @h{qw(a c)} ==> hash slice
+@@E
+my %h = (a => 1, b => 2);
+my %inverse = reverse %h;
+print join(",", map { "$_=$inverse{$_}" } sort keys %inverse), "\n";
+@@N reverse %h ==> swaps keys and values
+@@E
+my %count;
+$count{$_}++ for qw(a b a c a);
+print join(" ", map { "$_:$count{$_}" } sort keys %count), "\n";
+@@N $count{$_}++ ==> autovivifies the key
+@@T control-flow | control flow
+@@C conditionals | if, elsif and unless | 1 | Branches with if, elsif, else, unless and the ternary operator.
+@@E
+my $temperature = 28;
+if ($temperature > 25) {
+    print "warm\n";
+} elsif ($temperature > 10) {
+    print "mild\n";
+} else {
+    print "cold\n";
+}
+@@N elsif ==> not elseif
+@@E
+my $score = 72;
+print $score >= 60 ? "pass\n" : "fail\n";
+@@N ? "pass\n" ==> ternary operator
+@@E
+my $logged_in = 0;
+unless ($logged_in) {
+    print "please log in\n";
+}
+print "done\n" if !$logged_in;
+@@N unless ==> if not
+@@N if ==> statement modifier
+@@C for-foreach | for and foreach loops | 1 | Repeats code over ranges, lists and C-style counters.
+@@E
+for my $i (1 .. 3) {
+    print "$i\n";
+}
+@@N 1 .. 3 ==> range operator
+@@E
+for (my $i = 0; $i < 3; $i++) {
+    print "step $i\n";
+}
+@@N for (my $i = 0 ==> init; test; step
+@@E
+my @names = qw(ada grace);
+foreach my $name (@names) {
+    print "Hello, $name\n";
+}
+@@C while-until | while, until and loop control | 1 | Loops on a condition and controls iterations with next and last.
+@@E
+my $n = 3;
+while ($n > 0) {
+    print "$n\n";
+    $n--;
+}
+@@E
+my $i = 0;
+until ($i >= 3) {
+    $i++;
+}
+print "$i\n";
+@@N until ==> loops while false
+@@E
+for my $i (1 .. 10) {
+    next if $i == 3;
+    last if $i > 5;
+    print "$i\n";
+}
+@@N next ==> skips an iteration
+@@N last ==> leaves the loop
+@@C modifiers-labels | statement modifiers and labels | 2 | Writes one-line loops and conditions and jumps out of nested loops.
+@@E
+print "$_\n" for 1 .. 3;
+@@N for ==> modifier sets $_
+@@E
+my $x = 5;
+print "big\n" if $x > 3;
+print "small\n" unless $x > 3;
+@@E
+OUTER: for my $i (1 .. 3) {
+    for my $j (1 .. 3) {
+        next OUTER if $j == 2;
+        print "$i$j\n";
+    }
+}
+@@N OUTER: ==> label
+@@N next OUTER ==> continues the outer loop
+@@T subroutines | subroutines
+@@C defining-subs | defining and calling subs | 1 | Defines subroutines that read their arguments from the array @_.
+@@E
+sub square {
+    my ($n) = @_;
+    return $n * $n;
+}
+print square(4), "\n";
+@@N @_ ==> the argument list
+@@N my ($n) ==> copies the first argument
+@@E
+sub greet {
+    my ($name, $greeting) = @_;
+    $greeting //= "Hello";
+    return "$greeting, $name";
+}
+print greet("ada"), "\n";
+@@N //= ==> default for a missing argument
+@@E
+sub area {
+    my ($w, $h) = @_;
+    $w * $h;
+}
+print area(3, 4), "\n";
+@@N $w * $h ==> last value is returned
+@@C arguments-returns | arguments and return lists | 2 | Accepts any number of arguments and returns several values.
+@@E
+sub total {
+    my $sum = 0;
+    $sum += $_ for @_;
+    return $sum;
+}
+print total(1, 2, 3), "\n";
+@@E
+sub min_max {
+    my @sorted = sort { $a <=> $b } @_;
+    return ($sorted[0], $sorted[-1]);
+}
+my ($lo, $hi) = min_max(3, 1, 2);
+print "$lo $hi\n";
+@@N return ($sorted[0] ==> returns a list
+@@E
+sub config {
+    my %args = (port => 80, @_);
+    return "$args{host}:$args{port}";
+}
+print config(host => "example.com"), "\n";
+@@N (port => 80, @_) ==> defaults then overrides
+@@C context-code-refs | context and code references | 2 | Detects the calling context and stores subs in variables.
+@@E
+sub context {
+    return wantarray ? "list" : "scalar";
+}
+my @l = context();
+my $s = context();
+print "$l[0] $s\n";
+@@N wantarray ==> true in list context
+@@E
+my $double = sub { return $_[0] * 2 };
+print $double->(4), "\n";
+@@N sub { return $_[0] * 2 } ==> anonymous sub
+@@N $double->(4) ==> calls a code reference
+@@E
+sub apply {
+    my ($f, @items) = @_;
+    return map { $f->($_) } @items;
+}
+print join(",", apply(sub { $_[0] + 1 }, 1, 2, 3)), "\n";
+@@C closures-recursion | closures and recursion | 2 | Captures lexical variables and calls subs recursively.
+@@E
+sub make_counter {
+    my $count = 0;
+    return sub { return ++$count };
+}
+my $counter = make_counter();
+$counter->();
+print $counter->(), "\n";
+@@N $count ==> kept alive by the closure
+@@E
+sub fact {
+    my ($n) = @_;
+    return $n <= 1 ? 1 : $n * fact($n - 1);
+}
+print fact(5), "\n";
+@@E
+sub adder {
+    my ($n) = @_;
+    return sub { return $_[0] + $n };
+}
+my $add5 = adder(5);
+print $add5->(10), "\n";
+@@T references | references
+@@C refs-deref | references and dereferencing | 1 | Points at variables with a backslash and follows them with sigils or arrows.
+@@E
+my @nums = (1, 2, 3);
+my $ref = \@nums;
+print "$$ref[0] @{$ref}\n";
+print scalar(@$ref), "\n";
+@@N \@nums ==> reference to an array
+@@N @{$ref} ==> dereferences the array
+@@E
+my %h = (a => 1);
+my $href = \%h;
+print "$href->{a} $$href{a}\n";
+@@N ->{a} ==> arrow access
+@@E
+my $x = 10;
+my $r = \$x;
+$$r += 5;
+print "$x\n";
+@@N $$r ==> dereferences a scalar
+@@C anonymous-structures | anonymous arrays and hashes | 1 | Builds references directly with brackets and braces.
+@@E
+my $list = [1, 2, 3];
+print "$list->[1] ", scalar(@$list), "\n";
+@@N [1, 2, 3] ==> anonymous array
+@@E
+my $user = { name => "ada", age => 36 };
+print "$user->{name} is $user->{age}\n";
+@@N { name => "ada" ==> anonymous hash
+@@E
+my @people = ({ name => "ada" }, { name => "grace" });
+print $people[1]{name}, "\n";
+@@N [1]{name} ==> arrows are optional between subscripts
+@@C nested-data | nested data structures | 2 | Combines arrays and hashes into deeper structures.
+@@E
+my %data = (
+    langs => ["perl", "c"],
+    owner => { name => "ada" },
+);
+print "$data{langs}[0] $data{owner}{name}\n";
+@@E
+my @matrix = ([1, 2], [3, 4]);
+print $matrix[1][0], "\n";
+print join(",", map { $_->[1] } @matrix), "\n";
+@@N $_->[1] ==> second element of each row
+@@E
+my %tree;
+$tree{a}{b}{c} = 1;
+print join(",", keys %{ $tree{a} }), "\n";
+@@N $tree{a}{b}{c} ==> autovivifies the levels
+@@C ref-helpers | ref, by-reference arguments and dispatch | 2 | Inspects reference types, passes data by reference and dispatches on a hash of subs.
+@@E
+print ref([]), " ", ref({}), " ", ref(sub {}), " ", ref(\1), "\n";
+@@N ref ==> type name of a reference
+@@E
+sub add_item {
+    my ($list, $item) = @_;
+    push @$list, $item;
+}
+my @items = ("a");
+add_item(\@items, "b");
+print "@items\n";
+@@N \@items ==> avoids copying the array
+@@E
+my %op = (
+    add => sub { return $_[0] + $_[1] },
+    mul => sub { return $_[0] * $_[1] },
+);
+print $op{mul}->(3, 4), "\n";
+@@N $op{mul}->(3, 4) ==> call by key
+@@T regular-expressions | regular expressions
+@@C matching | matching | 1 | Tests strings against patterns with the binding operator.
+@@E
+my $text = "call 555-1234 now";
+if ($text =~ /(\d+)-(\d+)/) {
+    print "$1 / $2\n";
+}
+@@N =~ ==> binds the match
+@@N $1 ==> first capture group
+@@E
+my $email = "ada\@example.com";
+print "valid\n" if $email =~ /^\w+\@\w+\.com$/;
+@@N \@ ==> literal at sign
+@@E
+my $word = "Perl";
+print "match\n" if $word =~ /^perl$/i;
+print "no match\n" if $word !~ /^java/;
+@@N /i ==> ignore case
+@@N !~ ==> does not match
+@@C substitution | substitution and transliteration | 1 | Replaces text with s/// and translates characters with tr///.
+@@E
+my $s = "red apple, red car";
+(my $t = $s) =~ s/red/green/g;
+print "$t\n";
+@@N s/red/green/g ==> replace every match
+@@N (my $t = $s) ==> copy then modify
+@@E
+my $text = "hello";
+(my $up = $text) =~ tr/a-z/A-Z/;
+print "$up\n";
+@@N tr/a-z/A-Z/ ==> character translation
+@@E
+my $price = "cost: 12";
+my $new = $price =~ s/(\d+)/$1 * 2/er;
+print "$new\n";
+@@N /er ==> evaluate, and return the result
+@@C captures-global | captures and global matching | 2 | Collects all matches and named groups.
+@@E
+my $dates = "2024-01-15 and 2023-12-31";
+my @years = $dates =~ /(\d{4})-/g;
+print "@years\n";
+@@N /g ==> in list context, all matches
+@@E
+my $text = "a1b22c333";
+while ($text =~ /(\d+)/g) {
+    print "found $1\n";
+}
+@@N while ($text =~ /(\d+)/g) ==> iterates over matches
+@@E
+if ("john smith" =~ /(?<first>\w+) (?<last>\w+)/) {
+    print "$+{last}, $+{first}\n";
+}
+@@N (?<first>\w+) ==> named capture
+@@N $+{last} ==> read a named capture
+@@C split-qr | split, qr and modifiers | 2 | Splits on patterns and stores patterns in variables with qr.
+@@E
+my @parts = split /,\s*/, "a, b,c";
+print join("|", @parts), "\n";
+@@N split ==> pattern, then string
+@@E
+my $str = "one two  three";
+my @words = split ' ', $str;
+print scalar(@words), "\n";
+@@N split ' ' ==> splits on runs of whitespace
+@@E
+my $re = qr/(\w+)\@(\w+)/;
+my ($user, $host) = "ada\@example" =~ $re;
+print "$user at $host\n";
+@@N qr/(\w+) ==> compiled pattern
+@@T file-i-o | file I/O
+@@C read-write-files | reading and writing files | 1 | Opens files for writing and reading with lexical filehandles.
+@@E
+open(my $out, '>', "notes.txt") or die $!;
+print $out "first\nsecond\n";
+close($out);
+open(my $in, '<', "notes.txt") or die $!;
+while (my $line = <$in>) {
+    chomp $line;
+    print "got: $line\n";
+}
+close($in);
+unlink "notes.txt";
+@@N '>' ==> write mode
+@@N <$in> ==> reads one line
+@@E
+open(my $log, '>>', "log.txt") or die $!;
+print $log "start\n";
+print $log "end\n";
+close($log);
+open(my $fh, '<', "log.txt") or die $!;
+my @lines = <$fh>;
+close($fh);
+print scalar(@lines), " lines\n";
+unlink "log.txt";
+@@N '>>' ==> append mode
+@@N my @lines = <$fh> ==> all lines in list context
+@@E
+open(my $fh, '>', "data.txt") or die $!;
+print $fh "x";
+close($fh);
+print -e "data.txt" ? "exists\n" : "missing\n";
+print -s "data.txt", " bytes\n";
+unlink "data.txt";
+@@N -e ==> file exists
+@@N -s ==> size in bytes
+@@C slurp-and-errors | slurping and handling errors | 2 | Reads a whole file at once and reports failures with the error variable.
+@@E
+open(my $fh, '>', "t.txt") or die $!;
+print $fh "a\nb\n";
+close($fh);
+my $content = do {
+    local $/;
+    open(my $in, '<', "t.txt") or die $!;
+    <$in>;
+};
+print length($content), "\n";
+unlink "t.txt";
+@@N local $/ ==> no line separator
+@@E
+my $data = "x\ny\nz\n";
+open(my $fh, '<', \$data) or die $!;
+my @lines = <$fh>;
+chomp @lines;
+print "@lines\n";
+@@N \$data ==> in-memory filehandle
+@@E
+open(my $fh, '<', "missing.txt") or print "cannot open: $!\n";
+@@N $! ==> system error message
+@@C directories | directories and file tests | 2 | Handles creating, listing and removing directories and testing paths.
+@@E
+mkdir "tmp_dir" unless -d "tmp_dir";
+open(my $fh, '>', "tmp_dir/a.txt") or die $!;
+close($fh);
+my @files = glob("tmp_dir/*.txt");
+print "@files\n";
+unlink @files;
+rmdir "tmp_dir";
+@@N glob ==> files matching a pattern
+@@E
+opendir(my $dh, ".") or die $!;
+my @entries = grep { !/^\./ } readdir($dh);
+closedir($dh);
+print "listed\n";
+@@N readdir ==> names in a directory
+@@E
+print "dir\n" if -d ".";
+print "readable\n" if -r $0;
+@@N $0 ==> name of the script
+@@C output-formatting | standard streams and separators | 2 | Writes to STDOUT and STDERR and changes the output separators.
+@@E
+print STDOUT "to stdout\n";
+print STDERR "to stderr\n";
+@@N STDERR ==> error stream
+@@E
+printf("%-6s|%5.2f|\n", "tea", 2.5);
+@@N %-6s ==> left aligned
+@@E
+{
+    local $, = "-";
+    local $\ = "\n";
+    print "a", "b", "c";
+}
+@@N $, ==> separator between items
+@@N $\ ==> added after the last item
+@@T string-functions-sprintf | string functions & sprintf
+@@C basic-string-functions | basic string functions | 1 | Handles length, case changes and substring extraction.
+@@E
+my $s = "Hello, World";
+print length($s), "\n";
+print uc($s), " ", lc($s), "\n";
+print ucfirst(lc("PERL")), "\n";
+@@N ucfirst ==> capitalise the first letter
+@@E
+my $s = "abcdef";
+print substr($s, 1, 3), "\n";
+print index($s, "cd"), " ", rindex($s, "f"), "\n";
+@@N substr ==> offset and length
+@@N index ==> position or -1
+@@E
+my $s = "hello";
+substr($s, 0, 1) = "J";
+print "$s\n";
+print scalar reverse($s), "\n";
+@@N substr($s, 0, 1) = ==> assigns into the string
+@@C join-split-repeat | join, split and repeat | 1 | Converts between strings and lists and repeats text.
+@@E
+my @parts = split /,/, "a,b,c";
+print join("-", @parts), "\n";
+@@N join ==> list to string
+@@E
+print "-" x 10, "\n";
+print join(", ", ("ab") x 3), "\n";
+@@N ("ab") x 3 ==> repeats a list
+@@E
+my $csv = join ",", map { qq("$_") } qw(a b);
+print "$csv\n";
+@@C sprintf-formatting | sprintf and printf | 1 | Formats numbers and text with printf-style directives.
+@@E
+printf("%05d\n", 42);
+printf("%.2f\n", 3.14159);
+printf("%-8s|\n", "ada");
+printf("%8s|\n", "ada");
+@@N %05d ==> zero padded
+@@N %.2f ==> two decimals
+@@E
+my $s = sprintf("%s has %d items (%.1f%%)", "cart", 3, 42.5);
+print "$s\n";
+@@N sprintf ==> returns the string
+@@N %% ==> literal percent
+@@E
+print sprintf("%x %o %b %e", 255, 8, 5, 12345.678), "\n";
+@@N %x %o %b ==> hex, octal, binary
+@@C trimming-chars | trimming and characters | 2 | Cleans whitespace with substitutions and converts between characters and codes.
+@@E
+my $s = "  padded  ";
+$s =~ s/^\s+|\s+$//g;
+print "[$s]\n";
+@@N ^\s+|\s+$ ==> leading or trailing space
+@@E
+print ord("A"), " ", chr(97), "\n";
+print join(",", map { ord } split //, "abc"), "\n";
+@@N ord ==> character code
+@@N split // ==> one element per character
+@@E
+my $text = "the quick brown fox";
+my $count = () = $text =~ /o/g;
+print "$count\n";
+print join(" ", map { ucfirst } split / /, $text), "\n";
+@@N () = ==> counts the matches
+@@T modules-use | modules & use
+@@C pragmas-core | pragmas and core modules | 1 | Loads pragmas and core modules with use and imports chosen functions.
+@@E
+use strict;
+use warnings;
+my $x = 5;
+print "$x\n";
+@@N use strict ==> requires declared variables
+@@N use warnings ==> reports questionable code
+@@E
+use List::Util qw(sum max min first);
+print sum(1, 2, 3), " ", max(4, 9, 2), " ", min(4, 9, 2), "\n";
+print first { $_ > 2 } (1, 2, 3, 4);
+print "\n";
+@@N qw(sum max min first) ==> names to import
+@@E
+use POSIX qw(floor ceil);
+print floor(3.7), " ", ceil(3.2), "\n";
+@@C data-and-paths | Data::Dumper and path modules | 2 | Dumps structures and handles file paths with core modules.
+@@E
+use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+$Data::Dumper::Indent = 1;
+print Dumper({ a => 1, b => [2, 3] });
+@@N Dumper ==> prints a data structure
+@@E
+use File::Basename;
+my $path = "/var/log/app.log";
+print basename($path), " ", dirname($path), "\n";
+@@E
+use File::Spec;
+print File::Spec->catfile("data", "2024", "report.csv"), "\n";
+@@N catfile ==> joins path parts
+@@C constants-options | constants and options | 2 | Defines constants with use constant and parses command-line options.
+@@E
+use constant PI => 3.14159;
+use constant { MAX => 10, MIN => 1 };
+print PI * 2, " ", MAX - MIN, "\n";
+@@N use constant ==> compile-time constant
+@@E
+use Getopt::Long;
+local @ARGV = ("--name", "ada", "--verbose");
+GetOptions("name=s" => \my $name, "verbose" => \my $verbose);
+print "$name $verbose\n";
+@@N GetOptions ==> fills the variables
+@@E
+BEGIN {
+    package Greeter;
+    sub hello { return "hello" }
+    $INC{'Greeter.pm'} = 1;
+}
+use Greeter;
+print Greeter::hello(), "\n";
+@@N $INC{'Greeter.pm'} ==> pretends the file was loaded
+@@C require-qualified | require and qualified names | 2 | Loads modules at run time and calls their functions by full name.
+@@E
+use Cwd ();
+print Cwd::getcwd() ne "" ? "cwd ok\n" : "none\n";
+@@N () ==> imports nothing
+@@E
+require File::Basename;
+my $file = File::Basename::basename("/tmp/report.txt");
+print "$file\n";
+@@N require ==> loads at run time
+@@E
+use List::Util ();
+print List::Util::sum(1 .. 4), "\n";
+@@T packages-bless | packages & bless
+@@C packages | packages and namespaces | 1 | Groups subs under a package name and calls them with a qualified name.
+@@E
+package Math;
+sub square { my ($n) = @_; return $n * $n }
+package main;
+print Math::square(4), "\n";
+@@N package ==> switches the namespace
+@@E
+package Counter;
+my $count = 0;
+sub next_id { return ++$count }
+package main;
+print Counter::next_id(), Counter::next_id(), "\n";
+@@E
+package Util {
+    sub shout { return uc($_[0]) . "!" }
+}
+print Util::shout("hey"), "\n";
+@@N package Util { ==> block form
+@@C objects | objects with bless | 2 | Turns a reference into an object by blessing it into a package.
+@@E
+package Counter;
+sub new {
+    my ($class) = @_;
+    return bless { value => 0 }, $class;
+}
+sub increment { my $self = shift; $self->{value}++; return $self }
+package main;
+my $c = Counter->new;
+$c->increment->increment;
+print $c->{value}, "\n";
+@@N bless ==> attaches the package to the data
+@@N Counter->new ==> class method call
+@@E
+package Point;
+sub new {
+    my ($class, %args) = @_;
+    return bless { x => $args{x} // 0, y => $args{y} // 0 }, $class;
+}
+sub x { $_[0]{x} }
+package main;
+my $p = Point->new(x => 3);
+print $p->x, " ", ref($p), "\n";
+@@N ref($p) ==> the class name
+@@E
+package User;
+sub new {
+    my ($class, $name) = @_;
+    return bless { name => $name }, $class;
+}
+sub name { return $_[0]->{name} }
+package main;
+print User->new("ada")->name, "\n";
+@@C methods-accessors | methods and accessors | 2 | Writes instance methods and generates accessors.
+@@E
+package Rect;
+sub new { my ($c, %a) = @_; return bless {%a}, $c }
+sub area { my $s = shift; return $s->{w} * $s->{h} }
+package main;
+print Rect->new(w => 3, h => 4)->area, "\n";
+@@N shift ==> takes the invocant
+@@E
+package Temp;
+sub new { my ($c, $v) = @_; return bless { c => $v }, $c }
+sub to_f { return $_[0]{c} * 9 / 5 + 32 }
+package main;
+print Temp->new(100)->to_f, "\n";
+@@E
+package Person;
+sub new { return bless { name => $_[1], age => $_[2] }, $_[0] }
+for my $f (qw(name age)) {
+    no strict 'refs';
+    *{"Person::$f"} = sub { return $_[0]{$f} };
+}
+package main;
+print Person->new("ada", 36)->name, "\n";
+@@N *{"Person::$f"} ==> installs a sub by name
+@@C inheritance | inheritance and introspection | 2 | Inherits with @ISA or parent and checks classes with isa and can.
+@@E
+package Animal;
+sub new { my ($c, $n) = @_; return bless { name => $n }, $c }
+sub speak { return "..." }
+package Dog;
+our @ISA = ('Animal');
+sub speak { return "woof" }
+package main;
+print Dog->new("rex")->speak, "\n";
+@@N @ISA ==> list of parent classes
+@@E
+package Animal;
+sub new { my ($c) = @_; return bless {}, $c }
+sub speak { return "..." }
+package Dog;
+use parent -norequire, 'Animal';
+sub speak { my $self = shift; return "woof, " . $self->SUPER::speak() }
+package main;
+print Dog->new->speak, "\n";
+@@N SUPER:: ==> parent method
+@@E
+package Animal;
+sub new { return bless {}, shift }
+package Dog;
+our @ISA = ('Animal');
+package main;
+my $d = Dog->new;
+print $d->isa('Animal') ? "isa\n" : "no\n";
+print Dog->can('new') ? "can new\n" : "cannot\n";
+@@N isa ==> class membership test
+@@N can ==> method lookup
+@@T sort-map-grep | sort, map, grep
+@@C sorting | sorting | 1 | Orders lists with sort and a comparison block.
+@@E
+my @nums = (10, 9, 100, 1);
+print join(",", sort @nums), "\n";
+print join(",", sort { $a <=> $b } @nums), "\n";
+@@N sort ==> string order by default
+@@N <=> ==> numeric comparison
+@@E
+my @words = qw(pear fig apple);
+print join(" ", sort { length($a) <=> length($b) } @words), "\n";
+print join(" ", sort { $b cmp $a } @words), "\n";
+@@N cmp ==> string comparison
+@@E
+my %age = (ada => 36, linus => 54, grace => 30);
+for my $n (sort { $age{$a} <=> $age{$b} } keys %age) {
+    print "$n $age{$n}\n";
+}
+@@N $age{$a} ==> $a and $b are the pair
+@@C map | map | 1 | Transforms each element of a list with a block.
+@@E
+my @squares = map { $_ * $_ } (1 .. 5);
+print "@squares\n";
+@@N map ==> builds a new list
+@@E
+my @names = qw(ada grace);
+my %length = map { $_ => length($_) } @names;
+print join(",", map { "$_=$length{$_}" } sort keys %length), "\n";
+@@N $_ => ==> list becomes a hash
+@@E
+my @pairs = map { [$_, $_ * 2] } (1 .. 3);
+print join(" ", map { "$_->[0]:$_->[1]" } @pairs), "\n";
+@@C grep | grep | 1 | Selects the elements for which a block or pattern is true.
+@@E
+my @nums = (1 .. 10);
+my @even = grep { $_ % 2 == 0 } @nums;
+print "@even\n";
+@@N grep ==> keeps matching elements
+@@E
+my @words = qw(apple avocado banana);
+my @a = grep { /^a/ } @words;
+print scalar(@a), "\n";
+@@E
+my @list = (3, 8, 1);
+my ($first_big) = grep { $_ > 5 } @list;
+print "$first_big\n";
+print scalar(grep { $_ > 2 } @list), "\n";
+@@N scalar(grep { ==> count of matches
+@@C combining | combining sort, map and grep | 2 | Chains list operators and uses List::Util for folds and uniqueness.
+@@E
+my @words = qw(pear fig banana);
+my @sorted = map { $_->[1] }
+             sort { $a->[0] <=> $b->[0] }
+             map { [length($_), $_] } @words;
+print "@sorted\n";
+@@N sort { $a->[0] ==> sorts by a precomputed key
+@@E
+use List::Util qw(reduce);
+my $product = reduce { $a * $b } 1 .. 5;
+print "$product\n";
+@@N reduce ==> folds a list
+@@E
+my @uniq = do { my %s; grep { !$s{$_}++ } qw(a b a c b) };
+print "@uniq\n";
+@@N !$s{$_}++ ==> true the first time only
+@@T here-docs-context | here-docs & context
+@@C here-docs | here-docs | 1 | Writes multiline text with heredoc terminators.
+@@E
+my $name = "ada";
+print <<"END";
+Dear $name,
+welcome aboard.
+END
+@@N <<"END" ==> interpolating heredoc
+@@E
+print <<'END';
+No $interpolation here.
+END
+@@N <<'END' ==> literal heredoc
+@@E
+my $text = <<~EOT;
+    indented body
+      keeps relative indent
+    EOT
+print $text;
+@@N <<~ ==> strips common indent
+@@C scalar-list-context | scalar and list context | 1 | Evaluates expressions differently depending on whether a scalar or list is wanted.
+@@E
+my @items = (1, 2, 3);
+my $count = @items;
+my ($first) = @items;
+print "$count $first\n";
+@@N my $count = @items ==> scalar context, the length
+@@N my ($first) = ==> list context, the element
+@@E
+my @a = (4, 5, 6);
+print "n=" . @a . "\n";
+print "last=$a[-1] size=${\ scalar(@a)}\n";
+@@N . @a . ==> concatenation forces scalar context
+@@E
+my @t = gmtime(0);
+my $when = gmtime(0);
+print "$t[5] $when\n";
+@@N gmtime ==> list or string by context
+@@C context-functions | context-sensitive functions | 2 | Reverses strings or lists and counts list assignments.
+@@E
+print scalar reverse("abc"), "\n";
+print reverse("abc"), "\n";
+@@N scalar reverse ==> reverses characters
+@@E
+my @list = (1) x 3;
+my $n = () = (1, 2, 3, 4);
+print "@list $n\n";
+@@N () = ==> counts the right side
+@@E
+my @words = qw(a b c);
+my $last = $words[-1];
+my $len = scalar(@words);
+print "$last $len $#words\n";
+@@C special-variables | special variables | 2 | Uses $_, @ARGV and $@ for implicit and error values.
+@@E
+for (qw(a b)) {
+    print;
+    print "\n";
+}
+@@N print ==> prints $_ when bare
+@@E
+local @ARGV = ("one", "two");
+print scalar(@ARGV), " $ARGV[0]\n";
+@@N @ARGV ==> command-line arguments
+@@E
+my $ok = eval { die "boom\n"; 1 };
+print "error: $@" unless $ok;
+@@N eval ==> traps die
+@@N $@ ==> the error message

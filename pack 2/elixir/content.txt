@@ -1,0 +1,1044 @@
+@@T values-types | values & types
+@@C basic-types | basic types | 1 | Prints and tests integers, floats, booleans, atoms and strings.
+@@E
+IO.puts(42)
+IO.puts(3.14)
+IO.puts(true)
+IO.puts(:ok)
+IO.puts("text")
+@@N :ok ==> an atom
+@@E
+IO.inspect(is_integer(42))
+IO.inspect(is_float(1.5))
+IO.inspect(is_atom(:ok))
+IO.inspect(is_binary("hi"))
+@@N is_binary ==> true for strings
+@@E
+IO.inspect(7 / 2)
+IO.inspect(div(7, 2))
+IO.inspect(rem(7, 2))
+IO.inspect(2 ** 10)
+@@N / ==> always a float
+@@N div ==> integer division
+@@C variables | variables and rebinding | 1 | Binds names to immutable values and rebinds them.
+@@E
+city = "Oslo"
+visits = 0
+visits = visits + 1
+IO.puts("#{city}: #{visits}")
+@@N visits = ==> rebinding, not mutation
+@@E
+price = 9.99
+quantity = 3
+total = price * quantity
+IO.puts(total)
+@@E
+x = 1
+rebound = fn -> x end
+x = 2
+IO.puts(rebound.())
+@@N fn -> x end ==> captured the earlier value
+@@C atoms-booleans-nil | atoms, booleans and nil | 1 | Works with atoms and the logical operators and, or, not and the short-circuit pair.
+@@E
+status = :active
+IO.inspect(status == :active)
+IO.inspect(:"with space")
+@@N :"with space" ==> atom with spaces
+@@E
+IO.inspect(true and false)
+IO.inspect(nil || "default")
+IO.inspect(not true)
+@@N and ==> needs booleans
+@@N || ==> works with any value
+@@E
+IO.inspect(nil)
+IO.inspect(is_nil(nil))
+IO.inspect(1 && 2)
+@@C strings | strings | 1 | Handles joining, interpolation and case changes of UTF-8 strings.
+@@E
+name = "ada"
+IO.puts("Hello, #{name}")
+IO.puts("Hello, " <> name)
+@@N #{name} ==> interpolation
+@@N <> ==> concatenation
+@@E
+IO.puts(String.upcase("quiet"))
+IO.puts(String.length("héllo"))
+IO.inspect(String.split("a,b,c", ","))
+@@E
+IO.inspect(String.trim("  padded  "))
+IO.inspect(String.replace("red apple", "red", "green"))
+IO.inspect(String.contains?("apple", "pl"))
+@@N contains? ==> predicate ends in ?
+@@T pattern-matching | pattern matching
+@@C match-operator | the match operator | 1 | Binds variables by matching the right side against the left.
+@@E
+{status, value} = {:ok, 42}
+IO.inspect(status)
+IO.inspect(value)
+@@N = ==> match, not assignment
+@@E
+[first, second | rest] = [1, 2, 3, 4]
+IO.inspect({first, second, rest})
+@@N | rest ==> remaining elements
+@@E
+x = 5
+5 = x
+IO.puts("matched")
+@@N 5 = x ==> succeeds because values equal
+@@C destructuring | maps, tuples and the pin operator | 2 | Extracts values from maps and tuples and matches existing values with a caret.
+@@E
+%{name: name, age: age} = %{name: "ada", age: 36}
+IO.puts("#{name} is #{age}")
+@@N %{name: name, age: age} ==> partial map match
+@@E
+expected = 5
+^expected = 5
+IO.puts("pinned")
+@@N ^expected ==> use the existing value
+@@E
+{:ok, %{id: id}} = {:ok, %{id: 7, role: :admin}}
+IO.inspect(id)
+@@C function-heads | matching in function heads | 1 | Chooses a function clause by the shape of its arguments.
+@@E
+defmodule Math do
+  def describe(0), do: "zero"
+  def describe(n) when n > 0, do: "positive"
+  def describe(_), do: "negative"
+end
+IO.puts(Math.describe(3))
+@@N when ==> guard
+@@E
+defmodule Shape do
+  def area({:circle, r}), do: 3.14159 * r * r
+  def area({:rect, w, h}), do: w * h
+end
+IO.puts(Shape.area({:rect, 3, 4}))
+@@N {:circle, r} ==> tagged tuple
+@@E
+defmodule Lists do
+  def first([]), do: nil
+  def first([head | _]), do: head
+end
+IO.inspect(Lists.first([1, 2]))
+@@C repeated-and-failed | repeated variables and match errors | 2 | Matches equal values with repeated names and raises MatchError otherwise.
+@@E
+case {1, 2} do
+  {a, a} -> IO.puts("same")
+  {a, b} -> IO.puts("different #{a} #{b}")
+end
+@@N {a, a} ==> both must be equal
+@@E
+{_, second, _} = {1, 2, 3}
+IO.puts(second)
+@@N _ ==> ignored value
+@@E
+try do
+  {:ok, _} = {:error, :bad}
+rescue
+  MatchError -> IO.puts("no match")
+end
+@@N MatchError ==> raised on failure
+@@T functions-the-pipe-operator | functions & the pipe operator
+@@C anonymous-functions | anonymous functions | 1 | Creates functions with fn and calls them with a dot.
+@@E
+square = fn n -> n * n end
+IO.puts(square.(4))
+@@N square.(4) ==> dot calls an anonymous function
+@@E
+add = fn a, b -> a + b end
+IO.puts(add.(2, 3))
+@@E
+double = &(&1 * 2)
+IO.inspect(Enum.map([1, 2, 3], double))
+@@N &1 ==> first argument of the capture
+@@C named-functions | named functions | 1 | Defines public and private functions inside modules.
+@@E
+defmodule Greeter do
+  def hello(name), do: "Hello, #{name}"
+end
+IO.puts(Greeter.hello("ada"))
+@@N def ==> public function
+@@E
+defmodule Geometry do
+  def area(w, h \\ 1), do: w * h
+end
+IO.puts(Geometry.area(3, 4))
+IO.puts(Geometry.area(5))
+@@N \\ ==> default argument
+@@E
+defmodule Util do
+  defp secret, do: 42
+  def reveal, do: secret()
+end
+IO.puts(Util.reveal())
+@@N defp ==> private function
+@@C pipe-operator | the pipe operator | 1 | Passes the result of one call as the first argument of the next.
+@@E
+"  Hello World "
+|> String.trim()
+|> String.downcase()
+|> IO.puts()
+@@N |> ==> result becomes first argument
+@@E
+[1, 2, 3, 4]
+|> Enum.filter(&(&1 > 1))
+|> Enum.map(&(&1 * 10))
+|> IO.inspect()
+@@E
+"a,b,c"
+|> String.split(",")
+|> Enum.join("-")
+|> IO.puts()
+@@C captures-composition | captures and composition | 2 | Turns named functions into values and builds functions from functions.
+@@E
+IO.inspect(Enum.map(["a", "b"], &String.upcase/1))
+@@N &String.upcase/1 ==> function capture
+@@E
+add_one = &(&1 + 1)
+IO.inspect(add_one.(5))
+IO.inspect((&Kernel.+/2).(1, 2))
+@@N &Kernel.+/2 ==> operator as a function
+@@E
+compose = fn f, g -> fn x -> g.(f.(x)) end end
+inc_then_double = compose.(&(&1 + 1), &(&1 * 2))
+IO.puts(inc_then_double.(3))
+@@T lists-tuples-keyword-lists | lists, tuples, keyword lists
+@@C lists | lists | 1 | Works with linked lists using head, tail and list operators.
+@@E
+scores = [90, 72, 85]
+IO.inspect(hd(scores))
+IO.inspect(tl(scores))
+IO.inspect(length(scores))
+@@N hd ==> first element
+@@N tl ==> everything else
+@@E
+IO.inspect([1, 2] ++ [3, 4])
+IO.inspect([1, 2, 3, 2] -- [2])
+IO.inspect(0 in [0, 1])
+@@N -- ==> removes the first match
+@@E
+list = [3, 1, 2]
+IO.inspect(Enum.sort(list))
+IO.inspect(Enum.reverse(list))
+IO.inspect([0 | list])
+@@N [0 | list] ==> prepend is cheap
+@@C tuples | tuples | 1 | Groups a fixed number of values and reads them by position.
+@@E
+point = {3, 4}
+IO.inspect(elem(point, 0))
+IO.inspect(tuple_size(point))
+@@N elem ==> zero-based position
+@@E
+result = {:ok, "data"}
+{:ok, body} = result
+IO.puts(body)
+@@N {:ok, body} ==> conventional result tuple
+@@E
+IO.inspect(put_elem({1, 2}, 1, 9))
+IO.inspect(Tuple.to_list({1, 2, 3}))
+@@C keyword-lists | keyword lists | 1 | Stores ordered options as lists of two-element tuples with atom keys.
+@@E
+opts = [debug: true, level: 2]
+IO.inspect(opts[:level])
+IO.inspect(Keyword.get(opts, :debug))
+@@N debug: true ==> shorthand for a tuple
+@@E
+defaults = [port: 80, host: "localhost"]
+merged = Keyword.merge(defaults, port: 8080)
+IO.inspect(merged)
+@@E
+IO.inspect([a: 1] == [{:a, 1}])
+IO.inspect(Keyword.keys([a: 1, b: 2]))
+@@C ranges-charlists | ranges and charlists | 2 | Builds ranges and converts between charlists and strings.
+@@E
+IO.inspect(Enum.to_list(1..5))
+IO.inspect(Enum.to_list(1..10//3))
+@@N 1..10//3 ==> range with a step
+@@E
+IO.inspect(Enum.sum(1..100))
+IO.inspect(5 in 1..10)
+@@E
+IO.inspect(~c"abc")
+IO.inspect(to_charlist("hi"))
+IO.inspect(List.to_string([104, 105]))
+@@N ~c"abc" ==> charlist of codepoints
+@@T maps-structs | maps & structs
+@@C maps | maps | 1 | Stores key-value pairs with atom or string keys.
+@@E
+user = %{name: "ada", age: 36}
+IO.puts(user.name)
+IO.puts(user[:age])
+@@N user.name ==> raises if the key is missing
+@@E
+stock = %{"apple" => 4, "pear" => 0}
+IO.inspect(stock["apple"])
+IO.inspect(Map.get(stock, "plum", 0))
+@@N => ==> any key type
+@@E
+prices = %{tea: 2.5}
+prices = Map.put(prices, :cake, 4.0)
+IO.inspect(Map.delete(prices, :tea))
+@@C updating-maps | updating maps | 1 | Changes maps by returning new ones.
+@@E
+user = %{name: "ada", age: 36}
+older = %{user | age: 37}
+IO.inspect(older)
+@@N %{user | age: 37} ==> key must exist
+@@E
+base = %{a: 1}
+IO.inspect(Map.merge(base, %{b: 2}))
+IO.inspect(Map.keys(base))
+@@E
+config = %{db: %{host: "localhost"}}
+updated = put_in(config, [:db, :port], 5432)
+IO.inspect(get_in(updated, [:db, :port]))
+@@N put_in ==> updates a nested path
+@@C structs | structs | 2 | Defines named maps with fixed keys and defaults using defstruct.
+@@E
+defmodule User do
+  defstruct name: "", age: 0
+  def new, do: %User{name: "ada", age: 36}
+end
+IO.inspect(User.new())
+@@N defstruct ==> fields and defaults
+@@E
+defmodule Point do
+  defstruct [:x, :y]
+  def new, do: %Point{x: 1, y: 2}
+end
+IO.inspect(%{Point.new() | y: 5})
+@@E
+defmodule Account do
+  @enforce_keys [:owner]
+  defstruct [:owner, balance: 0]
+  def open(owner), do: %Account{owner: owner}
+end
+IO.inspect(Account.open("ada"))
+@@N @enforce_keys ==> required at creation
+@@C iterating-maps | iterating and transforming maps | 2 | Loops over entries and builds new maps from old ones.
+@@E
+ages = %{ada: 36, linus: 54}
+for {name, age} <- ages do
+  IO.puts("#{name}: #{age}")
+end
+@@N {name, age} <- ==> destructures each entry
+@@E
+prices = %{tea: 2.5, cake: 4.0}
+IO.inspect(Map.new(prices, fn {k, v} -> {k, v * 2} end))
+IO.inspect(Map.values(prices))
+@@E
+stock = %{apple: 4, pear: 0}
+IO.inspect(Enum.filter(stock, fn {_, n} -> n > 0 end))
+IO.inspect(Map.to_list(stock))
+@@T enum-stream | Enum & Stream
+@@C enum-basics | map, filter and reduce | 1 | Transforms and summarises any enumerable with Enum.
+@@E
+nums = [1, 2, 3, 4]
+IO.inspect(Enum.map(nums, &(&1 * 2)))
+IO.inspect(Enum.filter(nums, &(rem(&1, 2) == 0)))
+@@N Enum.map ==> works on any enumerable
+@@E
+IO.inspect(Enum.reduce([1, 2, 3], 0, fn x, acc -> acc + x end))
+IO.inspect(Enum.sum([3, 5, 7]))
+IO.inspect(Enum.count([1, 2, 3], &(&1 > 1)))
+@@N reduce ==> accumulator last
+@@E
+words = ["tea", "cake", "jam"]
+IO.inspect(Enum.map(words, &String.length/1))
+IO.inspect(Enum.find(words, &(String.length(&1) > 3)))
+@@C sorting-grouping | sorting and grouping | 1 | Sorts and groups elements and counts occurrences with Enum.
+@@E
+IO.inspect(Enum.sort([3, 1, 2], :desc))
+IO.inspect(Enum.sort_by(["pear", "fig"], &String.length/1))
+IO.inspect(Enum.max([3, 8, 1]))
+@@N sort_by ==> sort by a computed key
+@@E
+words = ["apple", "avocado", "banana"]
+IO.inspect(Enum.group_by(words, &String.first/1))
+@@N group_by ==> map of key to list
+@@E
+IO.inspect(Enum.frequencies(["a", "b", "a"]))
+IO.inspect(Enum.uniq([1, 1, 2]))
+IO.inspect(Enum.chunk_every([1, 2, 3, 4, 5], 2))
+@@C slicing-zipping | slicing and zipping | 2 | Slices and zips collections with take, drop, split and with_index.
+@@E
+IO.inspect(Enum.zip([1, 2], ["a", "b"]))
+IO.inspect(Enum.with_index(["a", "b"]))
+@@N with_index ==> pairs with positions
+@@E
+IO.inspect(Enum.take(1..10, 3))
+IO.inspect(Enum.drop(1..5, 3))
+IO.inspect(Enum.split([1, 2, 3, 4], 2))
+@@E
+IO.inspect(Enum.flat_map([1, 2], fn x -> [x, x * 10] end))
+IO.inspect(Enum.into([a: 1], %{}))
+@@N into ==> collects into a map
+@@C comprehensions | comprehensions | 2 | Generates and filters collections with for.
+@@E
+IO.inspect(for n <- 1..5, do: n * n)
+@@N <- ==> generator
+@@E
+IO.inspect(for n <- 1..10, rem(n, 2) == 0, do: n)
+@@N rem(n, 2) == 0 ==> filter
+@@E
+IO.inspect(for x <- [1, 2], y <- ["a", "b"], do: {x, y})
+@@C streams | Stream | 2 | Builds lazy pipelines that compute only what is taken.
+@@E
+stream = Stream.map(1..1_000_000, &(&1 * 2))
+IO.inspect(Enum.take(stream, 3))
+@@N Stream.map ==> lazy
+@@E
+IO.inspect(Stream.iterate(1, &(&1 * 2)) |> Enum.take(5))
+@@N Stream.iterate ==> infinite sequence
+@@E
+evens =
+  1..100
+  |> Stream.filter(&(rem(&1, 2) == 0))
+  |> Stream.map(&(&1 * &1))
+IO.inspect(Enum.take(evens, 3))
+@@T case-cond-with | case, cond, with
+@@C case-expressions | case | 1 | Branches by matching a value against several patterns.
+@@E
+result = {:ok, 42}
+case result do
+  {:ok, value} -> IO.puts("got #{value}")
+  {:error, reason} -> IO.puts("failed: #{reason}")
+end
+@@N case ==> first matching clause wins
+@@E
+case 5 do
+  n when n < 0 -> IO.puts("negative")
+  0 -> IO.puts("zero")
+  _ -> IO.puts("positive")
+end
+@@N _ ==> catch-all clause
+@@E
+case [1, 2, 3] do
+  [] -> IO.puts("empty")
+  [head | _] -> IO.puts("starts with #{head}")
+end
+@@C cond-and-if | cond and if | 1 | Branches on conditions with cond, if and the else keyword.
+@@E
+temperature = 28
+cond do
+  temperature > 25 -> IO.puts("warm")
+  temperature > 10 -> IO.puts("mild")
+  true -> IO.puts("cold")
+end
+@@N true -> ==> default branch
+@@E
+score = 72
+label = if score >= 60, do: "pass", else: "fail"
+IO.puts(label)
+@@N do: ==> keyword form
+@@E
+done = false
+if !done do
+  IO.puts("still working")
+end
+@@C with-expressions | with | 2 | Chains matches and stops at the first one that fails.
+@@E
+user = %{name: "ada", age: 36}
+with {:ok, name} <- Map.fetch(user, :name),
+     {:ok, age} <- Map.fetch(user, :age) do
+  IO.puts("#{name} #{age}")
+end
+@@N <- ==> match or stop
+@@E
+parse = fn s ->
+  case Integer.parse(s) do
+    {n, ""} -> {:ok, n}
+    _ -> {:error, :invalid}
+  end
+end
+result =
+  with {:ok, a} <- parse.("4"),
+       {:ok, b} <- parse.("x") do
+    {:ok, a + b}
+  end
+IO.inspect(result)
+@@N result ==> the first non-matching value
+@@E
+with {:ok, x} <- {:ok, 1},
+     {:ok, y} <- {:ok, 2} do
+  IO.puts(x + y)
+else
+  _ -> IO.puts("failed")
+end
+@@N else ==> handles non-matches
+@@C guards-in-functions | guards and multi-clause functions | 2 | Chooses clauses of anonymous functions and case with guards.
+@@E
+classify = fn
+  0 -> "zero"
+  n when n > 0 -> "positive"
+  _ -> "negative"
+end
+IO.puts(classify.(-5))
+@@N classify = fn ==> several clauses in one fn
+@@E
+check = fn
+  x when is_binary(x) -> "string"
+  x when is_integer(x) -> "integer"
+  _ -> "other"
+end
+IO.puts(check.(7))
+@@E
+case {1, 2} do
+  {x, y} when x + y > 2 -> IO.puts("big")
+  _ -> IO.puts("small")
+end
+@@T modules-guards | modules & guards
+@@C modules | modules and attributes | 1 | Groups functions in modules and shares constants with module attributes.
+@@E
+defmodule Math do
+  def square(n), do: n * n
+  def cube(n), do: n * square(n)
+end
+IO.puts(Math.cube(3))
+@@N defmodule ==> named group of functions
+@@E
+defmodule Greeting do
+  @salutation "Hello"
+  def greet(name), do: "#{@salutation}, #{name}"
+end
+IO.puts(Greeting.greet("ada"))
+@@N @salutation ==> compile-time constant
+@@E
+defmodule Shop do
+  @tax 0.2
+  def price(base), do: base * (1 + @tax)
+end
+IO.puts(Shop.price(100))
+@@C guards | guards | 1 | Restricts function clauses with when and guard-safe functions.
+@@E
+defmodule Check do
+  def kind(x) when is_integer(x), do: "integer"
+  def kind(x) when is_binary(x), do: "string"
+  def kind(_), do: "other"
+end
+IO.puts(Check.kind("a"))
+@@N is_integer ==> allowed in guards
+@@E
+defmodule Age do
+  def category(n) when n < 13, do: "child"
+  def category(n) when n < 20, do: "teen"
+  def category(_), do: "adult"
+end
+IO.puts(Age.category(15))
+@@E
+defmodule Guards do
+  defguard is_small(n) when is_integer(n) and n < 10
+  def small?(n) when is_small(n), do: true
+  def small?(_), do: false
+end
+IO.puts(Guards.small?(3))
+@@N defguard ==> reusable guard
+@@C alias-import | alias and import | 2 | Shortens module names with alias and brings functions in with import.
+@@E
+defmodule App.Models.User do
+  defstruct [:name]
+  def new(name), do: %__MODULE__{name: name}
+end
+alias App.Models.User
+IO.inspect(User.new("ada"))
+@@N alias ==> short name for a module
+@@E
+import List, only: [first: 1]
+IO.inspect(first([7, 8]))
+@@N only: ==> import selected functions
+@@E
+defmodule Util do
+  def shout(s), do: String.upcase(s) <> "!"
+end
+defmodule Main do
+  import Util
+  def run, do: IO.puts(shout("hey"))
+end
+Main.run()
+@@C docs-specs | docs and typespecs | 2 | Documents modules and declares function types with attributes.
+@@E
+defmodule Calc do
+  @moduledoc "Small calculator."
+  @doc "Adds two numbers."
+  @spec add(number, number) :: number
+  def add(a, b), do: a + b
+end
+IO.puts(Calc.add(1, 2))
+@@N @spec ==> checked by dialyzer
+@@E
+defmodule Limits do
+  @ceiling 10
+  def limit, do: @ceiling
+end
+IO.puts(Limits.limit())
+@@E
+defmodule Temp do
+  @type celsius :: float
+  @spec to_f(celsius) :: float
+  def to_f(c), do: c * 9 / 5 + 32
+end
+IO.puts(Temp.to_f(100.0))
+@@N @type ==> custom type name
+@@T recursion | recursion
+@@C basic-recursion | basic recursion | 1 | Solves problems by calling a function on smaller input.
+@@E
+defmodule Math do
+  def factorial(0), do: 1
+  def factorial(n), do: n * factorial(n - 1)
+end
+IO.puts(Math.factorial(5))
+@@N factorial(0) ==> base case
+@@E
+defmodule Count do
+  def down(0), do: :done
+  def down(n) do
+    IO.puts(n)
+    down(n - 1)
+  end
+end
+Count.down(3)
+@@E
+defmodule Fib do
+  def fib(0), do: 0
+  def fib(1), do: 1
+  def fib(n), do: fib(n - 1) + fib(n - 2)
+end
+IO.puts(Fib.fib(10))
+@@C list-recursion | recursion over lists | 1 | Processes a list by matching its head and tail.
+@@E
+defmodule MyList do
+  def sum([]), do: 0
+  def sum([h | t]), do: h + sum(t)
+end
+IO.puts(MyList.sum([1, 2, 3]))
+@@N [h | t] ==> head and tail
+@@E
+defmodule MyList do
+  def double([]), do: []
+  def double([h | t]), do: [h * 2 | double(t)]
+end
+IO.inspect(MyList.double([1, 2, 3]))
+@@E
+defmodule MyList do
+  def len([]), do: 0
+  def len([_ | t]), do: 1 + len(t)
+end
+IO.puts(MyList.len(~w(a b c)))
+@@N ~w(a b c) ==> word list sigil
+@@C tail-recursion | tail recursion and accumulators | 2 | Carries an accumulator so the last call is the recursive one.
+@@E
+defmodule Sum do
+  def to(n), do: loop(n, 0)
+  defp loop(0, acc), do: acc
+  defp loop(n, acc), do: loop(n - 1, acc + n)
+end
+IO.puts(Sum.to(100))
+@@N loop ==> tail call, no stack growth
+@@E
+defmodule Rev do
+  def reverse(list), do: go(list, [])
+  defp go([], acc), do: acc
+  defp go([h | t], acc), do: go(t, [h | acc])
+end
+IO.inspect(Rev.reverse([1, 2, 3]))
+@@E
+defmodule Pow do
+  def pow(_, 0, acc), do: acc
+  def pow(b, e, acc), do: pow(b, e - 1, acc * b)
+end
+IO.puts(Pow.pow(2, 10, 1))
+@@C recursion-in-practice | recursion in practice | 2 | Traverses nested data and compares recursion with Enum.reduce.
+@@E
+IO.puts(Enum.reduce(1..5, 1, &*/2))
+@@N &*/2 ==> multiplication as a function
+@@E
+defmodule Walk do
+  def flatten([]), do: []
+  def flatten([h | t]) when is_list(h), do: flatten(h) ++ flatten(t)
+  def flatten([h | t]), do: [h | flatten(t)]
+end
+IO.inspect(Walk.flatten([1, [2, [3]]]))
+@@E
+defmodule Collatz do
+  def steps(1, n), do: n
+  def steps(x, n) when rem(x, 2) == 0, do: steps(div(x, 2), n + 1)
+  def steps(x, n), do: steps(3 * x + 1, n + 1)
+end
+IO.puts(Collatz.steps(6, 0))
+@@T processes-messages | processes & messages
+@@C spawning | spawning processes | 1 | Starts lightweight processes with spawn and identifies them with pids.
+@@E
+pid = spawn(fn -> IO.puts("in a process") end)
+IO.inspect(is_pid(pid))
+Process.sleep(50)
+@@N spawn ==> returns a pid
+@@E
+IO.inspect(is_pid(self()))
+IO.inspect(Process.alive?(self()))
+@@N self() ==> the current pid
+@@E
+parent = self()
+spawn(fn -> send(parent, :hello) end)
+receive do
+  :hello -> IO.puts("got hello")
+end
+@@N send ==> asynchronous message
+@@C send-receive | send and receive | 1 | Delivers messages to a mailbox and matches them with receive.
+@@E
+send(self(), {:greet, "ada"})
+receive do
+  {:greet, name} -> IO.puts("hello #{name}")
+end
+@@N receive ==> matches mailbox messages
+@@E
+send(self(), :ping)
+receive do
+  :pong -> IO.puts("pong")
+after
+  100 -> IO.puts("timeout")
+end
+@@N after ==> gives up after 100 ms
+@@E
+send(self(), 1)
+send(self(), 2)
+IO.inspect(Process.info(self(), :message_queue_len))
+@@C message-loops | message loops and names | 2 | Keeps a process listening by recursing and registers names for pids.
+@@E
+defmodule Echo do
+  def loop do
+    receive do
+      msg -> IO.puts("got #{msg}")
+    end
+    loop()
+  end
+end
+send(spawn(&Echo.loop/0), "hi")
+Process.sleep(50)
+@@N loop() ==> waits for the next message
+@@E
+pid =
+  spawn(fn ->
+    receive do
+      msg -> IO.puts("got #{msg}")
+    end
+  end)
+Process.register(pid, :printer)
+send(:printer, "hello")
+Process.sleep(50)
+@@N Process.register ==> send by name
+@@E
+send(self(), {:low, 1})
+send(self(), {:high, 2})
+receive do
+  {:high, n} -> IO.puts("high #{n}")
+end
+receive do
+  {:low, n} -> IO.puts("low #{n}")
+end
+@@N receive ==> skips non-matching messages
+@@C links-monitors | links and monitors | 3 | Observes process exits with monitors, links and kill signals.
+@@E
+{pid, ref} = spawn_monitor(fn -> :ok end)
+receive do
+  {:DOWN, ^ref, :process, ^pid, reason} -> IO.inspect(reason)
+end
+@@N spawn_monitor ==> watches without linking
+@@E
+Process.flag(:trap_exit, true)
+pid = spawn_link(fn -> exit(:boom) end)
+receive do
+  {:EXIT, ^pid, reason} -> IO.inspect(reason)
+end
+@@N trap_exit ==> exits arrive as messages
+@@E
+pid = spawn(fn -> Process.sleep(1000) end)
+Process.exit(pid, :kill)
+Process.sleep(10)
+IO.inspect(Process.alive?(pid))
+@@T genserver | GenServer
+@@C basic-genserver | a basic GenServer | 2 | Wraps state in a process that answers calls and handles casts.
+@@E
+defmodule Counter do
+  use GenServer
+  @impl true
+  def init(n), do: {:ok, n}
+  @impl true
+  def handle_call(:get, _from, n), do: {:reply, n, n}
+  @impl true
+  def handle_cast(:inc, n), do: {:noreply, n + 1}
+end
+{:ok, pid} = GenServer.start_link(Counter, 0)
+GenServer.cast(pid, :inc)
+IO.puts(GenServer.call(pid, :get))
+@@N handle_call ==> synchronous request
+@@N handle_cast ==> asynchronous request
+@@E
+defmodule KV do
+  use GenServer
+  def init(_), do: {:ok, %{}}
+  def handle_cast({:put, k, v}, m), do: {:noreply, Map.put(m, k, v)}
+  def handle_call({:get, k}, _from, m), do: {:reply, m[k], m}
+end
+{:ok, kv} = GenServer.start_link(KV, nil)
+GenServer.cast(kv, {:put, :a, 1})
+IO.inspect(GenServer.call(kv, {:get, :a}))
+@@N {:reply, m[k], m} ==> reply and new state
+@@E
+defmodule Stack do
+  use GenServer
+  def start_link(list), do: GenServer.start_link(__MODULE__, list)
+  def push(pid, x), do: GenServer.cast(pid, {:push, x})
+  def pop(pid), do: GenServer.call(pid, :pop)
+  def handle_cast({:push, x}, list), do: {:noreply, [x | list]}
+  def handle_call(:pop, _from, [h | t]), do: {:reply, h, t}
+end
+{:ok, s} = Stack.start_link([])
+Stack.push(s, 1)
+IO.puts(Stack.pop(s))
+@@N Stack.push ==> client API hides messages
+@@C lifecycle | callbacks and lifecycle | 2 | Reacts to plain messages and names or stops servers.
+@@E
+defmodule Ticker do
+  use GenServer
+  def init(n) do
+    send(self(), :tick)
+    {:ok, n}
+  end
+  def handle_info(:tick, n), do: {:noreply, n + 1}
+end
+{:ok, pid} = GenServer.start_link(Ticker, 0)
+Process.sleep(10)
+IO.inspect(:sys.get_state(pid))
+@@N handle_info ==> any other message
+@@E
+defmodule Greeter do
+  use GenServer
+  def init(name), do: {:ok, name}
+  def handle_call(:greet, _from, name), do: {:reply, "hi #{name}", name}
+end
+GenServer.start_link(Greeter, "ada", name: Greeter)
+IO.puts(GenServer.call(Greeter, :greet))
+@@N name: Greeter ==> registered name
+@@E
+defmodule Worker do
+  use GenServer
+  def init(_), do: {:ok, nil}
+end
+{:ok, pid} = GenServer.start_link(Worker, nil)
+GenServer.stop(pid)
+IO.inspect(Process.alive?(pid))
+@@N stop ==> shuts the server down
+@@C supervisors | supervisors | 3 | Restarts failed child processes with a Supervisor.
+@@E
+children = [{Agent, fn -> 0 end}]
+{:ok, sup} = Supervisor.start_link(children, strategy: :one_for_one)
+IO.inspect(Supervisor.count_children(sup).active)
+@@N one_for_one ==> restart only the failed child
+@@E
+defmodule Worker do
+  use GenServer
+  def start_link(arg), do: GenServer.start_link(__MODULE__, arg)
+  def init(_), do: {:ok, 0}
+end
+{:ok, sup} = Supervisor.start_link([Worker], strategy: :one_for_one)
+IO.inspect(length(Supervisor.which_children(sup)))
+@@N [Worker] ==> child spec from the module
+@@E
+children = [{Agent, fn -> 0 end}]
+{:ok, sup} = Supervisor.start_link(children, strategy: :one_for_one)
+[{_, pid, _, _}] = Supervisor.which_children(sup)
+Process.exit(pid, :kill)
+Process.sleep(50)
+[{_, new_pid, _, _}] = Supervisor.which_children(sup)
+IO.inspect(pid != new_pid)
+@@N new_pid ==> a restarted child
+@@T task-agent | Task & Agent
+@@C task-async | Task.async and await | 1 | Runs work concurrently and collects the result with await.
+@@E
+task = Task.async(fn -> 6 * 7 end)
+IO.puts(Task.await(task))
+@@N Task.await ==> waits up to five seconds
+@@E
+tasks = for n <- 1..3, do: Task.async(fn -> n * n end)
+IO.inspect(Enum.map(tasks, &Task.await/1))
+@@E
+task =
+  Task.async(fn ->
+    Process.sleep(50)
+    :done
+  end)
+IO.inspect(Task.await(task, 1000))
+@@N 1000 ==> custom timeout in ms
+@@C task-streams | async_stream and start | 2 | Maps over collections in parallel and starts fire-and-forget tasks.
+@@E
+results = Task.async_stream(1..3, fn n -> n * 10 end) |> Enum.to_list()
+IO.inspect(results)
+@@N async_stream ==> yields {:ok, value}
+@@E
+1..3
+|> Task.async_stream(&(&1 * 2))
+|> Enum.map(fn {:ok, v} -> v end)
+|> IO.inspect()
+@@E
+{:ok, pid} = Task.start(fn -> IO.puts("fire and forget") end)
+Process.sleep(50)
+IO.inspect(is_pid(pid))
+@@N Task.start ==> no result to await
+@@C agents | Agent | 1 | Keeps shared state in a process with get and update.
+@@E
+{:ok, agent} = Agent.start_link(fn -> 0 end)
+Agent.update(agent, &(&1 + 5))
+IO.puts(Agent.get(agent, & &1))
+@@N & &1 ==> identity capture
+@@E
+{:ok, cart} = Agent.start_link(fn -> [] end)
+Agent.update(cart, &["tea" | &1])
+Agent.update(cart, &["cake" | &1])
+IO.inspect(Agent.get(cart, & &1))
+@@E
+{:ok, _} = Agent.start_link(fn -> %{} end, name: :stats)
+Agent.update(:stats, &Map.put(&1, :hits, 1))
+IO.inspect(Agent.get(:stats, & &1))
+@@N name: :stats ==> access by name
+@@C task-patterns | timeouts and combined results | 3 | Polls tasks without blocking and updates agents atomically.
+@@E
+task = Task.async(fn -> Process.sleep(500) end)
+IO.inspect(Task.yield(task, 10))
+Task.shutdown(task)
+@@N yield ==> nil if not finished
+@@E
+tasks = [Task.async(fn -> 1 end), Task.async(fn -> 2 end)]
+IO.inspect(Task.await_many(tasks))
+@@N await_many ==> list of results
+@@E
+{:ok, agent} = Agent.start_link(fn -> 1 end)
+value = Agent.get_and_update(agent, fn n -> {n, n + 1} end)
+IO.inspect({value, Agent.get(agent, & &1)})
+@@N get_and_update ==> returns and changes
+@@T protocols-behaviours | protocols & behaviours
+@@C protocols | protocols | 2 | Dispatches a function on the type of its first argument.
+@@E
+defprotocol Describe do
+  def describe(value)
+end
+defimpl Describe, for: Integer do
+  def describe(n), do: "integer #{n}"
+end
+IO.puts(Describe.describe(5))
+@@N defprotocol ==> the interface
+@@N defimpl ==> one implementation
+@@E
+defprotocol Area do
+  def area(shape)
+end
+defmodule Square do
+  defstruct [:side]
+end
+defimpl Area, for: Square do
+  def area(s), do: s.side * s.side
+end
+IO.puts(Area.area(struct(Square, side: 3)))
+@@N for: Square ==> implemented for a struct
+@@E
+defprotocol Size do
+  def size(data)
+end
+defimpl Size, for: BitString do
+  def size(s), do: byte_size(s)
+end
+defimpl Size, for: List do
+  def size(l), do: length(l)
+end
+IO.puts(Size.size("abc") + Size.size([1, 2]))
+@@C protocol-fallbacks | fallbacks and several types | 2 | Handles unknown types with Any and shares one implementation across types.
+@@E
+defprotocol Greet do
+  @fallback_to_any true
+  def hello(x)
+end
+defimpl Greet, for: Any do
+  def hello(_), do: "hello, whoever"
+end
+IO.puts(Greet.hello(:atom))
+@@N @fallback_to_any ==> use Any when missing
+@@E
+defprotocol Label do
+  def label(x)
+end
+defimpl Label, for: [Integer, Float] do
+  def label(n), do: "number #{n}"
+end
+IO.puts(Label.label(1.5))
+@@N for: [Integer, Float] ==> one impl, two types
+@@E
+defprotocol Name do
+  def name(x)
+end
+defimpl Name, for: Atom do
+  def name(a), do: Atom.to_string(a)
+end
+IO.puts(Name.name(:ada))
+@@C behaviours | behaviours | 2 | Declares callbacks that modules promise to implement.
+@@E
+defmodule Parser do
+  @callback parse(String.t()) :: {:ok, term} | {:error, term}
+end
+defmodule IntParser do
+  @behaviour Parser
+  def parse(s), do: {:ok, String.to_integer(s)}
+end
+IO.inspect(IntParser.parse("42"))
+@@N @callback ==> required function type
+@@N @behaviour ==> promises the callbacks
+@@E
+defmodule Shape do
+  @callback area(map) :: number
+end
+defmodule Square do
+  @behaviour Shape
+  def area(%{side: s}), do: s * s
+end
+IO.puts(Square.area(%{side: 3}))
+@@E
+defmodule Notifier do
+  @callback notify(String.t()) :: :ok
+  def deliver(mod, msg), do: mod.notify(msg)
+end
+defmodule Console do
+  @behaviour Notifier
+  def notify(msg), do: IO.puts(msg)
+end
+Notifier.deliver(Console, "hi")
+@@N mod.notify ==> module chosen at runtime
+@@C behaviour-extras | optional callbacks and @impl | 3 | Marks optional callbacks, checks implementations with @impl and lists callbacks.
+@@E
+defmodule Plugin do
+  @callback name() :: String.t()
+  @callback setup() :: :ok
+  @optional_callbacks setup: 0
+end
+defmodule Logger2 do
+  @behaviour Plugin
+  @impl true
+  def name, do: "logger"
+end
+IO.puts(Logger2.name())
+@@N @optional_callbacks ==> need not be defined
+@@N @impl true ==> marks a callback
+@@E
+defmodule Store do
+  @callback get(atom) :: term
+end
+defmodule MemStore do
+  @behaviour Store
+  @impl Store
+  def get(key), do: {:memory, key}
+end
+IO.inspect(MemStore.get(:a))
+@@E
+defmodule Shape do
+  @callback area(term) :: number
+end
+IO.inspect(Shape.behaviour_info(:callbacks))
+@@N behaviour_info ==> lists the callbacks

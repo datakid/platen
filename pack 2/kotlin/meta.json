@@ -1,0 +1,7 @@
+{
+  "name": "Kotlin",
+  "short": "KT",
+  "version": "2.4",
+  "indent": 4,
+  "pigment": { "light": "#B21FB2", "dark": "#E670E6" }
+}

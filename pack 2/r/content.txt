@@ -1,0 +1,826 @@
+@@T vectors-types | vectors & types
+@@C creating-vectors | creating vectors | 1 | Combines values of one type into a vector with c, colon and seq.
+@@E
+scores <- c(90, 72, 85)
+names <- c("ada", "grace")
+flags <- c(TRUE, FALSE, TRUE)
+print(scores)
+@@N c(90 ==> combines values
+@@N <- ==> assignment arrow
+@@E
+squares <- (1:5)^2
+print(squares)
+print(length(squares))
+@@N 1:5 ==> integer sequence
+@@E
+evens <- seq(0, 10, by = 2)
+tea <- rep("tea", times = 3)
+print(evens)
+print(tea)
+@@N rep ==> repeats a value
+@@C types-and-coercion | types and coercion | 1 | Inspects vector types and converts between them.
+@@E
+x <- 42L
+y <- 3.14
+z <- "text"
+print(class(x))
+print(class(y))
+print(class(z))
+@@N 42L ==> integer literal
+@@E
+mixed <- c(1, "a", TRUE)
+print(mixed)
+print(class(mixed))
+@@N c(1, "a", TRUE) ==> coerced to character
+@@E
+print(as.integer("42") + 1L)
+print(as.numeric("3.5"))
+print(as.character(7))
+print(is.numeric(7))
+@@N as.integer ==> explicit conversion
+@@C named-vectors | named vectors | 1 | Labels elements with names and reads them by name.
+@@E
+prices <- c(tea = 2.5, cake = 4)
+print(prices["tea"])
+print(names(prices))
+@@N tea = ==> element name
+@@E
+ages <- c(ada = 36, linus = 54)
+ages["grace"] <- 30
+print(ages)
+@@N ages["grace"] <- ==> adds a new element
+@@E
+stock <- c(apple = 4, pear = 0)
+names(stock)[2] <- "plum"
+print(stock)
+@@N names(stock)[2] ==> renames one element
+@@C sorting-and-summaries | sorting and summaries | 1 | Orders vectors and summarises them with built-in functions.
+@@E
+nums <- c(3, 1, 2)
+print(sort(nums))
+print(rev(nums))
+print(order(nums))
+@@N order ==> positions in sorted order
+@@E
+nums <- c(3, 5, 7)
+print(sum(nums))
+print(mean(nums))
+print(range(nums))
+@@N range ==> minimum and maximum
+@@E
+v <- 1:10
+print(head(v, 3))
+print(tail(v, 2))
+print(which(v > 7))
+@@N which ==> positions where true
+@@T vectorised-operations | vectorised operations
+@@C arithmetic-recycling | arithmetic and recycling | 1 | Applies operators to every element and recycles shorter vectors.
+@@E
+prices <- c(5, 12.5, 8)
+print(prices * 2)
+print(prices + c(1, 2, 3))
+@@N * ==> applies to each element
+@@E
+a <- c(1, 2, 3, 4)
+b <- c(10, 20)
+print(a + b)
+@@N b ==> recycled to length four
+@@E
+x <- 1:5
+print(x^2)
+print(x %% 2 == 0)
+print(x %/% 2)
+@@N %% ==> remainder
+@@N %/% ==> integer division
+@@C comparison-and-logic | comparison and logic | 1 | Compares elements and combines logical vectors.
+@@E
+scores <- c(90, 55, 72)
+print(scores >= 60)
+print(sum(scores >= 60))
+@@N sum(scores ==> counts the TRUE values
+@@E
+x <- c(TRUE, FALSE, TRUE)
+y <- c(TRUE, TRUE, FALSE)
+print(x & y)
+print(x | y)
+print(!x)
+@@N & ==> element-wise and
+@@E
+nums <- c(3, 8, 1)
+print(any(nums > 5))
+print(all(nums > 0))
+print(ifelse(nums > 2, "high", "low"))
+@@N ifelse ==> vectorised if
+@@C math-functions | math functions | 2 | Rounds and accumulates numeric vectors with built-in functions.
+@@E
+x <- c(1.234, 5.678)
+print(round(x, 1))
+print(floor(x))
+print(sqrt(c(4, 9)))
+@@N round(x, 1) ==> one decimal place
+@@E
+nums <- c(2, 4, 6)
+print(cumsum(nums))
+print(diff(nums))
+print(prod(nums))
+@@N cumsum ==> running total
+@@N diff ==> successive differences
+@@E
+v <- c(10, 20, 30)
+print(mean(v))
+print(sd(v))
+print(max(v) - min(v))
+@@T lists | lists
+@@C creating-lists | creating lists | 1 | Holds values of different types and lengths in a list.
+@@E
+user <- list(name = "ada", age = 36)
+print(user$name)
+print(user[["age"]])
+@@N $ ==> by name
+@@N [["age"]] ==> extracts one element
+@@E
+items <- list(1, "two", TRUE)
+print(length(items))
+print(class(items[[2]]))
+@@E
+config <- list(host = "localhost", ports = c(80, 443))
+str(config)
+@@N str ==> compact structure view
+@@C modifying-lists | modifying lists | 1 | Adds and removes list elements by name.
+@@E
+user <- list(name = "ada")
+user$age <- 36
+user[["email"]] <- "ada@example.com"
+print(names(user))
+@@N user$age <- ==> adds an element
+@@E
+user <- list(name = "ada", age = 36)
+user$age <- NULL
+print(length(user))
+@@N NULL ==> removes the element
+@@E
+inventory <- list(tea = 4, cake = 0)
+print(inventory["tea"])
+print(inventory[["tea"]])
+@@N inventory["tea"] ==> returns a sub-list
+@@N inventory[["tea"]] ==> returns the value
+@@C nested-lists | nested lists | 2 | Reaches into lists inside lists.
+@@E
+order <- list(id = 7, customer = list(name = "ada", city = "Oslo"))
+print(order$customer$city)
+@@N $customer$city ==> chained access
+@@E
+people <- list(list(name = "ada"), list(name = "grace"))
+print(people[[2]]$name)
+@@E
+cfg <- list(db = list(host = "localhost"))
+cfg$db$port <- 5432
+str(cfg)
+@@N cfg$db$port <- ==> assigns deep
+@@C list-helpers | iterating and combining lists | 2 | Loops over list names, flattens lists and joins them.
+@@E
+user <- list(name = "ada", age = 36)
+for (key in names(user)) {
+  cat(key, "=", format(user[[key]]), "\n")
+}
+@@N names(user) ==> loop over the keys
+@@E
+parts <- list(a = 1:2, b = 3)
+print(unlist(parts))
+@@N unlist ==> flattens to a vector
+@@E
+a <- list(x = 1)
+b <- list(y = 2)
+print(c(a, b))
+@@T data-frames | data frames
+@@C creating-data-frames | creating data frames | 1 | Builds a table of equal-length columns with data.frame.
+@@E
+users <- data.frame(
+  name = c("ada", "grace", "linus"),
+  age = c(36, 30, 54)
+)
+print(users)
+@@N data.frame ==> columns of equal length
+@@E
+prices <- data.frame(item = c("tea", "cake"), price = c(2.5, 4))
+str(prices)
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(nrow(df))
+print(ncol(df))
+print(names(df))
+@@N nrow ==> number of rows
+@@C columns-and-rows | columns and rows | 1 | Reads columns with a dollar sign and adds or selects rows.
+@@E
+df <- data.frame(name = c("ada", "grace"), age = c(36, 30))
+print(df$age)
+df$senior <- df$age > 32
+print(df)
+@@N df$senior <- ==> new column
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(df[2, ])
+print(df[df$score > 80, ])
+@@N df[2, ] ==> row two, all columns
+@@E
+df <- data.frame(id = 1:2, score = c(90, 72))
+df <- rbind(df, data.frame(id = 3, score = 85))
+print(df)
+@@N rbind ==> stacks rows
+@@C summaries-ordering | summaries and ordering | 1 | Summarises columns and sorts rows by a column.
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(summary(df$score))
+print(mean(df$score))
+@@N summary ==> quartiles and mean
+@@E
+df <- data.frame(name = c("ada", "grace"), age = c(36, 30))
+print(df[order(df$age), ])
+@@N order(df$age) ==> row order by age
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(head(df, 2))
+print(dim(df))
+@@C grouping-and-merging | grouping and merging | 2 | Aggregates by group, joins tables and filters with subset.
+@@E
+sales <- data.frame(city = c("Oslo", "Rome", "Oslo"), n = c(3, 5, 2))
+print(aggregate(n ~ city, data = sales, FUN = sum))
+@@N n ~ city ==> formula: n by city
+@@E
+a <- data.frame(id = 1:2, name = c("ada", "grace"))
+b <- data.frame(id = 1:2, age = c(36, 30))
+print(merge(a, b, by = "id"))
+@@N merge ==> joins on a key
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(subset(df, score > 80, select = id))
+@@N subset ==> filter rows and columns
+@@T indexing-subsetting | indexing & subsetting
+@@C vector-indexing | vector indexing | 1 | Selects elements by position, negative position or name.
+@@E
+v <- c(10, 20, 30, 40)
+print(v[2])
+print(v[c(1, 3)])
+print(v[-1])
+@@N v[-1] ==> drops the first element
+@@E
+v <- c(10, 20, 30, 40)
+print(v[v > 15])
+print(v[2:3])
+@@N v[v > 15] ==> logical index
+@@E
+v <- c(a = 1, b = 2, c = 3)
+print(v["b"])
+v[["c"]] <- 30
+print(v)
+@@C logical-selection | logical selection and which | 1 | Filters elements with conditions and finds their positions.
+@@E
+ages <- c(12, 40, 17, 65)
+print(ages[ages >= 18])
+print(which(ages >= 18))
+@@N which ==> indices, not values
+@@E
+x <- c(5, 3, 9)
+print(which.max(x))
+print(which.min(x))
+@@E
+words <- c("tea", "cake", "jam")
+print(words[nchar(words) > 3])
+print(words %in% c("tea", "jam"))
+@@N %in% ==> membership test
+@@C matrices | matrices | 2 | Indexes rows and columns of a two-dimensional array.
+@@E
+m <- matrix(1:6, nrow = 2)
+print(m)
+print(m[2, 3])
+print(m[, 2])
+@@N m[, 2] ==> whole column
+@@E
+m <- matrix(1:4, nrow = 2, byrow = TRUE)
+print(t(m))
+print(m %*% m)
+@@N byrow ==> fills across rows
+@@N %*% ==> matrix product
+@@E
+m <- matrix(1:6, nrow = 2)
+print(dim(m))
+print(rowSums(m))
+print(colMeans(m))
+@@C frame-and-list-indexing | data frame and list indexing | 2 | Selects from data frames and lists with single and double brackets.
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+print(df[df$score > 80, "id"])
+print(df[["score"]])
+@@N df[["score"]] ==> column as a vector
+@@E
+user <- list(name = "ada", tags = c("a", "b"))
+print(user$tags[2])
+print(user[["tags"]][1])
+@@E
+df <- data.frame(a = 1:3, b = letters[1:3])
+print(df[2:3, ])
+print(df[, "b", drop = FALSE])
+@@N drop = FALSE ==> keeps a data frame
+@@T factors | factors
+@@C creating-factors | creating factors | 1 | Stores categorical data as integer codes with labelled levels.
+@@E
+sizes <- factor(c("small", "large", "small"))
+print(sizes)
+print(levels(sizes))
+@@N levels ==> the distinct categories
+@@E
+grades <- factor(c("B", "A", "B"), levels = c("A", "B", "C"))
+print(table(grades))
+@@N levels = ==> sets category order
+@@E
+status <- factor(c("on", "off", "on"))
+print(as.integer(status))
+print(nlevels(status))
+@@N as.integer ==> underlying codes
+@@C ordered-factors | ordered factors | 2 | Compares categories that have a natural order.
+@@E
+size <- factor(
+  c("S", "L", "M"),
+  levels = c("S", "M", "L"),
+  ordered = TRUE
+)
+print(size < "L")
+@@N ordered = TRUE ==> enables comparison
+@@E
+rating <- factor("good", levels = c("bad", "good"), ordered = TRUE)
+print(rating > "bad")
+@@E
+x <- factor(c("lo", "hi", "lo"), levels = c("lo", "hi"))
+print(sort(x))
+print(max(as.integer(x)))
+@@C counting-by-group | counting by group | 2 | Tabulates and summarises values by factor level.
+@@E
+colors <- factor(c("red", "blue", "red"))
+print(table(colors))
+@@N table ==> counts per level
+@@E
+sales <- c(3, 5, 2, 4)
+city <- factor(c("Oslo", "Rome", "Oslo", "Rome"))
+print(tapply(sales, city, sum))
+@@N tapply ==> function per group
+@@E
+df <- data.frame(g = factor(c("a", "b", "a")), v = 1:3)
+print(split(df$v, df$g))
+@@N split ==> list of groups
+@@C changing-levels | changing levels | 2 | Renames and drops levels and bins numbers into levels with cut.
+@@E
+f <- factor(c("a", "b", "c"))
+levels(f)[levels(f) == "c"] <- "other"
+print(f)
+@@N levels(f)[levels(f) == "c"] ==> picks a level
+@@E
+f <- factor(c("a", "b", "b"))
+print(droplevels(f[f != "a"]))
+@@N droplevels ==> removes unused levels
+@@E
+ages <- c(5, 20, 65)
+labels <- c("child", "adult", "senior")
+print(cut(ages, breaks = c(0, 18, 64, Inf), labels = labels))
+@@N cut ==> bins numbers into a factor
+@@T functions-control-flow | functions & control flow
+@@C defining-functions | defining functions | 1 | Defines functions whose last expression is the result.
+@@E
+square <- function(n) {
+  n * n
+}
+print(square(4))
+@@N n * n ==> last value is returned
+@@E
+greet <- function(name, greeting = "Hello") {
+  paste(greeting, name)
+}
+print(greet("ada"))
+@@N = "Hello" ==> default argument
+@@E
+area <- function(w, h) w * h
+print(area(3, 4))
+@@N function(w, h) w * h ==> one-expression body
+@@C conditionals | if, else and switch | 1 | Branches with if and else, switch and vectorised ifelse.
+@@E
+temp <- 28
+if (temp > 25) {
+  print("warm")
+} else if (temp > 10) {
+  print("mild")
+} else {
+  print("cold")
+}
+@@N else if ==> chained test
+@@E
+code <- 404
+msg <- switch(
+  as.character(code),
+  "200" = "ok",
+  "404" = "not found",
+  "other"
+)
+print(msg)
+@@N "other" ==> unnamed default
+@@E
+x <- c(5, -2, 0)
+print(ifelse(x > 0, "pos", "non-pos"))
+@@C loops | loops | 1 | Repeats code with for and while and controls it with next and break.
+@@E
+for (i in 1:3) {
+  print(i)
+}
+@@E
+n <- 3
+while (n > 0) {
+  cat(n, "")
+  n <- n - 1
+}
+cat("\n")
+@@N cat ==> prints without quotes
+@@E
+for (i in 1:10) {
+  if (i == 3) next
+  if (i > 5) break
+  print(i)
+}
+@@N next ==> skips an iteration
+@@C returns-and-lambdas | return values, dots and lambdas | 2 | Returns lists, accepts extra arguments with dots and writes short lambdas.
+@@E
+stats <- function(x) {
+  list(min = min(x), max = max(x))
+}
+result <- stats(c(3, 1, 2))
+print(result$max)
+@@N list(min ==> several results
+@@E
+total <- function(...) {
+  sum(...)
+}
+print(total(1, 2, 3))
+@@N ... ==> passes extra arguments on
+@@E
+add_one <- \(x) x + 1
+print(add_one(4))
+print(sapply(1:3, \(i) i * 2))
+@@N \(x) ==> lambda shorthand
+@@T the-apply-family | the apply family
+@@C lapply-sapply | lapply and sapply | 1 | Applies a function to each element of a vector or list.
+@@E
+nums <- list(1:3, 4:6)
+print(lapply(nums, sum))
+@@N lapply ==> always returns a list
+@@E
+words <- c("tea", "cake", "jam")
+print(sapply(words, nchar))
+@@N sapply ==> simplifies to a vector
+@@E
+print(sapply(1:5, function(i) i^2))
+@@C vapply-mapply | vapply, mapply and Map | 2 | Applies functions with typed results or over several vectors at once.
+@@E
+x <- c(1, 4, 9)
+print(vapply(x, sqrt, numeric(1)))
+@@N numeric(1) ==> declared result type
+@@E
+print(mapply(function(a, b) a + b, 1:3, 4:6))
+@@N mapply ==> walks vectors in parallel
+@@E
+print(Map(function(n, s) paste(n, s), c("a", "b"), c("x", "y")))
+@@C apply-matrices | apply on matrices | 2 | Applies a function across the rows or columns of a matrix.
+@@E
+m <- matrix(1:6, nrow = 2)
+print(apply(m, 1, sum))
+print(apply(m, 2, max))
+@@N 1 ==> rows
+@@N 2 ==> columns
+@@E
+m <- matrix(c(1, 2, 3, 4), nrow = 2)
+print(apply(m, c(1, 2), function(v) v * 10))
+@@N c(1, 2) ==> every cell
+@@E
+scores <- matrix(c(90, 80, 70, 60), nrow = 2)
+print(apply(scores, 1, mean))
+@@C group-apply | tapply and split | 2 | Computes a summary per group by splitting data first.
+@@E
+sales <- c(3, 5, 2, 4)
+city <- c("Oslo", "Rome", "Oslo", "Rome")
+print(tapply(sales, city, sum))
+@@E
+df <- data.frame(g = c("a", "b", "a"), v = 1:3)
+print(sapply(split(df$v, df$g), sum))
+@@N split ==> then sapply per piece
+@@E
+words <- c("tea", "cake", "jam", "bun")
+print(table(nchar(words)))
+@@T strings-regex | strings & regex
+@@C basic-string-functions | basic string functions | 1 | Joins text, measures lengths and cuts or splits character vectors.
+@@E
+name <- "ada"
+print(paste("Hello,", name))
+print(paste0("id_", 1:3))
+@@N paste0 ==> no separator
+@@E
+title <- "Quarterly Report"
+print(toupper(title))
+print(nchar(title))
+print(substr(title, 1, 9))
+@@N substr ==> start and stop positions
+@@E
+csv <- "ada,grace,linus"
+parts <- strsplit(csv, ",")[[1]]
+print(parts)
+print(paste(parts, collapse = " | "))
+@@N [[1]] ==> strsplit returns a list
+@@N collapse ==> joins into one string
+@@C formatting | trimming and formatting | 1 | Formats numbers and text with padding, rounding and separators.
+@@E
+print(trimws("  padded  "))
+print(sprintf("%05.1f", 3.14159))
+print(sprintf("%s has %d items", "cart", 3L))
+@@N sprintf ==> printf-style formatting
+@@E
+print(format(1234567.891, big.mark = ",", nsmall = 2))
+print(formatC(7, width = 3, flag = "0"))
+print(format(0.5, nsmall = 2))
+@@N big.mark ==> thousands separator
+@@E
+x <- c("b", "a", "c")
+print(sort(x))
+print(rev(x))
+print(sprintf("%-5s|", "ada"))
+@@C regular-expressions | regular expressions | 2 | Matches text with grepl and rewrites or extracts it with sub, gsub and regmatches.
+@@E
+files <- c("a.txt", "b.csv", "c.txt")
+print(grepl("\\.txt$", files))
+print(files[grepl("\\.txt$", files)])
+@@N \\. ==> escaped dot
+@@E
+text <- "red apple, red car"
+print(sub("red", "green", text))
+print(gsub("red", "green", text))
+@@N sub ==> first match
+@@N gsub ==> every match
+@@E
+phone <- "call 555-1234 now"
+print(regmatches(phone, regexpr("[0-9]+-[0-9]+", phone)))
+@@N regmatches ==> returns matched text
+@@C searching-strings | searching and transforming | 2 | Tests prefixes, finds positions and swaps characters.
+@@E
+x <- c("tea", "cake")
+print(startsWith(x, "t"))
+print(endsWith(x, "e"))
+@@E
+print(unlist(gregexpr("p", "apple")))
+@@N gregexpr ==> all match positions
+@@E
+print(chartr("abc", "xyz", "aabbcc"))
+print(rev(strsplit("stream", "")[[1]]))
+@@N chartr ==> character-for-character swap
+@@T missing-values | missing values
+@@C na-basics | NA basics | 1 | Detects missing values and handles them in arithmetic.
+@@E
+x <- c(5, NA, 3)
+print(is.na(x))
+print(sum(is.na(x)))
+@@N is.na ==> logical vector
+@@E
+y <- c(1, NA, 3)
+print(sum(y))
+print(sum(y, na.rm = TRUE))
+@@N na.rm ==> ignore missing values
+@@E
+print(NA + 1)
+print(NA > 1)
+print(NA & FALSE)
+@@N NA & FALSE ==> still FALSE
+@@C removing-replacing | removing and replacing | 2 | Drops or fills missing values in vectors and data frames.
+@@E
+x <- c(5, NA, 3)
+print(x[!is.na(x)])
+print(as.vector(na.omit(x)))
+@@N na.omit ==> drops missing values
+@@E
+x <- c(5, NA, 3)
+x[is.na(x)] <- 0
+print(x)
+@@N x[is.na(x)] <- ==> fills by index
+@@E
+df <- data.frame(a = c(1, NA, 3), b = c("x", "y", NA))
+print(complete.cases(df))
+print(df[complete.cases(df), ])
+@@N complete.cases ==> rows without NA
+@@C na-statistics | missing values in statistics | 2 | Computes summaries while skipping or replacing missing data.
+@@E
+scores <- c(90, NA, 70)
+print(mean(scores, na.rm = TRUE))
+print(max(scores, na.rm = TRUE))
+@@E
+df <- data.frame(g = c("a", "b"), v = c(1, NA))
+print(colSums(is.na(df)))
+@@N colSums ==> counts of NA per column
+@@E
+x <- c(1, NA, 3)
+print(ifelse(is.na(x), mean(x, na.rm = TRUE), x))
+@@C null-nan-inf | NULL, NaN and Inf | 2 | Tells apart empty, undefined and infinite values.
+@@E
+print(is.null(NULL))
+print(length(NULL))
+l <- list(a = 1, b = NULL)
+print(length(l))
+@@N NULL ==> length zero
+@@E
+print(0 / 0)
+print(is.nan(0 / 0))
+print(1 / 0)
+@@N is.nan ==> true only for NaN
+@@E
+x <- c(1, NaN, Inf, NA)
+print(is.finite(x))
+print(is.na(x))
+@@T base-plotting | base plotting
+@@C plot-basics | plot basics | 1 | Draws scatter and line plots with plot.
+@@E
+x <- 1:10
+y <- x^2
+plot(x, y)
+@@N plot ==> scatter by default
+@@E
+scores <- c(90, 72, 85)
+plot(scores, type = "b", main = "Scores", xlab = "Test")
+@@N type = "b" ==> points and lines
+@@E
+x <- seq(0, 2 * pi, length.out = 50)
+plot(x, sin(x), type = "l", col = "blue")
+@@N type = "l" ==> line only
+@@C chart-types | chart types | 1 | Draws column charts, histograms and box plots.
+@@E
+sales <- c(Oslo = 3, Rome = 5, Paris = 4)
+barplot(sales, main = "Sales", col = "steelblue")
+@@N barplot ==> bars from named values
+@@E
+values <- c(2, 3, 3, 4, 4, 4, 5)
+hist(values, breaks = 4)
+@@N hist ==> distribution of values
+@@E
+groups <- data.frame(g = c("a", "a", "b", "b"), v = c(1, 2, 3, 5))
+boxplot(v ~ g, data = groups)
+@@N v ~ g ==> values by group
+@@C adding-layers | adding to a plot | 2 | Adds lines, points, fitted lines and legends to an existing plot.
+@@E
+x <- 1:5
+plot(x, x, type = "l")
+lines(x, x^2, col = "red")
+points(x, x^2, pch = 19)
+@@N lines ==> adds a line
+@@N points ==> adds markers
+@@E
+x <- c(1, 2, 3, 4)
+y <- c(2, 4, 5, 8)
+plot(x, y)
+abline(lm(y ~ x), col = "red")
+@@N lm(y ~ x) ==> linear model
+@@E
+plot(1:3, c(2, 4, 3), type = "b", col = "blue")
+legend("topleft", legend = "series", col = "blue", lty = 1)
+@@C devices-and-layout | saving and layout | 2 | Writes plots to files and arranges several plots on one page.
+@@E
+png("chart.png", width = 400, height = 300)
+plot(1:5)
+dev.off()
+@@N png ==> opens a file device
+@@N dev.off ==> closes and saves
+@@E
+par(mfrow = c(1, 2))
+plot(1:3)
+hist(c(1, 2, 2, 3))
+@@N mfrow ==> one row, two panels
+@@E
+pdf("report.pdf")
+barplot(c(a = 1, b = 2))
+dev.off()
+@@T pipes-functional-tools | pipes & functional tools
+@@C native-pipe | the native pipe | 1 | Passes the result of one call into the next with the pipe operator.
+@@E
+nums <- c(4, 9, 16)
+nums |> sqrt() |> sum() |> print()
+@@N |> ==> left side becomes first argument
+@@E
+c(3, 1, 2) |> sort() |> rev() |> print()
+@@E
+df <- data.frame(id = 1:3, score = c(90, 72, 85))
+df |> subset(score > 80) |> nrow() |> print()
+@@C filter-map-reduce | Filter, Map and Reduce | 2 | Picks elements with Filter, transforms with Map and folds with Reduce.
+@@E
+nums <- 1:6
+print(Filter(function(n) n %% 2 == 0, nums))
+print(Map(function(n) n * 2, 1:2))
+@@N Filter ==> keeps matching elements
+@@E
+print(Reduce(`+`, 1:5))
+print(Reduce(function(a, b) a * b, 1:5, accumulate = TRUE))
+@@N `+` ==> operator as a function
+@@N accumulate ==> keeps running results
+@@E
+words <- c("tea", "cake", "jam")
+print(Filter(function(w) nchar(w) > 3, words))
+print(Position(function(w) w == "jam", words))
+@@C closures-composition | closures and composition | 2 | Returns functions from functions and chains them.
+@@E
+square <- \(x) x^2
+print(sapply(1:4, square))
+@@E
+compose <- function(f, g) function(x) g(f(x))
+inc_then_double <- compose(\(x) x + 1, \(x) x * 2)
+print(inc_then_double(3))
+@@N function(x) ==> returned closure
+@@E
+add <- function(n) function(x) x + n
+add5 <- add(5)
+print(add5(10))
+@@N n ==> remembered by the closure
+@@C do-call-vectorize | do.call and Vectorize | 3 | Calls functions with argument lists and lifts scalar functions to vectors.
+@@E
+args <- list(1:10)
+print(do.call(mean, args))
+@@N do.call ==> arguments from a list
+@@E
+pieces <- list("a", "b", sep = "-")
+print(do.call(paste, pieces))
+@@E
+bigger <- Vectorize(function(a, b) if (a > b) a else b)
+print(bigger(c(1, 5), c(3, 2)))
+@@N Vectorize ==> scalar function over vectors
+@@T s3-classes | S3 classes
+@@C creating-objects | creating S3 objects | 1 | Tags a list with a class attribute to make an object.
+@@E
+dog <- list(name = "rex", sound = "woof")
+class(dog) <- "animal"
+print(class(dog))
+@@N class(dog) <- ==> sets the class
+@@E
+new_point <- function(x, y) {
+  structure(list(x = x, y = y), class = "point")
+}
+p <- new_point(1, 2)
+print(inherits(p, "point"))
+@@N structure ==> list plus attributes
+@@E
+account <- list(owner = "ada", balance = 100)
+class(account) <- "account"
+print(unclass(account)$balance)
+@@N unclass ==> strips the class
+@@C generics-methods | generics and methods | 2 | Dispatches on class with UseMethod and name.class methods.
+@@E
+speak <- function(x) UseMethod("speak")
+speak.default <- function(x) "..."
+speak.dog <- function(x) "woof"
+print(speak(structure(list(), class = "dog")))
+@@N UseMethod ==> picks the method by class
+@@N speak.default ==> fallback method
+@@E
+print.point <- function(x, ...) {
+  cat("Point(", x$x, ",", x$y, ")\n")
+}
+p <- structure(list(x = 1, y = 2), class = "point")
+print(p)
+@@N print.point ==> used by print
+@@E
+format.money <- function(x, ...) paste0(x$amount, " EUR")
+m <- structure(list(amount = 5), class = "money")
+print(format(m))
+@@C inheritance | inheritance and NextMethod | 2 | Chains class vectors and calls the next method with NextMethod.
+@@E
+describe <- function(x) UseMethod("describe")
+describe.animal <- function(x) "an animal"
+describe.dog <- function(x) paste("a dog,", NextMethod())
+d <- structure(list(), class = c("dog", "animal"))
+print(describe(d))
+@@N NextMethod ==> calls the parent class method
+@@E
+area <- function(s) UseMethod("area")
+area.square <- function(s) s$side^2
+area.circle <- function(s) pi * s$r^2
+print(area(structure(list(side = 3), class = "square")))
+@@E
+x <- structure(list(), class = c("child", "parent"))
+print(inherits(x, "parent"))
+print(inherits(x, c("a", "child"), which = TRUE))
+@@N class = c("child", "parent") ==> most specific first
+@@C operators-validators | operators and constructors | 3 | Overloads operators and validates input in constructor functions.
+@@E
+"+.money" <- function(e1, e2) {
+  structure(list(amount = e1$amount + e2$amount), class = "money")
+}
+a <- structure(list(amount = 2), class = "money")
+print((a + a)$amount)
+@@N "+.money" ==> overloads the plus operator
+@@E
+toString.point <- function(x, ...) paste0("(", x$x, ", ", x$y, ")")
+p <- structure(list(x = 1, y = 2), class = "point")
+print(toString(p))
+@@E
+new_temp <- function(c) {
+  stopifnot(is.numeric(c))
+  structure(list(celsius = c), class = "temp")
+}
+print(new_temp(20)$celsius)
+@@N stopifnot ==> validates the input

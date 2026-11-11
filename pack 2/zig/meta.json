@@ -1,0 +1,7 @@
+{
+  "name": "Zig",
+  "short": "ZG",
+  "version": "0.17.1",
+  "indent": 4,
+  "pigment": { "light": "#8B5D3C", "dark": "#C39574" }
+}

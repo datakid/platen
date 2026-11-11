@@ -1,0 +1,904 @@
+@@T val-var-types | val, var & types
+@@C val-and-var | val and var | 1 | Binds a name to a value with val for read-only or var for mutable.
+@@E
+val city = "Oslo"
+var visits = 0
+@@N val ==> cannot be reassigned
+@@N var ==> can be reassigned
+@@E
+val limit = 10
+var attempts = limit
+@@E
+val names = listOf("ada", "grace")
+var current = names.first()
+@@N listOf ==> a read-only list
+@@C types-and-inference | types and inference | 1 | Lets the compiler infer a type or states one explicitly after a colon.
+@@E
+val count: Int = 42
+val price: Double = 9.99
+val flag: Boolean = true
+@@N : Int ==> explicit type
+@@E
+val ratio = 3 / 4
+val exact = 3 / 4.0
+@@N 3 / 4 ==> integer division gives 0
+@@E
+val letter: Char = 'k'
+val big: Long = 3_000_000_000
+val small: Byte = 127
+@@N 3_000_000_000 ==> underscores group digits
+@@C numeric-conversion | numeric conversion | 1 | Converts between number types with explicit conversion functions.
+@@E
+val whole = 7
+val half = whole.toDouble() / 2
+@@N toDouble ==> no implicit widening
+@@E
+val text = "42"
+val n = text.toInt()
+val maybe = "x1".toIntOrNull()
+@@N toIntOrNull ==> null on bad input
+@@E
+val total = 5L + 3
+val asInt = total.toInt()
+val hex = 0xFF
+val bits = 0b1010
+@@C const-and-lateinit | const and lateinit | 2 | Declares compile-time constants and properties that are assigned later.
+@@E
+const val MAX_USERS = 100
+const val BASE_URL = "https://example.com"
+@@N const val ==> compile-time constant
+@@E
+class Session {
+    lateinit var token: String
+}
+@@N lateinit ==> assigned after construction
+@@E
+object Config {
+    const val VERSION = "2.4"
+    val retries = 3
+}
+@@T strings-templates | strings & templates
+@@C string-templates | string templates | 1 | Embeds variables and expressions in strings with a dollar sign.
+@@E
+val name = "ada"
+val greeting = "Hello, $name"
+val total = "Sum: ${2 + 3}"
+@@N $name ==> simple variable
+@@N ${2 + 3} ==> any expression
+@@E
+val items = listOf("tea", "cake")
+val line = "Order has ${items.size} items"
+@@E
+val price = 4.5
+val label = "Price: $price EUR"
+val shout = "${label.uppercase()}!"
+@@C raw-strings | raw strings | 2 | Writes multiline text in triple quotes and trims its indentation.
+@@E
+val sql = """
+    SELECT id
+    FROM users
+""".trimIndent()
+@@N trimIndent ==> removes common indent
+@@E
+val path = """C:\temp\logs"""
+@@N """ ==> no escapes needed
+@@E
+val text = """
+    |first
+    |second
+""".trimMargin()
+@@N trimMargin ==> strips up to the pipe
+@@C string-functions | string functions | 1 | Transforms and inspects strings with standard library functions.
+@@E
+val title = "  Report  "
+val trimmed = title.trim()
+val upper = trimmed.uppercase()
+@@N trim ==> removes outer whitespace
+@@E
+val csv = "ada,grace,linus"
+val parts = csv.split(",")
+val joined = parts.joinToString(" | ")
+@@N split ==> returns a list
+@@E
+val file = "report.pdf"
+val isPdf = file.endsWith(".pdf")
+val stem = file.substringBeforeLast(".")
+val padded = "7".padStart(3, '0')
+@@N padStart ==> pads on the left
+@@C characters-and-indexing | characters and indexing | 1 | Reads single characters by index and processes a string as a sequence.
+@@E
+val word = "kotlin"
+val first = word[0]
+val last = word.last()
+@@N word[0] ==> index operator
+@@E
+val word = "banana"
+val count = word.count { it == 'a' }
+val reversed = word.reversed()
+@@N count { ==> counts matching chars
+@@E
+val letters = "abc".toList()
+val code = 'a'.code
+val back = 97.toChar()
+@@T null-safety | null safety
+@@C nullable-types | nullable types | 1 | Marks values that may be absent by adding a question mark to the type.
+@@E
+var nickname: String? = null
+nickname = "ada"
+@@N String? ==> may hold null
+@@E
+val age: Int? = "42".toIntOrNull()
+val tags: List<String>? = null
+@@E
+fun find(users: Map<String, String>, id: String): String? {
+    return users[id]
+}
+@@N users[id] ==> map lookups are nullable
+@@C safe-call-and-elvis | safe calls and elvis | 1 | Handles null with the safe call operator and the elvis fallback.
+@@E
+val name: String? = null
+val size = name?.length
+val label = name ?: "guest"
+@@N ?. ==> null when the receiver is null
+@@N ?: ==> fallback value
+@@E
+fun describe(city: String?): String {
+    return city?.uppercase() ?: "unknown"
+}
+@@E
+val input: String? = readLine()
+val length = input?.trim()?.length ?: 0
+@@N ?.trim()?. ==> safe calls chain
+@@C assertions-and-smart-casts | assertions and smart casts | 2 | Narrows nullable types with checks or asserts non-null with a double bang.
+@@E
+fun parse(raw: String?): Int {
+    return raw!!.toInt()
+}
+@@N !! ==> throws if null
+@@E
+fun shout(text: String?) {
+    if (text != null) {
+        println(text.uppercase())
+    }
+}
+@@N text != null ==> smart cast to String
+@@E
+fun length(value: Any): Int {
+    return if (value is String) value.length else 0
+}
+@@N is String ==> smart cast inside the branch
+@@C let-and-require | let and requireNotNull | 2 | Runs code only for non-null values or fails fast with a message.
+@@E
+val email: String? = "ada@example.com"
+email?.let { println("Sending to $it") }
+@@N let ==> runs only when non-null
+@@E
+fun send(to: String?) {
+    val target = requireNotNull(to) { "address missing" }
+    println(target)
+}
+@@N requireNotNull ==> throws IllegalArgumentException
+@@E
+val values = listOf("1", "x", "3")
+val numbers = values.mapNotNull { it.toIntOrNull() }
+@@N mapNotNull ==> drops null results
+@@T functions-default-arguments | functions & default arguments
+@@C declaring-functions | declaring functions | 1 | Defines functions with block bodies or a single expression.
+@@E
+fun square(n: Int): Int {
+    return n * n
+}
+@@E
+fun area(w: Double, h: Double) = w * h
+@@N = ==> expression body
+@@E
+fun log(message: String) {
+    println("[log] $message")
+}
+@@N log(message: String) ==> returns Unit
+@@C default-arguments | default arguments | 1 | Gives parameters default values so callers can leave them out.
+@@E
+fun greet(name: String, greeting: String = "Hello"): String {
+    return "$greeting, $name"
+}
+@@N = "Hello" ==> default value
+@@E
+fun connect(host: String, port: Int = 80, secure: Boolean = false) {
+    println("$host:$port $secure")
+}
+@@E
+fun pad(text: String, width: Int = 8, fill: Char = ' '): String {
+    return text.padStart(width, fill)
+}
+@@C named-arguments | named arguments | 2 | Passes arguments by parameter name in any order.
+@@E
+fun connect(host: String, port: Int = 80) = "$host:$port"
+val url = connect(host = "example.com", port = 8080)
+@@N host = ==> named argument
+@@E
+fun box(width: Int, height: Int, depth: Int = 1): Int {
+    return width * height * depth
+}
+val volume = box(height = 2, width = 3)
+@@N height = 2 ==> order does not matter
+@@E
+fun price(amount: Double, digits: Int = 2, unit: String = "EUR") =
+    "%.${digits}f $unit".format(amount)
+val text = price(9.5, unit = "USD")
+@@N unit = ==> skips digits
+@@C vararg-parameters | vararg parameters | 2 | Accepts any number of arguments and spreads arrays into them.
+@@E
+fun sum(vararg numbers: Int): Int {
+    return numbers.sum()
+}
+@@N vararg ==> arrives as an IntArray
+@@E
+fun tags(vararg names: String) = names.joinToString(", ")
+val all = tags("a", "b", "c")
+@@E
+fun total(vararg values: Int) = values.sum()
+val data = intArrayOf(1, 2, 3)
+val result = total(*data)
+@@N * ==> spread operator
+@@T lambdas-higher-order-functions | lambdas & higher-order functions
+@@C lambda-syntax | lambda syntax | 1 | Writes anonymous functions in braces with an arrow.
+@@E
+val doubler = { n: Int -> n * 2 }
+@@N -> ==> separates parameters from body
+@@E
+val greet: (String) -> String = { name -> "Hello, $name" }
+@@N (String) -> String ==> function type
+@@E
+val add = { a: Int, b: Int -> a + b }
+val sum = add(2, 3)
+@@C it-and-trailing-lambdas | it and trailing lambdas | 1 | Uses the implicit it parameter and moves lambdas outside the parentheses.
+@@E
+val numbers = listOf(1, 2, 3)
+val doubled = numbers.map { it * 2 }
+@@N it ==> single implicit parameter
+@@E
+val names = listOf("ada", "grace")
+names.forEach { println(it) }
+@@N forEach { ==> trailing lambda
+@@E
+val words = listOf("kotlin", "java")
+val longest = words.maxByOrNull { it.length }
+@@C higher-order-functions | higher-order functions | 2 | Accepts or returns functions as values.
+@@E
+fun apply(n: Int, op: (Int) -> Int): Int {
+    return op(n)
+}
+@@N op: (Int) -> Int ==> function parameter
+@@E
+fun repeatAction(times: Int, action: () -> Unit) {
+    for (i in 1..times) action()
+}
+@@E
+fun compose(f: (Int) -> Int, g: (Int) -> Int): (Int) -> Int {
+    return { x -> g(f(x)) }
+}
+@@N return { ==> returns a lambda
+@@C references-and-closures | function references and closures | 2 | Passes named functions with double colon and captures outer variables.
+@@E
+fun isEven(n: Int) = n % 2 == 0
+val evens = listOf(1, 2, 3, 4).filter(::isEven)
+@@N ::isEven ==> function reference
+@@E
+fun counter(): () -> Int {
+    var count = 0
+    return { count++ }
+}
+@@N count ==> captured and mutated
+@@E
+val lengths = listOf("a", "bb").map(String::length)
+val trimmed = listOf(" a ", "b ").map(String::trim)
+@@N String::length ==> member reference
+@@T list-map-set | List, Map, Set
+@@C lists | lists | 1 | Stores ordered items in read-only or mutable lists.
+@@E
+val scores = listOf(90, 72, 85)
+val top = scores.first()
+@@N listOf ==> read-only
+@@E
+val names = mutableListOf("ada", "grace")
+names.add("linus")
+names.remove("grace")
+@@N mutableListOf ==> can change
+@@E
+val squares = List(5) { it * it }
+val last = squares.last()
+val size = squares.size
+@@N List(5) { ==> builds from the index
+@@C maps | maps | 1 | Associates keys with values using to pairs.
+@@E
+val stock = mapOf("apple" to 4, "pear" to 0)
+val apples = stock["apple"]
+@@N to ==> builds a key-value pair
+@@E
+val prices = mutableMapOf("tea" to 2.5)
+prices["cake"] = 4.0
+prices.remove("tea")
+@@E
+val ages = mapOf("ada" to 36, "linus" to 54)
+for ((name, age) in ages) {
+    println("$name: $age")
+}
+@@N (name, age) ==> destructures each entry
+@@C sets | sets | 1 | Keeps unique items and combines sets with infix operations.
+@@E
+val tags = mutableSetOf("kotlin", "web")
+tags.add("kotlin")
+tags.add("cli")
+@@N add ==> ignores duplicates
+@@E
+val a = setOf(1, 2, 3)
+val b = setOf(3, 4)
+val both = a intersect b
+val either = a union b
+@@N intersect ==> infix function
+@@E
+val seen = mutableSetOf<Int>()
+val isNew = seen.add(7)
+@@N add ==> returns false if present
+@@C ranges | ranges and progressions | 1 | Builds sequences of numbers with .., downTo, until and step.
+@@E
+val digits = 0..9
+val countdown = 10 downTo 1
+@@N .. ==> inclusive range
+@@E
+val evens = 0..20 step 2
+val half = 0 until 5
+@@N until ==> excludes the end
+@@E
+for (i in 1..3) {
+    println(i)
+}
+@@T collection-operations | collection operations
+@@C map-and-filter | map and filter | 1 | Transforms and selects elements with map and filter.
+@@E
+val prices = listOf(5.0, 12.5, 8.0)
+val cheap = prices.filter { it < 10 }
+val labels = prices.map { "$it EUR" }
+@@N filter ==> keeps matches
+@@N map ==> transforms each element
+@@E
+val users = listOf("ada", "grace", "linus")
+val short = users.filter { it.length <= 4 }
+@@E
+val nums = listOf(1, 2, 3, 4, 5, 6)
+val evenSquares = nums.filter { it % 2 == 0 }.map { it * it }
+@@C aggregation | aggregation | 1 | Reduces a collection to one value with sum, fold and counting functions.
+@@E
+val nums = listOf(3, 5, 7)
+val total = nums.sum()
+val average = nums.average()
+@@E
+val words = listOf("a", "bb", "ccc")
+val chars = words.fold(0) { acc, w -> acc + w.length }
+@@N fold ==> starts from an initial value
+@@E
+val prices = listOf(5, 9, 2)
+val highest = prices.max()
+val count = prices.count { it > 3 }
+@@C grouping | grouping and splitting | 2 | Splits and groups elements with groupBy, associateWith and partition.
+@@E
+val words = listOf("apple", "avocado", "banana")
+val byLetter = words.groupBy { it.first() }
+@@N groupBy ==> map of key to list
+@@E
+val names = listOf("ada", "grace")
+val lengths = names.associateWith { it.length }
+@@N associateWith ==> element to value
+@@E
+val nums = listOf(1, 2, 3, 4)
+val (even, odd) = nums.partition { it % 2 == 0 }
+@@N partition ==> pair of lists
+@@C sorting-and-slicing | sorting and slicing | 1 | Orders and slices collections with sorted, take, drop and zip.
+@@E
+val names = listOf("grace", "ada", "linus")
+val sorted = names.sorted()
+val byLength = names.sortedBy { it.length }
+@@N sortedBy ==> sorts by a key
+@@E
+val nums = listOf(5, 3, 9, 1)
+val top = nums.sortedDescending().take(2)
+@@E
+val items = listOf("a", "b", "c", "d")
+val firstTwo = items.take(2)
+val rest = items.drop(2)
+val pairs = items.zip(listOf(1, 2, 3, 4))
+@@C sequences | sequences | 3 | Processes elements lazily with sequences.
+@@E
+val firstBig = generateSequence(1) { it * 2 }
+    .first { it > 1000 }
+@@N generateSequence ==> infinite until stopped
+@@E
+val result = (1..1_000_000).asSequence()
+    .map { it * 2 }
+    .filter { it % 3 == 0 }
+    .take(3)
+    .toList()
+@@N asSequence ==> evaluates lazily
+@@E
+val lines = listOf("a", "", "b")
+val kept = lines.asSequence().filter { it.isNotEmpty() }.toList()
+@@T classes-properties | classes & properties
+@@C classes-and-constructors | classes and constructors | 1 | Declares classes with primary constructor properties.
+@@E
+class User(val name: String, var age: Int)
+@@N val name ==> read-only property
+@@N var age ==> mutable property
+@@E
+class Rectangle(val width: Double, val height: Double) {
+    fun area() = width * height
+}
+@@E
+class Counter {
+    var value = 0
+    fun increment() {
+        value++
+    }
+}
+@@C custom-accessors | getters and setters | 2 | Computes or validates a property with custom get and set.
+@@E
+class Circle(val radius: Double) {
+    val area: Double
+        get() = 3.14159 * radius * radius
+}
+@@N get() ==> computed on each read
+@@E
+class Temperature {
+    var celsius = 20.0
+        set(value) {
+            field = value.coerceAtLeast(-273.15)
+        }
+}
+@@N field ==> the backing field
+@@E
+class Person(val first: String, val last: String) {
+    val fullName get() = "$first $last"
+}
+@@C init-and-secondary | init blocks and secondary constructors | 2 | Validates in init and adds alternative constructors.
+@@E
+class Port(val value: Int) {
+    init {
+        require(value in 1..65535) { "bad port" }
+    }
+}
+@@N init ==> runs with the primary constructor
+@@E
+class Point(val x: Int, val y: Int) {
+    constructor() : this(0, 0)
+}
+@@N constructor() ==> secondary constructor
+@@E
+class Greeter(private val name: String) {
+    fun greet() = "Hello, $name"
+}
+@@N private val ==> hidden property
+@@C inheritance-and-visibility | inheritance and visibility | 2 | Extends open classes and hides state with visibility modifiers.
+@@E
+open class Animal {
+    open fun speak() = "..."
+}
+class Dog : Animal() {
+    override fun speak() = "woof"
+}
+@@N open ==> allows subclassing
+@@N override ==> replaces the parent member
+@@E
+abstract class Shape {
+    abstract fun area(): Double
+}
+class Square(val side: Double) : Shape() {
+    override fun area() = side * side
+}
+@@E
+class Wallet {
+    private var cents = 0
+    fun add(amount: Int) {
+        cents += amount
+    }
+    fun total() = cents
+}
+@@T data-classes | data classes
+@@C declaring-data-classes | declaring data classes | 1 | Generates equals, toString and copy from constructor properties.
+@@E
+data class User(val name: String, val age: Int)
+@@N data ==> generates members
+@@E
+data class Point(val x: Int, val y: Int)
+val origin = Point(0, 0)
+@@E
+data class Product(
+    val sku: String,
+    val price: Double,
+    val stock: Int = 0,
+)
+@@N stock: Int = 0 ==> default value
+@@C copy-and-equality | copy and equality | 1 | Copies instances with changes and compares them by value.
+@@E
+data class User(val name: String, val age: Int)
+val ada = User("ada", 36)
+val older = ada.copy(age = 37)
+@@N copy ==> new instance, changed fields
+@@E
+data class Point(val x: Int, val y: Int)
+val same = Point(1, 2) == Point(1, 2)
+@@N == ==> compares property values
+@@E
+data class Order(val id: Int, val total: Double)
+val first = Order(1, 9.5)
+val second = first.copy(id = 2)
+@@C destructuring-and-tuples | destructuring | 2 | Unpacks data classes, pairs and triples into variables.
+@@E
+data class Point(val x: Int, val y: Int)
+val (x, y) = Point(3, 4)
+@@N (x, y) ==> componentN functions
+@@E
+val pair = Pair("ada", 36)
+val (name, age) = pair
+@@E
+val triple = Triple(1, "one", 1.0)
+val (id, label, ratio) = triple
+@@C data-in-collections | data classes in collections | 2 | Sorts lists of data objects, removes duplicates and sums fields.
+@@E
+data class Item(val name: String, val qty: Int)
+val items = listOf(Item("pen", 3), Item("ink", 1))
+val sorted = items.sortedBy { it.qty }
+@@E
+data class Tag(val label: String)
+val unique = listOf(Tag("a"), Tag("a"), Tag("b")).distinct()
+@@N distinct ==> uses value equality
+@@E
+data class Row(val city: String, val sales: Int)
+val rows = listOf(Row("Oslo", 3), Row("Rome", 5))
+val total = rows.sumOf { it.sales }
+@@T sealed-classes-when | sealed classes & when
+@@C when-expressions | when expressions | 1 | Chooses a value with when instead of a chain of ifs.
+@@E
+fun describe(n: Int) = when {
+    n < 0 -> "negative"
+    n == 0 -> "zero"
+    else -> "positive"
+}
+@@N when ==> expression with a value
+@@E
+fun label(code: Int): String = when (code) {
+    200 -> "ok"
+    404 -> "not found"
+    else -> "other"
+}
+@@E
+fun kind(x: Any) = when (x) {
+    is Int -> "int"
+    is String -> "string"
+    else -> "other"
+}
+@@N is Int ==> type check branch
+@@C when-ranges | ranges and multiple conditions | 1 | Matches ranges and several values in a single when branch.
+@@E
+fun grade(score: Int) = when (score) {
+    in 90..100 -> "A"
+    in 80..89 -> "B"
+    else -> "C"
+}
+@@N in 90..100 ==> range branch
+@@E
+fun weekend(day: String) = when (day) {
+    "sat", "sun" -> true
+    else -> false
+}
+@@N "sat", "sun" ==> several values
+@@E
+fun size(list: List<Int>) = when {
+    list.isEmpty() -> "none"
+    list.size == 1 -> "one"
+    else -> "many"
+}
+@@C sealed-types | sealed classes and interfaces | 2 | Restricts a hierarchy to a known set of subtypes.
+@@E
+sealed class Result
+data class Success(val value: Int) : Result()
+data class Failure(val message: String) : Result()
+@@N sealed ==> subclasses known at compile time
+@@E
+sealed interface Shape
+data class Circle(val r: Double) : Shape
+data class Square(val side: Double) : Shape
+@@E
+sealed class Event {
+    data object Click : Event()
+    data class Key(val code: Int) : Event()
+}
+@@N data object ==> singleton with toString
+@@C exhaustive-when | exhaustive when | 3 | Covers every sealed subtype without an else branch.
+@@E
+sealed interface Shape
+data class Circle(val r: Double) : Shape
+data class Square(val side: Double) : Shape
+fun area(s: Shape) = when (s) {
+    is Circle -> 3.14159 * s.r * s.r
+    is Square -> s.side * s.side
+}
+@@N when (s) ==> compiler checks every case
+@@E
+sealed class Result
+data class Ok(val value: Int) : Result()
+data object Empty : Result()
+fun show(r: Result) = when (r) {
+    is Ok -> "value ${r.value}"
+    Empty -> "empty"
+}
+@@N Empty ==> object compared directly
+@@E
+sealed interface Light
+data object Red : Light
+data object Green : Light
+fun action(l: Light) = when (l) {
+    Red -> "stop"
+    Green -> "go"
+}
+@@T interfaces-objects | interfaces & objects
+@@C interfaces | interfaces | 1 | Declares contracts that classes implement with override.
+@@E
+interface Greeter {
+    fun greet(name: String): String
+}
+class Formal : Greeter {
+    override fun greet(name: String) = "Good day, $name"
+}
+@@N : Greeter ==> implements the interface
+@@E
+interface Shape {
+    val sides: Int
+    fun describe() = "$sides sides"
+}
+class Triangle : Shape {
+    override val sides = 3
+}
+@@N fun describe ==> default implementation
+@@E
+interface Logger {
+    fun log(message: String)
+}
+class ConsoleLogger : Logger {
+    override fun log(message: String) = println(message)
+}
+@@C object-declarations | object declarations | 2 | Creates a singleton with the object keyword.
+@@E
+object Registry {
+    val items = mutableListOf<String>()
+    fun add(item: String) = items.add(item)
+}
+@@N object ==> single instance
+@@E
+object Config {
+    const val NAME = "app"
+    var debug = false
+}
+@@E
+object Clock {
+    fun now() = System.currentTimeMillis()
+}
+@@C companion-objects | companion objects | 2 | Attaches static-like members to a class with a companion object.
+@@E
+class User(val name: String) {
+    companion object {
+        fun guest() = User("guest")
+    }
+}
+@@N companion ==> called as User.guest()
+@@E
+class Temperature(val celsius: Double) {
+    companion object {
+        const val FREEZING = 0.0
+        fun fromF(f: Double) = Temperature((f - 32) * 5 / 9)
+    }
+}
+@@E
+class Id private constructor(val value: Int) {
+    companion object {
+        fun of(value: Int) = Id(value)
+    }
+}
+@@N private constructor ==> only the companion builds it
+@@C expressions-and-delegation | object expressions and delegation | 3 | Builds anonymous objects and delegates to other objects or lazily.
+@@E
+interface Clickable { fun click() }
+val button = object : Clickable {
+    override fun click() = println("clicked")
+}
+@@N object : ==> anonymous implementation
+@@E
+interface Printer { fun print(text: String) }
+class Console : Printer {
+    override fun print(text: String) = println(text)
+}
+class Report(printer: Printer) : Printer by printer
+@@N by printer ==> forwards every member
+@@E
+val config: String by lazy {
+    println("loading")
+    "ready"
+}
+@@N by lazy ==> computed on first access
+@@T extension-functions | extension functions
+@@C extension-functions | extension functions | 1 | Adds functions to an existing type without inheritance.
+@@E
+fun String.isBlankOrShort() = isBlank() || length < 3
+@@N String. ==> receiver type
+@@E
+fun Int.isEven() = this % 2 == 0
+@@N this ==> the receiver
+@@E
+fun String.initial(): Char? = firstOrNull()
+@@C extension-properties | extension properties | 2 | Adds computed properties to a type with a custom getter.
+@@E
+val String.lastChar: Char
+    get() = this[length - 1]
+@@N get() ==> extensions have no backing field
+@@E
+val Int.squared: Int
+    get() = this * this
+@@E
+val List<Int>.total: Int
+    get() = sum()
+@@C generic-nullable-extensions | generic and nullable receivers | 3 | Writes extensions for generic types and nullable receivers.
+@@E
+fun <T> List<T>.secondOrNull(): T? = if (size > 1) this[1] else null
+@@N <T> ==> works for any element type
+@@E
+fun String?.orEmptyTrim(): String = this?.trim() ?: ""
+@@N String? ==> nullable receiver
+@@E
+fun <T : Comparable<T>> List<T>.isSorted(): Boolean {
+    return zipWithNext().all { (a, b) -> a <= b }
+}
+@@N T : Comparable<T> ==> bounded type
+@@C using-extensions | calling extensions | 2 | Calls extensions like members and builds small DSL helpers.
+@@E
+fun String.shout() = uppercase() + "!"
+val loud = "hey".shout()
+@@E
+fun Int.times(action: () -> Unit) {
+    repeat(this) { action() }
+}
+@@N repeat ==> runs the block this many times
+@@E
+fun Double.round2() = "%.2f".format(this)
+val price = 3.14159.round2()
+@@T scope-functions | scope functions
+@@C let-and-also | let and also | 1 | Runs a block on a value with it and returns the result or the value.
+@@E
+val name: String? = "ada"
+name?.let { println(it.uppercase()) }
+@@N let ==> returns the lambda result
+@@E
+val user = "ada".also { println("created $it") }
+@@N also ==> returns the receiver
+@@E
+val length = "kotlin".let { it.length * 2 }
+@@C apply-and-with | apply and with | 2 | Configures an object with apply or builds a value with with.
+@@E
+class Config {
+    var host = ""
+    var port = 0
+}
+val config = Config().apply {
+    host = "localhost"
+    port = 8080
+}
+@@N apply ==> returns the receiver
+@@E
+val builder = StringBuilder().apply {
+    append("a")
+    append("b")
+}
+@@E
+val text = with(StringBuilder()) {
+    append("total: ")
+    append(42)
+    toString()
+}
+@@N with ==> returns the last expression
+@@C run-and-takeif | run and takeIf | 2 | Groups statements with run and filters values with takeIf.
+@@E
+val result = run {
+    val a = 2
+    val b = 3
+    a * b
+}
+@@N run ==> block as an expression
+@@E
+val positive = 5.takeIf { it > 0 }
+val negative = (-5).takeUnless { it > 0 }
+@@N takeIf ==> null if the test fails
+@@E
+val port = "8080".toIntOrNull()?.takeIf { it in 1..65535 }
+@@T coroutines-basics | coroutines basics
+@@C suspend-functions | suspend functions | 2 | Declares functions that can pause without blocking a thread.
+@@E
+suspend fun fetchName(): String {
+    delay(1000)
+    return "ada"
+}
+@@N suspend ==> may pause
+@@N delay ==> from kotlinx.coroutines
+@@E
+suspend fun load(id: Int): String {
+    delay(200)
+    return "item $id"
+}
+@@E
+suspend fun load(id: Int): String {
+    delay(200)
+    return "item $id"
+}
+suspend fun total(): Int {
+    val a = load(1).length
+    val b = load(2).length
+    return a + b
+}
+@@N load(1) ==> suspend call inside suspend
+@@C launch-and-runblocking | launch and runBlocking | 2 | Starts coroutines with launch inside a runBlocking scope.
+@@E
+fun main() = runBlocking {
+    launch {
+        delay(100)
+        println("child")
+    }
+    println("parent")
+}
+@@N runBlocking ==> bridges to blocking code
+@@N launch ==> fire and forget
+@@E
+fun main() = runBlocking {
+    val job = launch { delay(500) }
+    job.join()
+    println("done")
+}
+@@N join ==> waits for the job
+@@E
+fun main() = runBlocking {
+    repeat(3) { i ->
+        launch { println("task $i") }
+    }
+}
+@@C async-and-await | async and await | 2 | Runs work concurrently and collects results with await.
+@@E
+fun main() = runBlocking {
+    val a = async { 6 }
+    val b = async { 7 }
+    println(a.await() * b.await())
+}
+@@N async ==> returns a Deferred
+@@N await ==> suspends for the result
+@@E
+suspend fun both(): Pair<Int, Int> = coroutineScope {
+    val x = async { 1 }
+    val y = async { 2 }
+    x.await() to y.await()
+}
+@@N coroutineScope ==> waits for its children
+@@E
+fun main() = runBlocking {
+    val deferred = async { "result" }
+    println(deferred.await())
+}
+@@C contexts-and-dispatchers | withContext and dispatchers | 3 | Switches the thread pool for a block with withContext.
+@@E
+suspend fun read(): String = withContext(Dispatchers.IO) {
+    "data"
+}
+@@N Dispatchers.IO ==> blocking I/O pool
+@@E
+suspend fun compute(): Int = withContext(Dispatchers.Default) {
+    (1..100).sum()
+}
+@@N Default ==> for cpu-bound work
+@@E
+suspend fun load(): String {
+    val text = withContext(Dispatchers.IO) { "file" }
+    return text.uppercase()
+}

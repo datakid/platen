@@ -1,0 +1,1184 @@
+@@T let-var-types | let, var & types
+@@C let-and-var | let and var | 1 | Binds a name to a value with let for constants or var for variables.
+@@E
+let city = "Oslo"
+var visits = 0
+visits += 1
+@@N let ==> cannot be reassigned
+@@N var ==> can be reassigned
+@@E
+let limit = 10
+var attempts = limit
+attempts -= 1
+@@E
+let names = ["ada", "grace"]
+var current = names[0]
+current = "linus"
+@@C types-and-inference | types and inference | 1 | Lets the compiler infer a type or states one after a colon.
+@@E
+let count: Int = 42
+let price: Double = 9.99
+let flag: Bool = true
+@@N : Int ==> explicit type
+@@E
+let ratio = 3 / 4
+let exact = 3.0 / 4
+@@N 3 / 4 ==> integer division gives 0
+@@E
+let letter: Character = "k"
+let tiny: UInt8 = 255
+let big: Int64 = 3_000_000_000
+@@N UInt8 ==> 0 to 255
+@@C numeric-conversion | numeric conversion | 1 | Converts between number types with explicit initializers.
+@@E
+let whole = 7
+let half = Double(whole) / 2
+@@N Double(whole) ==> no implicit widening
+@@E
+let text = "42"
+let n = Int(text)
+let doubled = (n ?? 0) * 2
+@@N Int(text) ==> optional, nil on bad input
+@@E
+let total = Int8(100) + 20
+let asDouble = Double(total)
+let hex = 0xFF
+let bits = 0b1010
+@@C tuples | tuples | 2 | Groups several values into one compound value.
+@@E
+let point = (3, 4)
+let (x, y) = point
+@@N (x, y) ==> decomposes the tuple
+@@E
+let user = (name: "ada", age: 36)
+print(user.name)
+@@N name: ==> labelled element
+@@E
+let status = (code: 404, message: "not found")
+let (code, _) = status
+@@N _ ==> ignores an element
+@@T strings | strings
+@@C literals-and-interpolation | literals and interpolation | 1 | Builds strings from literals and embedded expressions with backslash parentheses.
+@@E
+let name = "ada"
+let greeting = "Hello, \(name)"
+let total = "Sum: \(2 + 3)"
+@@N \(name) ==> interpolation
+@@E
+let item = "tea"
+let qty = 3
+let line = "\(qty) x \(item)"
+@@E
+let note = "She said \"hi\""
+let path = "C:\\temp\\logs"
+let tabbed = "name\tcity"
+@@N \\ ==> escaped backslash
+@@C multiline-and-raw | multiline and raw strings | 2 | Writes multiline text in triple quotes and raw text with hash delimiters.
+@@E
+let poem = """
+    first line
+    second line
+    """
+@@N """ ==> closing indent is stripped
+@@E
+let winPath = #"C:\temp\logs"#
+let quoted = #"say "hi""#
+@@N #"C: ==> raw, no escapes
+@@E
+let user = "ada"
+let letter = """
+    Dear \(user),
+    welcome aboard.
+    """
+@@C string-methods | string methods | 1 | Inspects and transforms strings with standard library members.
+@@E
+let title = "Quarterly Report"
+let upper = title.uppercased()
+let count = title.count
+@@N count ==> number of characters
+@@E
+let file = "report.final.pdf"
+let isPdf = file.hasSuffix(".pdf")
+let startsWell = file.hasPrefix("report")
+@@E
+let csv = "ada,grace,linus"
+let names = csv.split(separator: ",")
+let joined = names.joined(separator: " | ")
+@@N split ==> returns substrings
+@@C characters-and-indexing | characters and indexing | 2 | Reads characters with String.Index values instead of integers.
+@@E
+let word = "swift"
+let first = word.first
+let last = word.last
+@@N first ==> optional Character
+@@E
+let word = "banana"
+let index = word.index(word.startIndex, offsetBy: 2)
+let letter = word[index]
+@@N offsetBy ==> index arithmetic
+@@E
+let word = "stream"
+let reversed = String(word.reversed())
+let letters = Array(word)
+@@T optionals | optionals
+@@C declaring-optionals | declaring optionals | 1 | Represents a missing value with an optional type and nil.
+@@E
+var nickname: String? = nil
+nickname = "ada"
+@@N String? ==> value or nil
+@@E
+let age = Int("42")
+let broken = Int("x1")
+@@N Int("x1") ==> nil
+@@E
+let users = ["ada": 36]
+let found = users["ada"]
+let missing = users["linus"]
+@@N users["linus"] ==> lookups are optional
+@@C unwrapping | if let and guard let | 1 | Unwraps optionals safely with if let and guard let.
+@@E
+let input: String? = "ada"
+if let name = input {
+    print(name.uppercased())
+}
+@@N if let ==> runs when non-nil
+@@E
+func greet(_ name: String?) {
+    guard let name else {
+        print("anonymous")
+        return
+    }
+    print("Hello, \(name)")
+}
+@@N guard let ==> unwrapped for the rest
+@@E
+let a: Int? = 3
+let b: Int? = 4
+if let a, let b {
+    print(a + b)
+}
+@@N if let a ==> shorthand for a = a
+@@C coalescing-and-chaining | nil coalescing and optional chaining | 1 | Provides fallbacks with double question mark and chains calls with a question mark.
+@@E
+let name: String? = nil
+let label = name ?? "guest"
+@@N ?? ==> default when nil
+@@E
+let name: String? = "ada"
+let size = name?.count
+let shout = name?.uppercased() ?? ""
+@@N ?. ==> stops at nil
+@@E
+struct Profile {
+    var email: String?
+}
+let profile: Profile? = Profile(email: "a@b.c")
+let domain = profile?.email?.split(separator: "@").last
+@@C force-unwrapping | force unwrapping | 2 | Asserts a value is present with an exclamation mark or an implicitly unwrapped type.
+@@E
+let value: Int? = 5
+let sure = value!
+@@N ! ==> crashes if nil
+@@E
+let text = "7"
+let number = Int(text)!
+@@E
+class Screen {
+    var title: String!
+}
+@@N String! ==> implicitly unwrapped
+@@T control-flow-switch | control flow & switch
+@@C conditionals | conditionals | 1 | Branches with if, else, the ternary operator and guard.
+@@E
+let temperature = 28
+if temperature > 25 {
+    print("warm")
+} else if temperature > 10 {
+    print("mild")
+} else {
+    print("cold")
+}
+@@N temperature > 25 ==> no parentheses needed
+@@E
+let score = 72
+let grade = score >= 60 ? "pass" : "fail"
+@@N ? "pass" ==> ternary operator
+@@E
+func describe(_ age: Int) -> String {
+    guard age >= 0 else { return "invalid" }
+    return age < 18 ? "minor" : "adult"
+}
+@@N guard ==> early exit
+@@C for-in-loops | for-in loops | 1 | Iterates over ranges, collections and indexed pairs.
+@@E
+for i in 1...3 {
+    print(i)
+}
+@@N 1...3 ==> closed range
+@@E
+for n in 1...10 where n % 3 == 0 {
+    print(n)
+}
+@@N where ==> filters iterations
+@@E
+for (index, name) in ["ada", "grace"].enumerated() {
+    print("\(index): \(name)")
+}
+@@N enumerated ==> offset and element
+@@C while-and-repeat | while, repeat and loop control | 1 | Loops on a condition and controls iterations with break and continue.
+@@E
+var n = 3
+while n > 0 {
+    print(n)
+    n -= 1
+}
+@@E
+var tries = 0
+repeat {
+    tries += 1
+} while tries < 3
+@@N repeat ==> body runs at least once
+@@E
+for i in 1...10 {
+    if i == 3 { continue }
+    if i > 5 { break }
+    print(i)
+}
+@@N continue ==> skips to the next iteration
+@@C switch-statements | switch statements | 2 | Matches values against cases, ranges and tuple patterns.
+@@E
+let code = 404
+switch code {
+case 200:
+    print("ok")
+case 404:
+    print("not found")
+default:
+    print("other")
+}
+@@N default ==> required for coverage
+@@E
+let score = 85
+switch score {
+case 90...100:
+    print("A")
+case 80..<90:
+    print("B")
+default:
+    print("C")
+}
+@@N 80..<90 ==> half-open range
+@@E
+let point = (2, 0)
+switch point {
+case (0, 0):
+    print("origin")
+case (_, 0):
+    print("on x axis")
+case let (x, y) where x == y:
+    print("diagonal")
+default:
+    print("elsewhere")
+}
+@@N where ==> extra condition
+@@T functions-labels | functions & labels
+@@C functions | declaring functions | 1 | Defines functions with parameters and return types.
+@@E
+func square(_ n: Int) -> Int {
+    return n * n
+}
+@@N _ ==> no argument label
+@@E
+func area(width: Double, height: Double) -> Double {
+    width * height
+}
+@@N width * height ==> implicit return
+@@E
+func log(_ message: String) {
+    print("[log] \(message)")
+}
+@@C argument-labels | argument labels | 1 | Names arguments at the call site with external labels.
+@@E
+func move(from start: Int, to end: Int) -> Int {
+    return end - start
+}
+let distance = move(from: 2, to: 9)
+@@N from start ==> label then local name
+@@E
+func greet(_ name: String, with greeting: String) -> String {
+    return "\(greeting), \(name)"
+}
+let text = greet("ada", with: "Hello")
+@@E
+func connect(host: String, port: Int) -> String {
+    "\(host):\(port)"
+}
+let url = connect(host: "example.com", port: 80)
+@@N host: ==> label equals the name
+@@C defaults-and-variadics | default values and variadics | 2 | Gives parameters defaults and accepts any number of arguments.
+@@E
+func pad(_ text: String, width: Int = 8) -> String {
+    let gap = max(0, width - text.count)
+    return String(repeating: " ", count: gap) + text
+}
+@@N width: Int = 8 ==> default value
+@@E
+func sum(_ numbers: Int...) -> Int {
+    numbers.reduce(0, +)
+}
+@@N Int... ==> variadic parameter
+@@E
+func dial(host: String, port: Int = 80, tls: Bool = false) -> String {
+    "\(host):\(port) \(tls)"
+}
+@@C inout-and-tuples | inout parameters and tuple returns | 2 | Mutates arguments with inout and returns several values as a tuple.
+@@E
+func swapValues(_ a: inout Int, _ b: inout Int) {
+    let temp = a
+    a = b
+    b = temp
+}
+@@N inout ==> caller passes &variable
+@@E
+func minMax(_ values: [Int]) -> (min: Int, max: Int)? {
+    guard let first = values.first else { return nil }
+    return (values.reduce(first, min), values.reduce(first, max))
+}
+@@E
+func divide(_ a: Int, _ b: Int) -> (quotient: Int, remainder: Int) {
+    (a / b, a % b)
+}
+let result = divide(17, 5)
+@@N (quotient: Int, remainder: Int) ==> labelled tuple
+@@T closures | closures
+@@C closure-syntax | closure syntax | 1 | Writes unnamed functions in braces with the in keyword.
+@@E
+let doubler = { (n: Int) -> Int in
+    return n * 2
+}
+@@N in ==> separates signature from body
+@@E
+let greet = { (name: String) in
+    print("Hello, \(name)")
+}
+greet("ada")
+@@E
+let add: (Int, Int) -> Int = { $0 + $1 }
+let sum = add(2, 3)
+@@N $0 + $1 ==> shorthand arguments
+@@C trailing-closures | trailing closures and shorthand | 1 | Moves closures outside the parentheses and uses dollar-sign arguments.
+@@E
+let numbers = [1, 2, 3]
+let doubled = numbers.map { $0 * 2 }
+@@N map ==> trailing closure
+@@E
+let names = ["grace", "ada", "linus"]
+let sorted = names.sorted { $0 < $1 }
+@@E
+let words = ["swift", "go", "rust"]
+let long = words.filter { $0.count > 2 }
+@@C closures-as-parameters | closures as parameters | 2 | Accepts and returns closures through function types.
+@@E
+func apply(_ n: Int, using op: (Int) -> Int) -> Int {
+    op(n)
+}
+let result = apply(4) { $0 * 3 }
+@@N (Int) -> Int ==> function type
+@@E
+func repeatAction(times: Int, action: () -> Void) {
+    for _ in 0..<times { action() }
+}
+repeatAction(times: 2) { print("hi") }
+@@E
+func makeAdder(_ n: Int) -> (Int) -> Int {
+    return { $0 + n }
+}
+let addFive = makeAdder(5)
+@@C capturing-and-escaping | capturing and escaping | 3 | Captures outer values and marks stored closures as escaping.
+@@E
+func makeCounter() -> () -> Int {
+    var count = 0
+    return {
+        count += 1
+        return count
+    }
+}
+@@N count ==> captured by reference
+@@E
+var handlers: [() -> Void] = []
+func register(_ handler: @escaping () -> Void) {
+    handlers.append(handler)
+}
+@@N @escaping ==> outlives the call
+@@E
+let prefix = "item"
+let label = { (n: Int) in "\(prefix) \(n)" }
+@@T arrays-dictionaries-sets | arrays, dictionaries, sets
+@@C arrays | arrays | 1 | Stores ordered values in an array.
+@@E
+var scores = [90, 72, 85]
+scores.append(60)
+let top = scores.max()
+@@N max ==> optional result
+@@E
+var names = ["ada", "grace"]
+names.insert("linus", at: 0)
+names.remove(at: 1)
+print(names.count)
+@@N remove(at: 1) ==> shifts later items
+@@E
+let squares = (1...5).map { $0 * $0 }
+let firstTwo = squares.prefix(2)
+@@C dictionaries | dictionaries | 1 | Maps keys to values with subscripts and iteration.
+@@E
+var stock = ["apple": 4, "pear": 0]
+stock["plum"] = 7
+let apples = stock["apple"]
+@@N stock["plum"] ==> adds or replaces
+@@E
+var prices: [String: Double] = ["tea": 2.5]
+prices["cake"] = 4.0
+prices["tea"] = nil
+@@N = nil ==> removes the key
+@@E
+let ages = ["ada": 36, "linus": 54]
+for (name, age) in ages {
+    print("\(name): \(age)")
+}
+@@C sets | sets | 1 | Keeps unique values and combines sets with set algebra.
+@@E
+var tags: Set = ["swift", "ios"]
+tags.insert("swift")
+tags.insert("mac")
+@@N insert ==> ignores duplicates
+@@E
+let a: Set = [1, 2, 3]
+let b: Set = [3, 4]
+let both = a.intersection(b)
+let either = a.union(b)
+@@E
+var seen = Set<Int>()
+let inserted = seen.insert(7).inserted
+@@N .inserted ==> false if present
+@@C transforming-collections | transforming collections | 2 | Transforms collections with sorted, filter, map and reduce.
+@@E
+let nums = [3, 1, 2]
+let sorted = nums.sorted()
+let total = nums.reduce(0, +)
+@@N reduce ==> folds into one value
+@@E
+let words = ["a", "", "b"]
+let kept = words.filter { !$0.isEmpty }
+@@E
+let names = ["ada", "grace"]
+let lengths = names.map(\.count)
+let pairs = Dictionary(uniqueKeysWithValues: zip(names, lengths))
+@@N \.count ==> key path as a function
+@@T structs | structs
+@@C declaring-structs | declaring structs | 1 | Groups related values in a struct with a memberwise initializer.
+@@E
+struct User {
+    var name: String
+    var age: Int
+}
+let ada = User(name: "ada", age: 36)
+@@N User(name: ==> memberwise init
+@@E
+struct Point {
+    var x = 0
+    var y = 0
+}
+let origin = Point()
+@@N = 0 ==> default property value
+@@E
+struct Rectangle {
+    let width: Double
+    let height: Double
+}
+let box = Rectangle(width: 3, height: 4)
+@@C methods-and-computed | methods and computed properties | 1 | Adds behaviour with methods and derived values with computed properties.
+@@E
+struct Circle {
+    var radius: Double
+    var area: Double {
+        3.14159 * radius * radius
+    }
+}
+@@N area ==> computed on each read
+@@E
+struct Counter {
+    var value = 0
+    mutating func increment() {
+        value += 1
+    }
+}
+@@N mutating ==> allowed to change self
+@@E
+struct Temperature {
+    var celsius: Double
+    func toFahrenheit() -> Double {
+        celsius * 9 / 5 + 32
+    }
+}
+@@C initializers | custom initializers | 2 | Sets up properties in init and adds initializers through extensions.
+@@E
+struct Account {
+    var owner: String
+    var balance: Double
+    init(owner: String) {
+        self.owner = owner
+        self.balance = 0
+    }
+}
+@@N init ==> replaces the memberwise init
+@@E
+struct Port {
+    let value: Int
+    init?(_ value: Int) {
+        guard (1...65535).contains(value) else { return nil }
+        self.value = value
+    }
+}
+@@N init? ==> failable initializer
+@@E
+struct Size {
+    var width: Double
+    var height: Double
+}
+extension Size {
+    init(square side: Double) {
+        self.init(width: side, height: side)
+    }
+}
+@@N extension ==> keeps the memberwise init
+@@C value-semantics | value semantics | 2 | Copies structs on assignment so each variable owns its data.
+@@E
+struct Point {
+    var x: Int
+}
+var a = Point(x: 1)
+var b = a
+b.x = 5
+print(a.x)
+@@N var b = a ==> copies the value
+@@E
+struct Item {
+    var qty: Int
+}
+let fixed = Item(qty: 1)
+var editable = fixed
+editable.qty += 1
+@@N let ==> struct is fully immutable
+@@E
+struct Point {
+    var x: Int
+}
+func reset(_ p: Point) -> Point {
+    var copy = p
+    copy.x = 0
+    return copy
+}
+@@N p ==> parameters are constants
+@@T classes-arc | classes & ARC
+@@C declaring-classes | declaring classes | 1 | Defines reference types with stored properties and an initializer.
+@@E
+class Counter {
+    var value = 0
+    func increment() {
+        value += 1
+    }
+}
+@@N func increment() ==> no mutating needed
+@@E
+class User {
+    let name: String
+    init(name: String) {
+        self.name = name
+    }
+}
+@@N init ==> classes need one
+@@E
+class Rectangle {
+    var width = 0.0
+    var height = 0.0
+    var area: Double { width * height }
+}
+@@C inheritance | inheritance | 2 | Subclasses a class and replaces members with override.
+@@E
+class Animal {
+    func speak() -> String { "..." }
+}
+class Dog: Animal {
+    override func speak() -> String { "woof" }
+}
+@@N : Animal ==> superclass
+@@N override ==> required keyword
+@@E
+class Vehicle {
+    let wheels: Int
+    init(wheels: Int) { self.wheels = wheels }
+}
+class Bike: Vehicle {
+    init() { super.init(wheels: 2) }
+}
+@@N super.init ==> after own properties
+@@E
+class Employee {
+    func describe() -> String { "employee" }
+}
+final class Manager: Employee {
+    override func describe() -> String {
+        "manager, " + super.describe()
+    }
+}
+@@N final ==> cannot be subclassed
+@@C reference-semantics | reference semantics | 1 | Shares one instance between variables that refer to the same object.
+@@E
+class Box {
+    var value = 1
+}
+let a = Box()
+let b = a
+b.value = 5
+print(a.value)
+@@N let b = a ==> same object
+@@E
+class Box {
+    var value = 1
+}
+let x = Box()
+let y = x
+print(x === y)
+@@N === ==> identity comparison
+@@E
+class Counter {
+    var count = 0
+}
+func bump(_ c: Counter) {
+    c.count += 1
+}
+@@N c.count ==> changes the caller's object
+@@C arc-and-weak | ARC, deinit and weak | 3 | Frees objects with reference counting and breaks cycles with weak.
+@@E
+class Session {
+    deinit {
+        print("session closed")
+    }
+}
+var current: Session? = Session()
+current = nil
+@@N deinit ==> runs when freed
+@@E
+class Owner {
+    var pet: Pet?
+}
+class Pet {
+    weak var owner: Owner?
+}
+@@N weak ==> does not keep it alive
+@@E
+class Loader {
+    var onDone: (() -> Void)?
+    func start() {
+        onDone = { [weak self] in
+            guard let self else { return }
+            print(self)
+        }
+    }
+}
+@@N [weak self] ==> avoids a retain cycle
+@@T enums-associated-values | enums & associated values
+@@C enum-cases | enum cases | 1 | Names a fixed set of related values with an enum.
+@@E
+enum Direction {
+    case north, east, south, west
+}
+let heading = Direction.east
+@@N case ==> lists the values
+@@E
+enum Status {
+    case active
+    case paused
+    case closed
+}
+@@E
+enum Light {
+    case red, green
+}
+let light = Light.red
+switch light {
+case .red:
+    print("stop")
+case .green:
+    print("go")
+}
+@@N .red ==> type inferred from light
+@@C raw-values | raw values | 2 | Backs each case with an integer or string value.
+@@E
+enum Level: Int {
+    case low = 1, medium, high
+}
+let raw = Level.medium.rawValue
+@@N medium ==> auto-increments to 2
+@@E
+enum Planet: String {
+    case earth, mars
+}
+let name = Planet.mars.rawValue
+@@N String ==> raw value defaults to the name
+@@E
+enum Coin: Int {
+    case penny = 1
+    case dime = 10
+}
+let coin = Coin(rawValue: 10)
+@@N Coin(rawValue: 10) ==> optional result
+@@C associated-values | associated values | 2 | Attaches data to each case so cases can carry different payloads.
+@@E
+enum Payment {
+    case cash
+    case card(number: String)
+    case transfer(iban: String, ref: Int)
+}
+let pay = Payment.card(number: "4242")
+@@N card(number: String) ==> payload per case
+@@E
+enum Shape {
+    case circle(Double)
+    case square(Double)
+}
+func area(_ shape: Shape) -> Double {
+    switch shape {
+    case .circle(let r): return 3.14159 * r * r
+    case .square(let s): return s * s
+    }
+}
+@@N let r ==> binds the payload
+@@E
+enum Event {
+    case click(x: Int, y: Int)
+    case key(String)
+}
+let event = Event.click(x: 1, y: 2)
+if case .click(let x, _) = event {
+    print(x)
+}
+@@N if case ==> matches one case
+@@C enum-members | methods and CaseIterable | 2 | Adds computed properties, mutating methods and case lists to enums.
+@@E
+enum Direction: CaseIterable {
+    case north, east, south, west
+}
+let count = Direction.allCases.count
+@@N CaseIterable ==> provides allCases
+@@E
+enum Light {
+    case red, green
+    var action: String {
+        switch self {
+        case .red: return "stop"
+        case .green: return "go"
+        }
+    }
+}
+@@N switch self ==> branches on the case
+@@E
+enum Weekday {
+    case mon, tue, wed
+    mutating func next() {
+        self = self == .mon ? .tue : .wed
+    }
+}
+@@N mutating ==> assigns to self
+@@T protocols-extensions | protocols & extensions
+@@C protocols | protocols | 1 | Declares required members that types promise to provide.
+@@E
+protocol Greeter {
+    func greet(name: String) -> String
+}
+struct Formal: Greeter {
+    func greet(name: String) -> String { "Good day, \(name)" }
+}
+@@N : Greeter ==> conforms to the protocol
+@@E
+protocol Shape {
+    var sides: Int { get }
+}
+struct Triangle: Shape {
+    let sides = 3
+}
+@@N { get } ==> readable property
+@@E
+protocol Named {
+    var name: String { get set }
+}
+class Person: Named {
+    var name = "ada"
+}
+@@N { get set } ==> must be settable
+@@C extensions | extensions | 1 | Adds members to an existing type in a separate declaration.
+@@E
+extension String {
+    var isBlank: Bool {
+        allSatisfy { $0 == " " }
+    }
+}
+@@N extension ==> adds to String
+@@E
+extension Int {
+    func squared() -> Int { self * self }
+}
+@@E
+extension Array where Element == Int {
+    var total: Int { reduce(0, +) }
+}
+@@N where ==> limits to Int arrays
+@@C protocol-extensions | protocol extensions | 2 | Supplies default implementations for every conforming type.
+@@E
+protocol Describable {
+    var name: String { get }
+}
+extension Describable {
+    func describe() -> String { "I am \(name)" }
+}
+@@N describe ==> free for all conformers
+@@E
+protocol Logger {
+    func log(_ message: String)
+}
+extension Logger {
+    func warn(_ message: String) { log("warning: \(message)") }
+}
+@@E
+protocol Scorable {
+    var score: Int { get }
+}
+extension Scorable {
+    var isPassing: Bool { score >= 60 }
+}
+@@C conformances | Comparable, Hashable and composition | 2 | Adopts standard protocols and combines protocols with an ampersand.
+@@E
+struct Version: Comparable {
+    let major: Int
+    static func < (a: Version, b: Version) -> Bool {
+        a.major < b.major
+    }
+}
+@@N Comparable ==> needs only <
+@@E
+struct Point: Hashable {
+    var x: Int
+    var y: Int
+}
+let seen: Set<Point> = [Point(x: 0, y: 0)]
+@@N Hashable ==> synthesized for structs
+@@E
+protocol Flyer { func fly() }
+protocol Swimmer { func swim() }
+func move(_ animal: any Flyer & Swimmer) {
+    animal.fly()
+    animal.swim()
+}
+@@N & ==> requires both protocols
+@@T generics | generics
+@@C generic-functions | generic functions | 1 | Writes one function that works for any type with a type parameter.
+@@E
+func firstOf<T>(_ items: [T]) -> T? {
+    items.first
+}
+@@N <T> ==> placeholder type
+@@E
+func swapPair<A, B>(_ pair: (A, B)) -> (B, A) {
+    (pair.1, pair.0)
+}
+@@E
+func pick<T>(_ flag: Bool, _ a: T, _ b: T) -> T {
+    flag ? a : b
+}
+@@C generic-types | generic types | 2 | Parameterises structs and classes over the types they store.
+@@E
+struct Box<T> {
+    var value: T
+}
+let boxed = Box(value: 42)
+@@N Box(value: 42) ==> type inferred as Int
+@@E
+struct Stack<Element> {
+    private var items: [Element] = []
+    mutating func push(_ item: Element) { items.append(item) }
+    mutating func pop() -> Element? { items.popLast() }
+}
+@@N popLast ==> nil when empty
+@@E
+struct Pair<A, B> {
+    let first: A
+    let second: B
+}
+let pair = Pair(first: "ada", second: 36)
+@@C constraints | type constraints | 2 | Restricts a type parameter to types that conform to a protocol.
+@@E
+func largest<T: Comparable>(_ items: [T]) -> T? {
+    items.max()
+}
+@@N T: Comparable ==> needed for max
+@@E
+func total<T: Numeric>(_ items: [T]) -> T {
+    items.reduce(0, +)
+}
+@@N Numeric ==> supports + and zero
+@@E
+func describe<T>(_ value: T) -> String
+where T: CustomStringConvertible {
+    value.description
+}
+@@N where ==> constraint clause
+@@C associated-types-and-extensions | associated types and generic extensions | 3 | Uses associatedtype in protocols and constrains extensions with where.
+@@E
+protocol Container {
+    associatedtype Item
+    var items: [Item] { get }
+}
+struct Shelf: Container {
+    var items = ["book", "lamp"]
+}
+@@N associatedtype ==> placeholder inside a protocol
+@@E
+extension Array where Element: Comparable {
+    func isSorted() -> Bool {
+        zip(self, dropFirst()).allSatisfy { $0 <= $1 }
+    }
+}
+@@E
+extension Optional where Wrapped == String {
+    var orEmpty: String { self ?? "" }
+}
+@@T error-handling | error handling
+@@C throwing-functions | throwing functions | 1 | Marks functions that can fail with throws and signals errors with throw.
+@@E
+enum InputError: Error {
+    case empty
+    case tooLong(Int)
+}
+func check(_ text: String) throws {
+    if text.isEmpty { throw InputError.empty }
+}
+@@N : Error ==> marks an error type
+@@N throws ==> caller must handle
+@@E
+struct ParseError: Error {
+    let line: Int
+}
+func parse(_ raw: String) throws -> Int {
+    guard let n = Int(raw) else { throw ParseError(line: 1) }
+    return n
+}
+@@E
+enum BankError: Error {
+    case insufficientFunds(needed: Double)
+}
+func withdraw(_ amount: Double, from balance: Double) throws -> Double {
+    guard amount <= balance else {
+        throw BankError.insufficientFunds(needed: amount - balance)
+    }
+    return balance - amount
+}
+@@C do-catch | do and catch | 1 | Handles thrown errors with do, try and catch clauses.
+@@E
+enum LoadError: Error {
+    case missing
+}
+func load() throws -> String { throw LoadError.missing }
+do {
+    let text = try load()
+    print(text)
+} catch LoadError.missing {
+    print("not found")
+} catch {
+    print("other: \(error)")
+}
+@@N try ==> marks the throwing call
+@@N error ==> implicit in a bare catch
+@@E
+enum ParseError: Error { case invalid(String) }
+func parse(_ raw: String) throws -> Int {
+    guard let n = Int(raw) else { throw ParseError.invalid(raw) }
+    return n
+}
+do {
+    print(try parse("x"))
+} catch ParseError.invalid(let raw) {
+    print("bad input \(raw)")
+} catch {
+    print(error)
+}
+@@N invalid(let raw) ==> binds the payload
+@@E
+enum NetworkError: Error {
+    case offline, timeout
+}
+func ping() throws {
+    throw NetworkError.timeout
+}
+do {
+    try ping()
+} catch {
+    print("failed: \(error)")
+}
+@@C try-optional | try? and try! | 2 | Turns a thrown error into nil or traps when the call fails.
+@@E
+enum ParseError: Error {
+    case invalid
+}
+func parse(_ raw: String) throws -> Int {
+    guard let n = Int(raw) else { throw ParseError.invalid }
+    return n
+}
+let a = try? parse("12")
+let b = try! parse("34")
+@@N try? ==> nil on failure
+@@N try! ==> crashes on failure
+@@E
+enum ConfigError: Error {
+    case missing
+}
+func readPort() throws -> Int { throw ConfigError.missing }
+let port = (try? readPort()) ?? 8080
+@@N ?? ==> fallback after try?
+@@E
+enum ParseError: Error {
+    case invalid
+}
+func parse(_ raw: String) throws -> Int {
+    guard let n = Int(raw) else { throw ParseError.invalid }
+    return n
+}
+if let n = try? parse("5") {
+    print(n)
+}
+@@C defer-and-result | defer and Result | 2 | Runs cleanup with defer and models success or failure with Result.
+@@E
+func process() {
+    print("start")
+    defer { print("cleanup") }
+    print("work")
+}
+@@N defer ==> runs when the scope exits
+@@E
+enum ParseError: Error {
+    case invalid
+}
+func parse(_ raw: String) -> Result<Int, ParseError> {
+    guard let n = Int(raw) else { return .failure(.invalid) }
+    return .success(n)
+}
+@@N Result ==> success or failure value
+@@E
+enum ParseError: Error {
+    case invalid
+}
+func parse(_ raw: String) throws -> Int { throw ParseError.invalid }
+let outcome = Result { try parse("x") }
+switch outcome {
+case .success(let n): print(n)
+case .failure(let error): print(error)
+}
+@@N Result { ==> captures a thrown error
+@@T async-await | async/await
+@@C async-functions | async functions | 1 | Declares functions that can suspend with async and call others with await.
+@@E
+func fetchName() async -> String {
+    try? await Task.sleep(for: .seconds(1))
+    return "ada"
+}
+@@N async ==> may suspend
+@@N await ==> marks a suspension point
+@@E
+func load(id: Int) async throws -> String {
+    try await Task.sleep(for: .milliseconds(200))
+    return "item \(id)"
+}
+@@N async throws ==> order is fixed
+@@E
+func score(of name: String) async -> Int { name.count }
+func total() async -> Int {
+    let a = await score(of: "ada")
+    let b = await score(of: "grace")
+    return a + b
+}
+@@C tasks | Task | 2 | Starts asynchronous work from synchronous code with Task.
+@@E
+func fetchName() async -> String { "ada" }
+Task {
+    print(await fetchName())
+}
+@@N Task { ==> starts concurrent work
+@@E
+func load() async throws -> Int { 42 }
+Task {
+    do {
+        let value = try await load()
+        print(value)
+    } catch {
+        print("failed: \(error)")
+    }
+}
+@@E
+let task = Task { 6 * 7 }
+let value = await task.value
+@@N task.value ==> awaits the result
+@@C async-let | async let | 2 | Runs independent calls concurrently and awaits their results together.
+@@E
+func one() async -> Int { 1 }
+func two() async -> Int { 2 }
+func both() async -> Int {
+    async let a = one()
+    async let b = two()
+    return await a + b
+}
+@@N async let ==> starts immediately
+@@E
+func download(_ name: String) async -> String { name }
+func run() async {
+    async let first = download("a")
+    async let second = download("b")
+    print(await [first, second])
+}
+@@E
+func square(_ n: Int) async -> Int { n * n }
+func run() async {
+    async let x = square(3)
+    async let y = square(4)
+    let (a, b) = await (x, y)
+    print(a + b)
+}
+@@C groups-and-actors | task groups and actors | 3 | Fans out work with task groups and guards shared state with actors.
+@@E
+func sum() async -> Int {
+    await withTaskGroup(of: Int.self) { group in
+        for n in 1...3 {
+            group.addTask { n * n }
+        }
+        return await group.reduce(0, +)
+    }
+}
+@@N addTask ==> adds a child task
+@@E
+actor Bank {
+    private var balance = 100
+    func deposit(_ amount: Int) -> Int {
+        balance += amount
+        return balance
+    }
+}
+@@N actor ==> serialises access to state
+@@E
+actor Counter {
+    private(set) var value = 0
+    func increment() { value += 1 }
+}
+func run() async {
+    let counter = Counter()
+    await counter.increment()
+    print(await counter.value)
+}
+@@N await counter ==> crossing the actor boundary

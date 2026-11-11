@@ -1,0 +1,7 @@
+{
+  "name": "Scala",
+  "short": "SC",
+  "version": "3.7",
+  "indent": 2,
+  "pigment": { "light": "#31725C", "dark": "#4BAF8E" }
+}

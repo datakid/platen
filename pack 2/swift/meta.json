@@ -1,0 +1,7 @@
+{
+  "name": "Swift",
+  "short": "SW",
+  "version": "5.10",
+  "indent": 4,
+  "pigment": { "light": "#157915", "dark": "#22C322" }
+}
