@@ -31,14 +31,26 @@ export const registry = [
   L("bash", "Bash", "SH", "5.x", 14),
   L("java", "Java", "JV", "21", 16),
   L("dart", "Dart", "DT", "3.x", 15),
-  L("powershell", "PowerShell", "PS", "7.x", 16)
+  L("powershell", "PowerShell", "PS", "7.x", 16),
+  L("html", "HTML", "HT", "5", 12),
+  L("css", "CSS", "CSS", "2024", 13),
+  L("git", "Git", "GIT", "2.x", 12, null, "bash"),
+  L("react", "React", "RX", "19.3", 14, "javascript", "javascript"),
+  L("django", "Django", "DJ", "6.1", 14, "python", "python"),
+  L("fastapi", "FastAPI", "FA", "0.162", 12, "python", "python"),
+  L("express", "Express", "XP", "5.x", 12, "javascript", "javascript"),
+  L("solid", "Solid", "SD", "1.9", 12, "javascript", "javascript"),
+  L("dockerfile", "Dockerfile", "DK", "26", 12),
+  L("angular", "Angular", "NG", "22.2", 15, "javascript", "angular"),
+  L("svelte", "Svelte", "SV", "5.57", 14, "javascript", "svelte"),
+  L("vue", "Vue", "VU", "3.5", 15, "javascript", "vue")
 ];
 
 export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue"]);
 const modules = new Map();
 const flat = new WeakMap();
 

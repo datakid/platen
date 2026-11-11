@@ -247,5 +247,108 @@ export const lexers = {
     blockComment: ["<#", "#>"],
     strings: { quotes: ['"', "'"], prefix: /^$/, rawQuotes: ["'"], escape: "`" },
     clusters: ["::", "&&", "||", "++", "--", "+=", "-=", "*=", "/=", "%=", ".."]
+  },
+  html: {
+    ignoreCase: true,
+    keywords: [
+      "html", "head", "body", "title", "meta", "link", "script", "style", "base",
+      "header", "nav", "main", "footer", "section", "article", "aside", "address",
+      "h1", "h2", "h3", "h4", "h5", "h6", "p", "br", "hr", "blockquote", "q", "cite",
+      "em", "strong", "code", "kbd", "mark", "sub", "sup", "time", "span", "div", "pre",
+      "a", "img", "picture", "source", "track", "audio", "video", "iframe", "figure", "figcaption",
+      "ul", "ol", "li", "dl", "dt", "dd",
+      "table", "caption", "colgroup", "col", "thead", "tbody", "tfoot", "tr", "th", "td",
+      "form", "label", "input", "button", "select", "option", "optgroup", "datalist",
+      "textarea", "fieldset", "legend", "output", "progress", "meter",
+      "details", "summary", "dialog", "template", "slot", "noscript", "canvas", "svg",
+      "doctype"
+    ],
+    lineComment: null,
+    blockComment: ["<!--", "-->"],
+    strings: { quotes: ['"', "'"], prefix: /^$/, rawQuotes: ['"', "'"], multiline: ['"', "'"] },
+    numberRe: /\d+(?:\.\d+)?/y,
+    clusters: ["</", "/>", "<!"]
+  },
+  css: {
+    ignoreCase: true,
+    keywords: [
+      "@media", "@container", "@layer", "@import", "@font-face", "@keyframes", "@supports", "@property", "@scope", "@starting-style",
+      "display", "position", "top", "right", "bottom", "left", "inset", "inset-inline", "inset-block", "z-index",
+      "margin", "margin-inline", "margin-block", "padding", "padding-inline", "padding-block", "border", "border-radius", "outline", "box-sizing",
+      "width", "height", "min-width", "max-width", "min-height", "max-height", "inline-size", "block-size", "aspect-ratio", "overflow",
+      "color", "background", "background-color", "opacity", "box-shadow", "filter", "transform", "transition", "animation",
+      "font", "font-family", "font-size", "font-weight", "font-style", "line-height", "letter-spacing", "text-align", "text-transform", "text-decoration", "white-space",
+      "flex-direction", "flex-wrap", "flex-grow", "flex-shrink", "flex-basis", "gap", "row-gap", "column-gap", "justify-content", "align-items", "align-content", "align-self", "justify-items", "place-items", "order",
+      "grid", "grid-template-columns", "grid-template-rows", "grid-template-areas", "grid-area", "grid-column", "grid-row", "grid-auto-flow", "grid-auto-columns", "grid-auto-rows",
+      "container-type", "container-name", "cursor", "content", "visibility", "pointer-events", "object-fit", "will-change",
+      "and", "not", "only", "from", "to", "screen", "print", "important",
+      "none", "auto", "inherit", "initial", "unset", "revert", "block", "inline", "inline-block", "flex", "relative", "absolute", "fixed", "sticky", "static",
+      "solid", "dashed", "dotted", "transparent", "currentcolor", "center", "start", "end", "space-between", "space-around", "space-evenly", "stretch", "wrap", "nowrap", "row", "column",
+      "repeat", "minmax", "fit-content", "auto-fill", "auto-fit", "span", "calc", "clamp", "min", "max", "var", "env", "url", "rgb", "rgba", "hsl", "oklch", "oklab", "color-mix", "light-dark",
+      "ease", "ease-in", "ease-out", "ease-in-out", "linear", "infinite", "forwards", "alternate", "normal", "bold", "italic", "hidden", "visible", "scroll", "pointer", "cover", "contain",
+      "is", "where", "has", "nth-child", "nth-of-type", "first-child", "last-child", "hover", "focus", "focus-visible", "focus-within", "active", "disabled", "checked", "before", "after", "root", "host"
+    ],
+    lineComment: null,
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /[+-]?(?:\d+\.?\d*|\.\d+)(?:%|[a-zA-Z]+)?/y,
+    clusters: ["::", "||", ">=", "<=", "~=", "|=", "^=", "$=", "*=", "!="]
+  },
+  dockerfile: {
+    ignoreCase: true,
+    keywords: [
+      "FROM", "RUN", "CMD", "LABEL", "MAINTAINER", "EXPOSE", "ENV", "ADD", "COPY", "ENTRYPOINT",
+      "VOLUME", "USER", "WORKDIR", "ARG", "ONBUILD", "STOPSIGNAL", "HEALTHCHECK", "SHELL",
+      "AS", "NONE", "EOF", "EOT"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    commentBoundary: true,
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /\d+(?:\.\d+)*(?:[a-zA-Z]+)?/y,
+    clusters: ["&&", "||", ">>", "<<", "${", "$(", "--"]
+  },
+  angular: {
+    keywords: [
+      "import", "from", "export", "class", "extends", "implements", "abstract", "interface", "type", "const", "let",
+      "var", "function", "async", "await", "return", "new", "private", "protected", "public", "readonly", "static",
+      "this", "true", "false", "null", "undefined", "void", "typeof", "if", "else", "for", "of", "in", "throw",
+      "string", "number", "boolean", "unknown", "never", "as", "default", "get", "set",
+      "Component", "Directive", "Pipe", "Injectable", "InjectionToken", "inject", "signal", "computed", "effect",
+      "input", "output", "model", "resource", "selector", "template", "imports", "providers", "host"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ["`", '"', "'"], prefix: /^$/, multiline: ["`"] },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|\d[\d_]*(?:\.\d+)?)/y,
+    clusters: ["...", "===", "!==", "=>", "==", "!=", "<=", ">=", "&&", "||", "??", "?.", "++", "--", "+=", "-=", "*=", "/="]
+  },
+  svelte: {
+    keywords: [
+      "if", "else", "each", "as", "await", "then", "catch", "snippet", "render", "html", "const", "key", "debug",
+      "let", "var", "function", "async", "return", "import", "from", "export", "new", "for", "of", "in", "out",
+      "true", "false", "null", "undefined", "typeof", "this", "break", "continue", "while", "switch", "case",
+      "default", "try", "throw", "class", "script", "style", "bind", "transition", "animate", "use", "global",
+      "$state", "$derived", "$effect", "$props", "$bindable", "$inspect", "$host", "by", "raw", "snapshot", "pre", "root"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ["`", '"', "'"], prefix: /^$/, multiline: ["`"] },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|\d[\d_]*(?:\.\d+)?)/y,
+    clusters: ["...", "===", "!==", "=>", "==", "!=", "<=", ">=", "&&", "||", "??", "?.", "++", "--", "+=", "-=", "*=", "/=", "{#", "{:", "{/", "{@", "</", "/>"]
+  },
+  vue: {
+    keywords: [
+      "template", "script", "setup", "style", "scoped", "lang", "slot", "if", "else", "for", "in", "show", "model",
+      "bind", "on", "html", "once", "deep", "const", "let", "var", "function", "async", "await", "return", "new",
+      "of", "true", "false", "null", "undefined", "typeof", "throw", "this", "import", "from", "export", "default",
+      "defineProps", "defineEmits", "defineModel", "ref", "reactive", "computed", "watch", "watchEffect",
+      "onMounted", "onUnmounted", "provide", "inject", "nextTick", "interface", "type", "string", "number", "boolean"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ["`", '"', "'"], prefix: /^$/, multiline: ["`"] },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|\d[\d_]*(?:\.\d+)?)/y,
+    clusters: ["...", "===", "!==", "=>", "==", "!=", "<=", ">=", "&&", "||", "??", "?.", "++", "--", "+=", "-=", "*=", "/=", "{{", "}}", "</", "/>"]
   }
 };
