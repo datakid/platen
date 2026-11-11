@@ -21,6 +21,7 @@ const defaults = () => ({
     sound: "off"
   },
   cursor: null,
+  where: {},
   last: null,
   plates: {},
   units: {},

@@ -28,6 +28,7 @@ export async function mount(root, r, ctx) {
   ]);
   store.update((s) => {
     s.cursor = { mode: "blocks", lang: r.lang, topic: r.topic, concept: r.concept, variant: r.variant };
+    (s.where || (s.where = {}))[r.lang] = { at: Date.now(), topic: r.topic, concept: r.concept, variant: r.variant };
   });
 
   const sessionKey = `${r.lang}/${r.topic}/${r.concept}`;
@@ -53,7 +54,7 @@ export async function mount(root, r, ctx) {
 <ol class="notelist" aria-label="notes"></ol>
 <div class="ro"><span class="live">start typing</span><span class="result" aria-live="polite"></span></div>
 <p class="kbnote">platen needs a physical keyboard</p>
-<p class="hints">esc again · ⏎ next · ctrl ← → plates · ⌘k jump</p>
+<p class="hints">esc again · ⏎ next · ctrl ← → plates · ⌘k jump · ⌘l language</p>
 <canvas class="tape" aria-hidden="true"></canvas>
 </section>`;
 

@@ -12,6 +12,8 @@ const view = document.getElementById("view");
 const crumbEl = document.getElementById("crumb");
 const modesEl = document.getElementById("modes");
 const navEl = document.getElementById("nav");
+const langBtn = document.getElementById("lang");
+const langName = document.getElementById("ln");
 const themeBtn = document.getElementById("theme");
 const themeLabel = document.getElementById("tl");
 
@@ -64,6 +66,14 @@ themeBtn.addEventListener("click", () => {
   }, 1000);
 });
 
+function setLang(meta) {
+  langBtn.classList.toggle("none", !meta);
+  langName.textContent = meta ? meta.short : "lang";
+  langBtn.title = meta ? `${meta.name} · switch language · ⌘l` : "switch language · ⌘l";
+}
+
+langBtn.addEventListener("click", () => togglePalette("lang"));
+
 document.addEventListener("platen:apply", applySettings);
 
 document.addEventListener("keydown", (e) => {
@@ -74,6 +84,9 @@ document.addEventListener("keydown", (e) => {
   } else if (e.key.toLowerCase() === "k") {
     e.preventDefault();
     togglePalette();
+  } else if (e.key.toLowerCase() === "l" && !e.shiftKey && !e.altKey) {
+    e.preventDefault();
+    togglePalette("lang");
   }
 });
 
@@ -146,6 +159,7 @@ async function render() {
   const lang = ["t", "drill", "sprint", "recall"].includes(h) ? a : h === "index" || h === "stats" ? a : null;
   const meta = lang ? byId(lang) : null;
   if (meta) document.body.dataset.pg = meta.pigment;
+  setLang(meta);
 
   let mod = null;
   let args = {};
