@@ -1,3 +1,0 @@
-Verified with dockerfile-utils (npm, parser diagnostics at error and warning level) on 143 examples and hadolint 2.15.1 on the same files; no parse errors, and the only error is the intended relative WORKDIR example.
-Not verified: a real docker build, so image tags and download urls are checked by reading only; the two .dockerignore concepts are pattern lines and were skipped by the Dockerfile parser; hadolint style warnings (pinned versions, shell form) are left because they are what the concepts teach.
-Version stays at the floor of 26; digest pinning is not covered because a sha256 digest cannot fit in 72 columns.

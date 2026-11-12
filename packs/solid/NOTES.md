@@ -1,3 +1,0 @@
-Verified with solid-js 1.9.18 (latest stable on npm, 7 Nov 2026; 2.0 is still a release candidate), babel-preset-solid 1.9.16, Node 22; meta.json and examples use 1.9. Rosters and pigment are my own since the spec has none.
-All 111 examples were compiled with the Solid Babel transform for both DOM and server output, mounted in jsdom 31 with every button, input, select, checkbox and form exercised, and server-rendered with solid-js/web: no errors or dev warnings beyond the console line Solid prints for the deliberate ErrorBoundary example.
-Unverified: fetch and lazy imports were stubbed, hydration was not run, and imports from solid-js, solid-js/store and solid-js/web are assumed where a topic's first concept says so.

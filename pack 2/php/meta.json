@@ -1,7 +1,0 @@
-{
-  "name": "PHP",
-  "short": "PHP",
-  "version": "8.3",
-  "indent": 4,
-  "pigment": { "light": "#A44E46", "dark": "#CD8F89" }
-}

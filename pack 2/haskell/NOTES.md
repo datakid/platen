@@ -1,3 +1,0 @@
-Verified with GHC 9.4.7 (Ubuntu package) only: all 156 examples compile with `ghc -O0` and run with exit code 0; module-header examples that are not Main were compiled with `ghc -c`. This is older than the 9.8 floor in meta.json, so nothing from GHC 9.8 was checked.
-Examples use plain Haskell 2010 plus bang patterns (default in GHC2021) and avoid LANGUAGE pragmas because the lexer would color them as comments; input examples were run with "42" on stdin.
-Examples that need a main function and have none in the plate are shown without it (the harness added `main = return ()`), and file examples write notes.txt and log.txt in the working directory.

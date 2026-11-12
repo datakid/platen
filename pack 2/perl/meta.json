@@ -1,7 +1,0 @@
-{
-  "name": "Perl",
-  "short": "PRL",
-  "version": "5.38",
-  "indent": 4,
-  "pigment": { "light": "#7C54B6", "dark": "#AD94D1" }
-}

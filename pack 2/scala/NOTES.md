@@ -1,3 +1,0 @@
-Verified with Scala 3.7.4 (`scalac` from the official release, JDK 25): all 164 examples compile and run with exit code 0 and no compiler warnings; plates with top-level statements were checked by moving declarations to the top level and wrapping the statements in an `@main` method, so run them as a Scala script or inside a main.
-Scala 3 indentation syntax is used throughout (`then`, `do`, `given ... with`); the Future topic uses scala.concurrent with the global ExecutionContext and Await only to keep examples synchronous.
-meta.json uses version 3.7, the newer stable toolchain, instead of the 3.4 floor; scala-cli itself could not be used because it needs Maven access.

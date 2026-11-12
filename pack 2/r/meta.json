@@ -1,7 +1,0 @@
-{
-  "name": "R",
-  "short": "R",
-  "version": "4.5",
-  "indent": 2,
-  "pigment": { "light": "#4E6F20", "dark": "#7DB234" }
-}

@@ -1,3 +1,0 @@
-Verified with svelte 5.57.3 (latest on npm, 7 Nov 2026), runes mode, Node 22; meta.json and examples use 5.57, above any floor. Rosters and pigment are my own since the spec has none.
-All 126 examples compiled with svelte/compiler (zero compiler warnings), server-rendered with svelte/server, and mounted in jsdom 31 where every button, input, select, checkbox and form was exercised: no errors or runtime warnings. lexer.mjs passed a reference tokenizer smoke test.
-Unverified: fetch and Element.animate were stubbed, so real network calls and transition timing were not exercised; svelte, svelte/transition and svelte/animate imports are assumed where the first concept of a topic says so.

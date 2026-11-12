@@ -1,3 +1,0 @@
-Verified with Zig 0.17.1 (pip package `ziglang`): all 144 examples pass `zig run` (examples with main), `zig test` (examples with test blocks) or `zig test` with refAllDecls appended for declaration-only plates; each ran with exit code 0.
-Zig changed APIs recently, so check the version before copying: array repetition uses `@splat` because `**` is rejected by 0.17.1, std.ArrayList is unmanaged (`.empty`, allocator passed to each call) and type reflection uses `@typeInfo(T).@"struct".field_names`.
-Output goes through `std.debug.print`; one-line method bodies are used in a few examples to fit the 12-line limit.

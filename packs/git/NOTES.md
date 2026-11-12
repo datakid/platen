@@ -1,3 +1,0 @@
-Verified with git 2.43.0: every one of the 219 examples ran under bash -e in throwaway repositories, with a local bare origin standing in for the github urls, a temporary HOME and GIT_EDITOR set to true; each succeeded in at least one prepared state.
-State dependent examples (stash pop, rebase --continue, merge --abort, cherry-pick --skip, bisect good and bad, git remote remove upstream) were run in a matching prepared state and not from a plain checkout; no example output is shown.
-Not verified: real network access to github and tags signed with gpg; git 2.x is the floor, no newer release was tested.

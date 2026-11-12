@@ -1,3 +1,0 @@
-Verified with Node 22.23.4 and express 5.3.0 (cookie-parser, cors and express-session installed for the check): each of the 148 examples was loaded as a module with its assumed setup, every registered route was requested over http, and static folders were probed against real files; error handlers answered as written and no default stack trace was returned.
-Not verified: res.download and res.sendFile against large or missing files, real browser cookie behaviour and a production proxy; examples assume app = express(), express from express, and the cookie-parser, cors and express-session packages.
-meta.json keeps 5.x because the installed release is 5.3.0, inside that line.
