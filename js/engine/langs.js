@@ -350,5 +350,201 @@ export const lexers = {
     strings: { quotes: ["`", '"', "'"], prefix: /^$/, multiline: ["`"] },
     numberRe: /(?:0[xX][0-9a-fA-F_]+|\d[\d_]*(?:\.\d+)?)/y,
     clusters: ["...", "===", "!==", "=>", "==", "!=", "<=", ">=", "&&", "||", "??", "?.", "++", "--", "+=", "-=", "*=", "/=", "{{", "}}", "</", "/>"]
+  },
+  kotlin: {
+    keywords: [
+      "package", "import", "class", "interface", "object", "fun", "val", "var", "typealias",
+      "if", "else", "when", "for", "while", "do", "return", "break", "continue", "in", "is", "as",
+      "try", "catch", "finally", "throw", "this", "super", "null", "true", "false",
+      "by", "init", "constructor", "companion", "data", "sealed", "enum", "annotation", "value",
+      "open", "override", "abstract", "final", "private", "protected", "public", "internal",
+      "inner", "lateinit", "const", "suspend", "inline", "noinline", "crossinline", "reified",
+      "out", "where", "get", "set", "vararg", "operator", "infix", "tailrec", "external",
+      "expect", "actual", "field", "it"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"""', '"', "'"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)(?:[uU]?[lL]|[fF]|[uU])?/y,
+    clusters: [
+      "?.", "?:", "!!", "->", "::", "..<", "..", "===", "!==", "==", "!=", "<=", ">=", "&&", "||",
+      "++", "--", "+=", "-=", "*=", "/=", "%="
+    ]
+  },
+  swift: {
+    keywords: [
+      "import", "class", "struct", "enum", "protocol", "extension", "actor", "func", "var", "let",
+      "init", "deinit", "subscript", "typealias", "associatedtype", "operator", "if", "else", "guard",
+      "switch", "case", "default", "for", "while", "repeat", "in", "where", "do", "catch", "throw",
+      "throws", "rethrows", "try", "return", "break", "continue", "fallthrough", "defer", "as", "is",
+      "self", "Self", "super", "nil", "true", "false", "static", "final", "override", "mutating",
+      "nonmutating", "lazy", "weak", "unowned", "private", "fileprivate", "internal", "public", "open",
+      "inout", "async", "await", "some", "any", "convenience", "required", "indirect", "isolated",
+      "nonisolated", "willSet", "didSet", "get", "set"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"""', '"'], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+(?:\.[0-9a-fA-F_]+)?(?:[pP][+-]?\d+)?|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      "...", "..<", "===", "!==", "?.", "??", "->", "==", "!=", "<=", ">=", "&&", "||", "+=", "-=",
+      "*=", "/=", "%=", "<<", ">>", "&+", "&-", "&*"
+    ]
+  },
+  elixir: {
+    keywords: [
+      "def", "defp", "defmodule", "defmacro", "defmacrop", "defstruct", "defprotocol", "defimpl",
+      "defguard", "defdelegate", "do", "end", "fn", "case", "cond", "with", "if", "else", "unless",
+      "for", "when", "in", "and", "or", "not", "true", "false", "nil", "import", "require", "alias",
+      "use", "receive", "after", "rescue", "try", "catch", "raise", "throw", "quote", "unquote",
+      "super", "__MODULE__"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    strings: { quotes: ['"""', '"', "'"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      "|>", "->", "<-", "===", "!==", "==", "!=", "<=", ">=", "&&", "||", "++", "--", "<>", "..",
+      "=>", "::", "\\\\", "<<", ">>", "**", "//"
+    ]
+  },
+  haskell: {
+    keywords: [
+      "case", "class", "data", "default", "deriving", "do", "else", "forall", "if", "import", "in",
+      "infix", "infixl", "infixr", "instance", "let", "module", "newtype", "of", "then", "type",
+      "where", "qualified", "as", "hiding", "True", "False", "Nothing", "Just", "Left", "Right",
+      "otherwise", "undefined"
+    ],
+    lineComment: "--",
+    blockComment: ["{-", "-}"],
+    strings: { quotes: ['"'], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      ">=>", "<$>", "<*>", "<|>", ">>=", "=<<", "<>", "->", "<-", "=>", "::", "..", "==", "/=", "<=",
+      ">=", "&&", "||", "++", "!!", ">>", "<$", "*>", "<*", "$!", "\\\\"
+    ]
+  },
+  julia: {
+    keywords: [
+      "abstract", "baremodule", "begin", "break", "catch", "const", "continue", "do", "else", "elseif",
+      "end", "export", "finally", "for", "function", "global", "if", "import", "in", "isa", "let",
+      "local", "macro", "module", "mutable", "primitive", "quote", "return", "struct", "try", "type",
+      "using", "where", "while", "true", "false", "nothing", "missing", "Inf", "NaN", "pi"
+    ],
+    lineComment: "#",
+    blockComment: ["#=", "=#"],
+    strings: { quotes: ['"""', '"', "'"], prefix: /^(?:r|raw|b|v|s)$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|(?:\d[\d_]*\.?[\d_]*|\.\d[\d_]*)(?:[eEf][+-]?\d+)?(?:im)?)/y,
+    clusters: [
+      "...", ">>>", "===", "!==", "<:", ">:", "->", "=>", "==", "!=", "<=", ">=", "&&", "||", "::",
+      "|>", ".+", ".-", ".*", "./", ".^", ".=", ".>", ".<", "+=", "-=", "*=", "/=", "^=", "%=", "//", "<<", ">>"
+    ]
+  },
+  php: {
+    keywords: [
+      "abstract", "and", "array", "as", "break", "callable", "case", "catch", "class", "clone",
+      "const", "continue", "declare", "default", "do", "echo", "else", "elseif", "empty", "enddeclare",
+      "endfor", "endforeach", "endif", "endswitch", "endwhile", "enum", "extends", "final",
+      "finally", "fn", "for", "foreach", "function", "global", "goto", "if", "implements", "include",
+      "include_once", "instanceof", "insteadof", "interface", "isset", "list", "match", "namespace",
+      "new", "or", "print", "private", "protected", "public", "readonly", "require", "require_once",
+      "return", "static", "switch", "throw", "trait", "try", "unset", "use", "var", "while", "xor",
+      "yield", "self", "parent", "null", "true", "false", "mixed", "never", "void", "int", "float",
+      "string", "bool", "iterable", "object", "__DIR__", "__FILE__", "__LINE__", "__NAMESPACE__"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      "<=>", "===", "!==", "??=", "...", "?->", "**=", "<<=", ">>=", "=>", "->", "::", "==", "!=",
+      "<>", "<=", ">=", "&&", "||", "??", "++", "--", "+=", "-=", "*=", "/=", ".=", "%=", "**", "<<", ">>"
+    ]
+  },
+  r: {
+    keywords: [
+      "if", "else", "repeat", "while", "function", "for", "in", "next", "break", "return",
+      "TRUE", "FALSE", "NULL", "Inf", "NaN", "NA", "NA_integer_", "NA_real_", "NA_character_",
+      "T", "F", "library", "require", "stop", "warning", "UseMethod", "NextMethod"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    strings: { quotes: ['"', "'", "`"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F]+L?|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?[Li]?)/y,
+    clusters: [
+      "<<-", "->>", "<-", "->", "|>", "%in%", "%o%", "%*%", "%/%", "%%", ":::", "::", "==", "!=",
+      "<=", ">=", "&&", "||"
+    ]
+  },
+  ruby: {
+    keywords: [
+      "alias", "and", "begin", "BEGIN", "break", "case", "class", "def", "defined?", "do", "else",
+      "elsif", "end", "END", "ensure", "false", "for", "if", "in", "module", "next", "nil", "not",
+      "or", "redo", "rescue", "retry", "return", "self", "super", "then", "true", "undef", "unless",
+      "until", "when", "while", "yield", "__method__", "attr_reader", "attr_writer", "attr_accessor",
+      "include", "extend", "prepend", "private", "protected", "public", "require", "raise", "lambda",
+      "proc", "puts", "p", "print", "loop"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO]?[0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)[ri]?/y,
+    clusters: [
+      "<=>", "===", "**=", "<<=", ">>=", "&&=", "||=", "&.", "...", "..", "=>", "->", "::", "==", "!=",
+      "<=", ">=", "&&", "||", "=~", "!~", "**", "<<", ">>", "+=", "-=", "*=", "/=", "%=", "|=", "&="
+    ]
+  },
+  scala: {
+    keywords: [
+      "abstract", "case", "catch", "class", "def", "do", "else", "enum", "export", "extends", "false",
+      "final", "finally", "for", "given", "if", "implicit", "import", "lazy", "match", "new", "null",
+      "object", "override", "package", "private", "protected", "return", "sealed", "super", "then",
+      "this", "throw", "trait", "true", "try", "type", "val", "var", "while", "with", "yield",
+      "using", "extension", "inline", "opaque", "transparent", "open", "end"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"""', '"', "'"], prefix: /^(?:s|f|raw)$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+[lL]?|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?[lLfFdD]?)/y,
+    clusters: [
+      "=>>", "?=>", "=>", "<-", "->", "<:", ">:", "::", ":::", "++", "==", "!=", "<=", ">=", "&&",
+      "||", "+=", "-=", "*=", "/=", "%=", "--", "**"
+    ]
+  },
+  zig: {
+    keywords: [
+      "addrspace", "align", "allowzero", "and", "anyframe", "anytype", "asm", "break", "callconv",
+      "catch", "comptime", "const", "continue", "defer", "else", "enum", "errdefer", "error",
+      "export", "extern", "fn", "for", "if", "inline", "linksection", "noalias", "nosuspend",
+      "opaque", "or", "orelse", "packed", "pub", "resume", "return", "struct", "suspend", "switch",
+      "test", "threadlocal", "try", "union", "unreachable", "var", "volatile", "while", "true",
+      "false", "null", "undefined"
+    ],
+    lineComment: "//",
+    blockComment: null,
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      "...", "..", "==", "!=", "<=", ">=", "<<", ">>", "+=", "-=", "*=", "/=", "%=", "++", "**",
+      "||", "=>", ".*", ".?", "+%", "-%", "*%", "+|", "-|", "*|"
+    ]
+  },
+  perl: {
+    keywords: [
+      "my", "our", "local", "sub", "if", "elsif", "else", "unless", "while", "until", "for", "foreach",
+      "return", "last", "next", "redo", "use", "no", "package", "require", "do", "eval", "die", "warn",
+      "print", "printf", "and", "or", "not", "xor", "eq", "ne", "lt", "gt", "le", "ge", "cmp", "x",
+      "defined", "undef", "ref", "bless", "scalar", "wantarray", "qw", "qq", "q", "qr", "tr", "s", "m",
+      "__PACKAGE__", "BEGIN", "END"
+    ],
+    lineComment: "#",
+    commentBoundary: true,
+    blockComment: null,
+    strings: { quotes: ['"', "'", "`"], prefix: /^$/ },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: [
+      "<=>", "**=", "||=", "&&=", "//=", "...", "=>", "->", "==", "!=", "<=", ">=", "&&", "||", "//",
+      "**", "..", ".=", "+=", "-=", "*=", "/=", "=~", "!~", "++", "--", "::", "<<", ">>"
+    ]
   }
 };

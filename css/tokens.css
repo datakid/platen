@@ -46,6 +46,17 @@
   --pg-angular: light-dark(#CB1D17, #E8837F);
   --pg-svelte: light-dark(#B14611, #E2885C);
   --pg-vue: light-dark(#0F755D, #2DB393);
+  --pg-kotlin: light-dark(#B21FB2, #E670E6);
+  --pg-swift: light-dark(#157915, #22C322);
+  --pg-elixir: light-dark(#9D26D9, #C886EA);
+  --pg-haskell: light-dark(#BA2194, #E774CA);
+  --pg-julia: light-dark(#C72331, #E9818A);
+  --pg-php: light-dark(#A44E46, #CD8F89);
+  --pg-r: light-dark(#4E6F20, #7DB234);
+  --pg-ruby: light-dark(#766532, #B49B50);
+  --pg-scala: light-dark(#31725C, #4BAF8E);
+  --pg-zig: light-dark(#8B5D3C, #C39574);
+  --pg-perl: light-dark(#7C54B6, #AD94D1);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -81,3 +92,14 @@ body[data-pg="dockerfile"] { --pg: var(--pg-dockerfile); }
 body[data-pg="angular"] { --pg: var(--pg-angular); }
 body[data-pg="svelte"] { --pg: var(--pg-svelte); }
 body[data-pg="vue"] { --pg: var(--pg-vue); }
+body[data-pg="kotlin"] { --pg: var(--pg-kotlin); }
+body[data-pg="swift"] { --pg: var(--pg-swift); }
+body[data-pg="elixir"] { --pg: var(--pg-elixir); }
+body[data-pg="haskell"] { --pg: var(--pg-haskell); }
+body[data-pg="julia"] { --pg: var(--pg-julia); }
+body[data-pg="php"] { --pg: var(--pg-php); }
+body[data-pg="r"] { --pg: var(--pg-r); }
+body[data-pg="ruby"] { --pg: var(--pg-ruby); }
+body[data-pg="scala"] { --pg: var(--pg-scala); }
+body[data-pg="zig"] { --pg: var(--pg-zig); }
+body[data-pg="perl"] { --pg: var(--pg-perl); }
