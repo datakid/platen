@@ -546,5 +546,109 @@ export const lexers = {
       "<=>", "**=", "||=", "&&=", "//=", "...", "=>", "->", "==", "!=", "<=", ">=", "&&", "||", "//",
       "**", "..", ".=", "+=", "-=", "*=", "/=", "=~", "!~", "++", "--", "::", "<<", ">>"
     ]
+  },
+  json: {
+    keywords: ["true", "false", "null"],
+    lineComment: null,
+    blockComment: null,
+    strings: { quotes: ['"'], prefix: /^$/ },
+    numberRe: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/y,
+    clusters: []
+  },
+  yaml: {
+    keywords: ["true", "false", "null"],
+    lineComment: "#",
+    commentBoundary: true,
+    blockComment: null,
+    strings: { quotes: ['"', "'"], prefix: /^$/, rawQuotes: ["'"] },
+    numberRe: /-?(?:0x[0-9a-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/y,
+    clusters: ["---", "...", "<<", "|-", "|+", ">-", ">+"]
+  },
+  markdown: {
+    keywords: [],
+    lineComment: null,
+    blockComment: ["<!--", "-->"],
+    strings: { quotes: ["`"], prefix: /^$/, multiline: ["`"] },
+    clusters: ["***", "**", "__", "~~", "![", "](", "```", "---", "___", "[^"]
+  },
+  fortran: {
+    ignoreCase: true,
+    keywords: [
+      "allocatable", "allocate", "allocated", "associated", "block", "call", "case", "character",
+      "class", "close", "complex", "concurrent", "contains", "cycle", "data", "deallocate",
+      "default", "do", "double", "else", "elseif", "elemental", "end", "exit", "function", "if",
+      "implicit", "in", "inout", "integer", "intent", "interface", "intrinsic", "kind", "len",
+      "logical", "module", "none", "null", "only", "open", "optional", "out", "parameter",
+      "pointer", "precision", "present", "print", "private", "procedure", "program", "public",
+      "pure", "read", "real", "recursive", "result", "return", "rewind", "save", "select",
+      "stop", "subroutine", "target", "then", "type", "use", "where", "while", "write"
+    ],
+    lineComment: "!",
+    blockComment: null,
+    strings: { quotes: ['"', "'"], prefix: /^$/, rawQuotes: ['"', "'"] },
+    numberRe: /(?:\d+\.?\d*|\.\d+)(?:[eEdD][+-]?\d+)?(?:_\w+)?/y,
+    clusters: [
+      ".neqv.", ".false.", ".true.", ".and.", ".not.", ".eqv.", ".or.", ".eq.", ".ne.", ".lt.",
+      ".le.", ".gt.", ".ge.", "::", "=>", "==", "/=", "<=", ">=", "**", "//"
+    ]
+  },
+  assembly: {
+    ignoreCase: true,
+    keywords: [
+      "add", "and", "bits", "bt", "btr", "bts", "byte", "call", "cmovg", "cmovl", "cqo", "cmp",
+      "db", "dd", "default", "dec", "div", "dq", "dw", "dword", "equ", "global", "idiv", "imul",
+      "inc", "ja", "jb", "je", "jg", "jge", "jl", "jmp", "jnz", "jns", "jne", "lea", "leave",
+      "loop", "mov", "movsx", "movsxd", "movzx", "neg", "not", "or", "pop", "push", "qword",
+      "rel", "resb", "resd", "resq", "resw", "ret", "rol", "ror", "sar", "section", "sete", "setg",
+      "shl", "shr", "sub", "syscall", "test", "times", "word", "xchg", "xor"
+    ],
+    lineComment: ";",
+    blockComment: null,
+    strings: { quotes: ['"', "'"], prefix: /^$/, rawQuotes: ['"', "'"] },
+    numberRe: /(?:0[xX][0-9a-fA-F_]+|0[bB][01_]+|\d[\d_]*(?:\.\d+)?)/y,
+    clusters: []
+  },
+  vba: {
+    ignoreCase: true,
+    keywords: [
+      "and", "as", "boolean", "byref", "byval", "call", "case", "const", "date", "dim", "do",
+      "double", "each", "else", "elseif", "end", "error", "exit", "explicit", "false", "for",
+      "function", "get", "goto", "if", "in", "integer", "is", "let", "long", "loop", "mod", "new",
+      "next", "not", "nothing", "object", "on", "option", "optional", "or", "paramarray",
+      "preserve", "private", "property", "public", "redim", "resume", "select", "set", "step",
+      "string", "sub", "then", "to", "true", "until", "variant", "while", "with"
+    ],
+    lineComment: "'",
+    blockComment: null,
+    strings: { quotes: ['"'], prefix: /^$/, rawQuotes: ['"'] },
+    numberRe: /\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/y,
+    clusters: ["<>", "<=", ">="]
+  },
+  m: {
+    keywords: [
+      "and", "as", "each", "else", "error", "false", "if", "in", "is", "let", "meta", "not",
+      "null", "nullable", "optional", "or", "otherwise", "section", "shared", "then", "true",
+      "try", "type"
+    ],
+    lineComment: "//",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"'], prefix: /^$/, rawQuotes: ['"'] },
+    numberRe: /(?:0[xX][0-9a-fA-F]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/y,
+    clusters: ["=>", "..", "<>", "<=", ">=", "??"]
+  },
+  mojo: {
+    keywords: [
+      "False", "None", "True", "and", "as", "break", "comptime", "continue", "def", "deinit",
+      "elif", "else", "except", "finally", "for", "from", "if", "imm", "import", "in", "is",
+      "mut", "not", "or", "out", "pass", "raise", "raises", "return", "self", "Self", "struct",
+      "trait", "try", "var", "where", "while", "with"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    strings: { quotes: ['"""', '"', "'"], prefix: /^[rRbBtT]{1}$/ },
+    clusters: [
+      "**=", "//=", ">>=", "<<=", "...", "->", "**", "//", "==", "!=", "<=", ">=", "+=", "-=",
+      "*=", "/=", "%=", "<<", ">>", "&=", "|=", "^="
+    ]
   }
 };

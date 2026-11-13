@@ -57,6 +57,14 @@
   --pg-scala: light-dark(#31725C, #4BAF8E);
   --pg-zig: light-dark(#8B5D3C, #C39574);
   --pg-perl: light-dark(#7C54B6, #AD94D1);
+  --pg-json: light-dark(#8A5A00, #D9A441);
+  --pg-yaml: light-dark(#2F6F7A, #5FB4C2);
+  --pg-markdown: light-dark(#3E6B9E, #7FA9D6);
+  --pg-fortran: light-dark(#6B4FA3, #A68ED6);
+  --pg-assembly: light-dark(#9A3B3B, #E08A8A);
+  --pg-vba: light-dark(#1F7A4D, #5DBB8A);
+  --pg-m: light-dark(#2B6CB0, #63A4E8);
+  --pg-mojo: light-dark(#B83B0A, #FB923C);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -103,3 +111,11 @@ body[data-pg="ruby"] { --pg: var(--pg-ruby); }
 body[data-pg="scala"] { --pg: var(--pg-scala); }
 body[data-pg="zig"] { --pg: var(--pg-zig); }
 body[data-pg="perl"] { --pg: var(--pg-perl); }
+body[data-pg="json"] { --pg: var(--pg-json); }
+body[data-pg="yaml"] { --pg: var(--pg-yaml); }
+body[data-pg="markdown"] { --pg: var(--pg-markdown); }
+body[data-pg="fortran"] { --pg: var(--pg-fortran); }
+body[data-pg="assembly"] { --pg: var(--pg-assembly); }
+body[data-pg="vba"] { --pg: var(--pg-vba); }
+body[data-pg="m"] { --pg: var(--pg-m); }
+body[data-pg="mojo"] { --pg: var(--pg-mojo); }

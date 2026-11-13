@@ -54,14 +54,22 @@ export const registry = [
   L("ruby", "Ruby", "RB", "3.4", 14),
   L("scala", "Scala", "SC", "3.7", 13),
   L("zig", "Zig", "ZG", "0.17.1", 12),
-  L("perl", "Perl", "PRL", "5.38", 12)
+  L("perl", "Perl", "PRL", "5.38", 12),
+  L("json", "JSON", "JSN", "RFC 8259", 10),
+  L("yaml", "YAML", "YML", "1.2", 12),
+  L("markdown", "Markdown", "MD", "CommonMark 0.31", 12),
+  L("fortran", "Fortran", "FT", "2018", 12),
+  L("assembly", "x86 Assembly", "ASM", "NASM 2.16", 12),
+  L("vba", "VBA", "VBA", "7.1", 12),
+  L("m", "M (Power Query)", "M", "Power Query", 12),
+  L("mojo", "Mojo", "MJO", "1.2", 12)
 ];
 
 export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo"]);
 const modules = new Map();
 const flat = new WeakMap();
 

@@ -22,7 +22,7 @@ export async function mount(root, r, ctx) {
   }
 
   ctx.crumb([
-    { t: meta.name.toLowerCase(), href: `#/index/${meta.id}` },
+    { t: `${meta.name.toLowerCase()} ${meta.version}`, href: `#/index/${meta.id}` },
     { t: p.topic.title, href: `#/index/${meta.id}` },
     { t: `${p.concept.title} · ${letter(p.vi)}` }
   ]);

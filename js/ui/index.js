@@ -28,7 +28,7 @@ export async function mount(root, r, ctx) {
     root.innerHTML = '<p class="empty">no data yet</p>';
     return () => {};
   }
-  ctx.crumb([{ t: "index", href: "#/index" }, { t: meta.name.toLowerCase() }]);
+  ctx.crumb([{ t: "index", href: "#/index" }, { t: `${meta.name.toLowerCase()} ${meta.version}` }]);
   const rec = store.state.plates;
   const all = plates(data);
   root.innerHTML = `<div class="toc">${data.topics
