@@ -83,6 +83,7 @@ button.srow:hover { color: var(--ink); }
 .pal-list .pl { flex: 1; }
 .pal-list .ph2, .pal-list .pk { color: var(--ink-3); }
 .pal.langs .pal-list { max-height: min(60vh, 34em); overflow-y: auto; }
+.pal-list li.pal-sep { display: block; padding: 8px 16px 4px; border-top: 1px solid var(--rule); color: var(--ink-3); letter-spacing: .06em; cursor: default; }
 .pal-list .sq { flex: none; align-self: center; width: 10px; height: 10px; background: var(--pgc); }
 .pal-list .sh { flex: none; width: 4ch; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
 .pal-list .par { margin-left: 8px; color: var(--ink-3); }

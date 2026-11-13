@@ -112,29 +112,18 @@ const set = (k, v) => () => {
   document.dispatchEvent(new CustomEvent("platen:apply"));
 };
 
-async function build(mode) {
-  if (mode === "lang") return languageItems();
+function allLanguageItems() {
+  return registry.map((l) => ({
+    kind: "language",
+    label: l.name.toLowerCase(),
+    hint: l.short.toLowerCase(),
+    hay: `${l.short} ${l.name} ${l.id}`.toLowerCase(),
+    run: go(`#/index/${l.id}`)
+  }));
+}
+
+function commands() {
   const out = [];
-  for (const l of registry) {
-    out.push({ kind: "language", label: l.name.toLowerCase(), hint: l.short.toLowerCase(), hay: `${l.short} ${l.name} ${l.id}`.toLowerCase(), run: go(`#/index/${l.id}`) });
-  }
-  for (const id of readyIds()) {
-    const d = await loadLanguage(id);
-    if (!d) continue;
-    for (const t of d.topics) {
-      out.push({ kind: "topic", label: t.title, hint: `${d.short} · ${pad(t.n)}`, hay: `${d.short} ${d.name} ${t.title}`.toLowerCase(), run: go(`#/index/${id}`) });
-      for (const c of t.concepts) {
-        const first = plates(d).find((x) => x.concept === c);
-        out.push({
-          kind: "concept",
-          label: c.title,
-          hint: `${d.short} · ${pad(t.n)} · ${pad(c.n)}`,
-          hay: `${d.short} ${d.name} ${t.title} ${c.title}`.toLowerCase(),
-          run: go(addressOf(first))
-        });
-      }
-    }
-  }
   const cmd = (label, run) => out.push({ kind: "command", label, hint: "", hay: label.toLowerCase(), run });
   for (const v of ["system", "light", "dark"]) cmd(`theme ${v}`, set("theme", v));
   for (const v of ["jetbrains", "plex", "geist", "fira"]) cmd(`font ${v}`, set("font", v));
@@ -148,6 +137,52 @@ async function build(mode) {
     for (const n of [30, 60, 120]) cmd(`sprint ${id} ${n}`, go(`#/sprint/${id}/${n}`));
   }
   return out;
+}
+
+const idents = (c) => {
+  const seen = new Set();
+  for (const e of c.examples) for (const w of e.code.match(/[A-Za-z_][A-Za-z0-9_]{2,}/g) || []) seen.add(w.toLowerCase());
+  return [...seen].join(" ");
+};
+
+let lessonCache = null;
+
+function lessons() {
+  if (!lessonCache) {
+    lessonCache = Promise.all(readyIds().map((id) => loadLanguage(id))).then((all) => {
+      const out = [];
+      for (const d of all) {
+        if (!d) continue;
+        const first = new Map();
+        for (const p of plates(d)) if (!first.has(p.concept)) first.set(p.concept, p);
+        for (const t of d.topics) {
+          out.push({ kind: "topic", lang: d.id, label: t.title, hint: `${d.short} · ${pad(t.n)}`, hay: `${d.short} ${d.name} ${t.title}`.toLowerCase(), run: go(`#/index/${d.id}`) });
+          for (const c of t.concepts) {
+            const at = first.get(c);
+            if (!at) continue;
+            out.push({
+              kind: "concept",
+              lang: d.id,
+              label: c.title,
+              hint: `${d.short} · ${pad(t.n)} · ${pad(c.n)}`,
+              hay: `${d.short} ${d.name} ${t.title} ${c.title}`.toLowerCase(),
+              deep: `${c.gloss || ""} ${idents(c)}`.toLowerCase(),
+              run: go(addressOf(at))
+            });
+          }
+        }
+      }
+      return out;
+    });
+  }
+  return lessonCache;
+}
+
+function currentLang() {
+  const m = location.hash.match(/^#\/(?:t|index|drill|sprint|recall|stats)\/([a-z0-9]+)/);
+  if (m && byId(m[1])) return m[1];
+  const cur = store.state.cursor;
+  return cur && cur.lang ? cur.lang : null;
 }
 
 function scoreTerm(term, hay) {
@@ -164,23 +199,32 @@ function scoreTerm(term, hay) {
   return Math.max(1, 50 - gaps);
 }
 
-function rank(q, items, lim = 8) {
-  if (!q) return items.slice(0, lim);
+function scored(q, items, here = null) {
   const terms = q.split(/\s+/).filter(Boolean);
   return items
     .map((it) => {
-      let total = 0;
+      let total = here && it.lang === here ? 25 : 0;
+      let strong = true;
       for (const t of terms) {
-        const sc = scoreTerm(t, it.hay);
+        let sc = scoreTerm(t, it.hay);
+        const sub = it.hay.includes(t) || (it.deep && it.deep.includes(t));
+        if (it.deep && it.deep.includes(t)) sc = Math.max(sc, 30);
         if (sc < 0) return null;
+        if (!sub) strong = false;
         total += sc + (it.keys && it.keys.includes(t) ? 200 : 0);
       }
-      return { it, total };
+      return { it, total, strong };
     })
     .filter(Boolean)
-    .sort((a, b) => b.total - a.total)
-    .map((x) => x.it);
+    .sort((a, b) => b.total - a.total);
 }
+
+function rank(q, items, lim = 8, here = null) {
+  if (!q) return items.slice(0, lim);
+  return scored(q, items, here).map((x) => x.it);
+}
+
+const plainRow = (it, i, on) => `<li role="option" data-i="${i}" aria-selected="${on}" class="${on ? "sel" : ""}"><span class="pl">${esc(it.label)}</span><span class="ph2">${esc(it.hint)}</span><span class="pk">${it.kind}</span></li>`;
 
 export async function togglePalette(mode = "all") {
   if (current) {
@@ -192,11 +236,15 @@ export async function togglePalette(mode = "all") {
   const prev = document.activeElement;
   const wrap = document.createElement("div");
   wrap.className = "pal-wrap";
-  wrap.innerHTML = `<div class="pal${lang ? " langs" : ""}" role="dialog" aria-modal="true" aria-label="${lang ? "language" : "jump"}"><input class="pal-in" type="text" autocomplete="off" spellcheck="false" placeholder="${lang ? "switch language" : "jump to a language, topic or concept"}" aria-label="search"><ul class="pal-list" role="listbox"></ul>${lang ? '<p class="pal-ft"><span>↵ resume</span><span>⇧↵ contents</span><span>esc close</span></p>' : ""}</div>`;
+  wrap.innerHTML = `<div class="pal${lang ? " langs" : ""}" role="dialog" aria-modal="true" aria-label="${lang ? "language" : "jump"}"><input class="pal-in" type="text" autocomplete="off" spellcheck="false" placeholder="${lang ? "language or lesson" : "jump to a language, topic or concept"}" aria-label="search"><ul class="pal-list" role="listbox"></ul>${lang ? '<p class="pal-ft"><span>↵ resume</span><span>⇧↵ contents</span><span>esc close</span></p>' : ""}</div>`;
   document.body.append(wrap);
   document.body.classList.add("pal");
   const input = wrap.querySelector("input");
   const ul = wrap.querySelector("ul");
+  const near = currentLang();
+  const langItems = lang ? languageItems() : allLanguageItems();
+  const cmdItems = lang ? [] : commands();
+  let loaded = [];
   let items = [];
   let shown = [];
   let sel = 0;
@@ -209,14 +257,27 @@ export async function togglePalette(mode = "all") {
   };
   current = { close, mode };
 
+  const compose = () => (lang ? langItems : [...langItems, ...loaded, ...cmdItems]);
+
   function draw() {
+    const q = input.value.trim().toLowerCase();
     const lim = lang ? Infinity : 8;
-    shown = rank(input.value.trim().toLowerCase(), items, lim).slice(0, lim);
+    let main = rank(q, items, lim, near).slice(0, lim);
+    let more = [];
+    if (lang && q) {
+      const hits = scored(q, loaded.filter((x) => x.kind === "concept"), near).filter((x) => x.strong);
+      if (hits.length) {
+        more = hits.slice(0, 6).map((x) => x.it);
+        main = scored(q, items, near).filter((x) => x.strong).map((x) => x.it);
+      }
+    }
+    shown = main.concat(more);
     if (sel >= shown.length) sel = Math.max(0, shown.length - 1);
     ul.innerHTML = shown
-      .map((it, i) => (it.id ? langRow(it, i, i === sel) : `<li role="option" data-i="${i}" aria-selected="${i === sel}" class="${i === sel ? "sel" : ""}"><span class="pl">${esc(it.label)}</span><span class="ph2">${esc(it.hint)}</span><span class="pk">${it.kind}</span></li>`))
+      .map((it, i) => (more.length && main.length && i === main.length ? '<li class="pal-sep" role="presentation">lessons</li>' : "") + (it.id ? langRow(it, i, i === sel) : plainRow(it, i, i === sel)))
       .join("");
-    if (lang && ul.children[sel]) ul.children[sel].scrollIntoView({ block: "nearest" });
+    const at = lang && ul.querySelector(`[data-i="${sel}"]`);
+    if (at) at.scrollIntoView({ block: "nearest" });
   }
 
   function run(i, alt) {
@@ -245,17 +306,20 @@ export async function togglePalette(mode = "all") {
   });
   ul.addEventListener("click", (e) => {
     const li = e.target.closest("li");
-    if (li) run(Number(li.dataset.i), e.shiftKey);
+    if (li && li.dataset.i !== undefined) run(Number(li.dataset.i), e.shiftKey);
   });
   wrap.addEventListener("mousedown", (e) => {
     if (e.target === wrap) close();
   });
 
   input.focus();
-  items = await build(mode);
+  items = compose();
   if (lang) sel = Math.max(0, items.findIndex((it) => !it.here));
+  draw();
+  if (lang) fillProgress(wrap, ul);
+  loaded = await lessons().catch(() => []);
   if (current && current.close === close) {
+    items = compose();
     draw();
-    if (lang) fillProgress(wrap, ul);
   }
 }

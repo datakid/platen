@@ -22,8 +22,8 @@ Run it with any static server from this folder, for example `python3 -m http.ser
 - Tape: a 28px canvas along the bottom edge, one tick per keystroke (taller is faster, errors drop below the baseline in the error color).
 - Proof view: opens after the last variant of a concept. Numerals, expanded tape with the wpm line, plate thumbnails with error dots, hesitation table, token-class accuracy, next concept, again, drill.
 - Settings: every row cycles on click, Enter or the arrow keys. Export json, import json (merge with an inline confirmation), reset (type reset to confirm).
-- Command palette: Ctrl or Cmd plus K. Fuzzy search over languages, topics and concepts, plus commands such as theme dark, font 20, drill python, sprint python 60.
-- Language picker: Ctrl or Cmd plus L, or the language chip in the header. Type to filter (short codes and aliases such as `ts`, `js`, `cs`, `docker` work), the previous language is preselected so `ctrl+l` then Enter flips back, Enter resumes where you left off in that language, Shift+Enter opens its contents. Rows show learned concepts out of total and the version.
+- Command palette: Ctrl or Cmd plus K. Fuzzy search over languages, topics and concepts (concepts also match their summary and the identifiers in their code, and the current language ranks first), plus commands such as theme dark, font 20, drill python, sprint python 60.
+- Language picker: Ctrl or Cmd plus L, or the language chip in the header. Type to filter (short codes and aliases such as `ts`, `js`, `cs`, `docker` work), the previous language is preselected so `ctrl+l` then Enter flips back, Enter resumes where you left off in that language, Shift+Enter opens its contents. Rows show learned concepts out of total and the version. Typing a word that matches lessons, such as `defer` or `closures`, lists them below the languages and Enter opens the lesson.
 - Index: language list with a progress strip per language (new, seen, learned), and a per-language table of contents with dotted leaders and best wpm.
 - Below 760px or on touch-only devices the typing view is read-only with a keyboard note.
 
