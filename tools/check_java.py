@@ -56,4 +56,4 @@ for k, tpl in enumerate(templates):
 for n in sorted(pending):
     print(items[n]["id"], " | ", last.get(n, "?")[:140])
 shutil.rmtree(work, ignore_errors=True)
-print(f"compiled {len(items)} snippets with javac 21, {len(pending)} failed", flush=True)
+print(f"compiled {len(items)} snippets with javac 25, {len(pending)} failed", flush=True)

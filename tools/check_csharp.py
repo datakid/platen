@@ -22,8 +22,9 @@ items = json.loads(raw.stdout)
 if only:
     items = [i for i in items if any(i["id"].startswith(o) for o in only)]
 
-ref_dir = sorted(glob.glob("/usr/lib/dotnet/packs/Microsoft.NETCore.App.Ref/*/ref/net8.0"))[-1]
-csc = sorted(glob.glob("/usr/lib/dotnet/sdk/*/Roslyn/bincore/csc.dll"))[-1]
+droot = os.environ.get("DOTNET_ROOT", "/usr/lib/dotnet")
+ref_dir = sorted(glob.glob(droot + "/packs/Microsoft.NETCore.App.Ref/*/ref/net*"))[-1]
+csc = sorted(glob.glob(droot + "/sdk/*/Roslyn/bincore/csc.dll"))[-1]
 refs = ["-r:" + f for f in sorted(glob.glob(ref_dir + "/*.dll"))]
 env = dict(os.environ, DOTNET_CLI_TELEMETRY_OPTOUT="1", DOTNET_NOLOGO="1")
 work = tempfile.mkdtemp(prefix="platen_cs_")
@@ -41,7 +42,7 @@ def build(src, tag):
     with open(path, "w") as f:
         f.write(src)
     r = subprocess.run(
-        ["dotnet", csc, "-nologo", "-nullable:enable", "-langversion:12", "-t:exe", "-out:" + os.path.join(work, tag + ".dll")] + refs + [globals_path, path],
+        ["dotnet", csc, "-nologo", "-nullable:enable", "-langversion:14", "-t:exe", "-out:" + os.path.join(work, tag + ".dll")] + refs + [globals_path, path],
         capture_output=True,
         text=True,
         env=env,

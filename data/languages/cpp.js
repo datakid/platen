@@ -4,7 +4,7 @@ export default {
   short: "CPP",
   pigment: "cpp",
   family: null,
-  version: "20",
+  version: "23",
   lexer: "cpp",
   indent: 4,
   topics: [
@@ -1193,7 +1193,7 @@ std::vector<P> people;
 std::ranges::sort(people, {}, &P::age);`, notes: [{ at: "&P::age", text: "the projection: sort by age" }] },
             { code: `struct P { std::string name; int age; };
 std::vector<P> people;
-auto it = std::ranges::find(people, "ada", &P::name);`, notes: [] },
+auto it = std::ranges::find(people, std::string("ada"), &P::name);`, notes: [] },
             { code: `struct P { std::string name; int age; };
 std::vector<P> people;
 auto oldest = std::ranges::max_element(people, {}, &P::age);`, notes: [] }

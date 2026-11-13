@@ -4,7 +4,7 @@ export default {
   short: "GO",
   pigment: "go",
   family: null,
-  version: "1.22",
+  version: "1.27",
   lexer: "go",
   indent: 4,
   topics: [

@@ -4,7 +4,7 @@ export default {
   short: "PD",
   pigment: "pandas",
   family: "python",
-  version: "2.2",
+  version: "3.1",
   lexer: "python",
   indent: 4,
   topics: [

@@ -4,7 +4,7 @@ export default {
   short: "PHP",
   pigment: "php",
   family: null,
-  version: "8.3",
+  version: "8.5",
   lexer: "php",
   indent: 4,
   topics: [

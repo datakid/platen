@@ -4,7 +4,7 @@ export default {
   short: "LU",
   pigment: "lua",
   family: null,
-  version: "5.4",
+  version: "5.5",
   lexer: "lua",
   indent: 4,
   topics: [

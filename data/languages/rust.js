@@ -4,7 +4,7 @@ export default {
   short: "RS",
   pigment: "rust",
   family: null,
-  version: "2021",
+  version: "2024",
   lexer: "rust",
   indent: 4,
   topics: [

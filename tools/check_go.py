@@ -27,7 +27,7 @@ IGNORE = ("declared and not used", "and not used")
 
 work = tempfile.mkdtemp(prefix="platen_go_")
 with open(os.path.join(work, "go.mod"), "w") as f:
-    f.write("module platen\n\ngo 1.22\n")
+    f.write("module platen\n\ngo 1.27\n")
 env = dict(os.environ, GOFLAGS="-mod=mod", GOPATH=os.path.join(work, "gopath"), GOCACHE=os.environ.get("GOCACHE", os.path.join(work, "cache")))
 
 

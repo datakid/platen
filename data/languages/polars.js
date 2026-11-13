@@ -4,7 +4,7 @@ export default {
   short: "PL",
   pigment: "polars",
   family: "python",
-  version: "1.x",
+  version: "2.x",
   lexer: "python",
   indent: 4,
   topics: [

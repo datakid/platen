@@ -4,7 +4,7 @@ export default {
   short: "PY",
   pigment: "python",
   family: null,
-  version: "3.12",
+  version: "3.15",
   lexer: "python",
   indent: 4,
   topics: [

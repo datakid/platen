@@ -4,7 +4,7 @@ export default {
   short: "SK",
   pigment: "sklearn",
   family: "python",
-  version: "1.5",
+  version: "1.9",
   lexer: "python",
   indent: 4,
   topics: [
@@ -557,7 +557,8 @@ print(forest.feature_importances_.round(2))`, notes: [{ at: "feature_importances
           examples: [
             { code: `knn = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)`, notes: [{ at: "n_neighbors=5", text: "votes among the five closest points" }] },
             { code: `svm = SVC(kernel="rbf", C=1.0).fit(X_train, y_train)`, notes: [{ at: 'kernel="rbf"', text: "a curved decision boundary" }] },
-            { code: `svm = SVC(probability=True).fit(X_train, y_train)`, notes: [{ at: "probability=True", text: "enables predict_proba, but is slower" }] }
+            { code: `svm = CalibratedClassifierCV(SVC(), ensemble=False)
+svm.fit(X_train, y_train)`, notes: [{ at: "CalibratedClassifierCV", text: "adds predict_proba to the SVM" }] }
           ]
         },
         {

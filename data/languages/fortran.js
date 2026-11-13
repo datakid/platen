@@ -4,7 +4,7 @@ export default {
   short: "FT",
   pigment: "fortran",
   family: null,
-  version: "2018",
+  version: "2023",
   lexer: "fortran",
   indent: 2,
   topics: [

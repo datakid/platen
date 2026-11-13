@@ -4,7 +4,7 @@ export default {
   short: "RB",
   pigment: "ruby",
   family: null,
-  version: "3.4",
+  version: "4.0",
   lexer: "ruby",
   indent: 2,
   topics: [

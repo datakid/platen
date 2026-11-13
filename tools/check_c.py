@@ -7,12 +7,12 @@ import tempfile
 
 lang = sys.argv[1] if len(sys.argv) > 1 else "c"
 if lang == "c":
-    cc, std, ext = "gcc", "-std=c17", ".c"
+    cc, std, ext = "gcc", "-std=c23", ".c"
     heads = "stdio stdlib string stdint stdbool stddef ctype math errno assert limits time".split()
     inc = "".join(f"#include <{h}.h>\n" for h in heads)
     main_open, main_close = "int main(void) {\n", "\nreturn 0;\n}\n"
 else:
-    cc, std, ext = "g++", "-std=c++20", ".cpp"
+    cc, std, ext = "g++", "-std=c++23", ".cpp"
     heads = "algorithm array cassert cctype chrono cmath compare concepts cstdint cstdio cstdlib cstring deque format functional initializer_list iostream iterator list map memory mutex numbers numeric optional ranges set span sstream stdexcept string string_view tuple type_traits unordered_map unordered_set utility variant vector".split()
     inc = "".join(f"#include <{h}>\n" for h in heads)
     main_open, main_close = "int main() {\n", "\nreturn 0;\n}\n"

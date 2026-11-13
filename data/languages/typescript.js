@@ -4,7 +4,7 @@ export default {
   short: "TS",
   pigment: "typescript",
   family: null,
-  version: "5.x",
+  version: "7.x",
   lexer: "typescript",
   indent: 2,
   topics: [

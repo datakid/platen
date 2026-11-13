@@ -4,7 +4,7 @@ export default {
   short: "PRL",
   pigment: "perl",
   family: null,
-  version: "5.38",
+  version: "5.44",
   lexer: "perl",
   indent: 4,
   topics: [

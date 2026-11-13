@@ -4,7 +4,7 @@ export default {
   short: "R",
   pigment: "r",
   family: null,
-  version: "4.5",
+  version: "4.6",
   lexer: "r",
   indent: 2,
   topics: [

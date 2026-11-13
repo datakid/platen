@@ -4,7 +4,7 @@ export default {
   short: "JV",
   pigment: "java",
   family: null,
-  version: "21",
+  version: "25",
   lexer: "java",
   indent: 4,
   topics: [

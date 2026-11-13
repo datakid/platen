@@ -28,10 +28,10 @@ for it in items:
     path = os.path.join(work, "snippet.lua")
     with open(path, "w") as f:
         f.write(it["code"] + "\n")
-    r = subprocess.run(["lua5.4", path], capture_output=True, text=True, cwd=work, timeout=10)
+    r = subprocess.run(["lua", path], capture_output=True, text=True, cwd=work, timeout=10)
     if r.returncode:
         bad += 1
         print(it["id"], " | ", (r.stderr.strip().splitlines() or [""])[0][:120], flush=True)
 shutil.rmtree(work, ignore_errors=True)
-print(f"ran {len(items)} snippets with lua5.4, {bad} failed", flush=True)
+print(f"ran {len(items)} snippets with lua 5.5, {bad} failed", flush=True)
 sys.exit(1 if bad else 0)

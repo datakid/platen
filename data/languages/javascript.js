@@ -4,7 +4,7 @@ export default {
   short: "JS",
   pigment: "javascript",
   family: null,
-  version: "ES2023",
+  version: "ES2026",
   lexer: "javascript",
   indent: 2,
   topics: [

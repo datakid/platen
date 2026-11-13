@@ -37,7 +37,7 @@ def build(src, tag):
     with open(path, "w") as f:
         f.write(src)
     r = subprocess.run(
-        ["rustc", "--edition", "2021", "--crate-type", "bin", "-A", "warnings", "--emit=metadata", "-o", os.path.join(work, tag + ".rmeta"), path],
+        ["rustc", "--edition", "2024", "--crate-type", "bin", "-A", "warnings", "--emit=metadata", "-o", os.path.join(work, tag + ".rmeta"), path],
         capture_output=True,
         text=True,
         timeout=180,

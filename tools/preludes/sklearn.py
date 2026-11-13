@@ -9,6 +9,7 @@ from joblib import Parallel, delayed, parallel_backend
 from scipy import sparse
 from scipy.stats import loguniform
 from sklearn.base import BaseEstimator, TransformerMixin, clone
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from sklearn.compose import ColumnTransformer, make_column_selector, make_column_transformer
 from sklearn.datasets import make_classification, make_regression
