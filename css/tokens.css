@@ -65,6 +65,8 @@
   --pg-vba: light-dark(#1F7A4D, #5DBB8A);
   --pg-m: light-dark(#2B6CB0, #63A4E8);
   --pg-mojo: light-dark(#B83B0A, #FB923C);
+  --pg-tailwind: light-dark(#0369A1, #38BDF8);
+  --pg-regex: light-dark(#566E00, #B5D334);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -119,3 +121,5 @@ body[data-pg="assembly"] { --pg: var(--pg-assembly); }
 body[data-pg="vba"] { --pg: var(--pg-vba); }
 body[data-pg="m"] { --pg: var(--pg-m); }
 body[data-pg="mojo"] { --pg: var(--pg-mojo); }
+body[data-pg="tailwind"] { --pg: var(--pg-tailwind); }
+body[data-pg="regex"] { --pg: var(--pg-regex); }

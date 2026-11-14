@@ -650,5 +650,30 @@ export const lexers = {
       "**=", "//=", ">>=", "<<=", "...", "->", "**", "//", "==", "!=", "<=", ">=", "+=", "-=",
       "*=", "/=", "%=", "<<", ">>", "&=", "|=", "^="
     ]
+  },
+  tailwind: {
+    ignoreCase: true,
+    keywords: [
+      "html", "head", "body", "main", "header", "footer", "nav", "section", "article", "aside",
+      "h1", "h2", "h3", "h4", "p", "a", "span", "div", "pre", "hr", "img", "button", "input",
+      "label", "form", "ul", "ol", "li", "table", "svg", "select", "textarea",
+      "@import", "@theme", "@apply", "@utility", "@variant", "@custom-variant", "@layer",
+      "@source", "@plugin", "@keyframes", "@reference", "@config",
+      "inline", "initial", "base", "components", "utilities", "prefix", "important", "var", "calc",
+      "oklch", "theme", "true", "false"
+    ],
+    lineComment: null,
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"', "'"], prefix: /^$/ },
+    numberRe: /[+-]?(?:\d+\.?\d*|\.\d+)(?:%|[a-zA-Z]+)?/y,
+    clusters: ["</", "/>", "::", "&:", "--", "@md", "@lg"]
+  },
+  regex: {
+    keywords: ["const", "let", "for", "of", "true", "false", "null", "console", "log", "test", "match", "matchAll", "replace", "split", "groups"],
+    lineComment: null,
+    blockComment: null,
+    strings: { quotes: [], prefix: /^$/ },
+    numberRe: /\d+/y,
+    clusters: ["(?:", "(?=", "(?!", "(?<=", "(?<!", "(?<", "*?", "+?", "??", "\\k", "??"]
   }
 };
