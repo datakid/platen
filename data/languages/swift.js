@@ -4,7 +4,7 @@ export default {
   short: "SW",
   pigment: "swift",
   family: null,
-  version: "5.10",
+  version: "6.x",
   lexer: "swift",
   indent: 4,
   topics: [
@@ -444,9 +444,11 @@ let addFive = makeAdder(5)`, notes: [] }
         return count
     }
 }`, notes: [{ at: "count", text: "captured by reference" }] },
-            { code: `var handlers: [() -> Void] = []
-func register(_ handler: @escaping () -> Void) {
-    handlers.append(handler)
+            { code: `final class Registry {
+    var handlers: [() -> Void] = []
+    func register(_ handler: @escaping () -> Void) {
+        handlers.append(handler)
+    }
 }`, notes: [{ at: "@escaping", text: "outlives the call" }] },
             { code: `let prefix = "item"
 let label = { (n: Int) in "\\(prefix) \\(n)" }`, notes: [] }

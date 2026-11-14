@@ -4,7 +4,7 @@ export default {
   short: "DK",
   pigment: "dockerfile",
   family: null,
-  version: "26",
+  version: "29",
   lexer: "dockerfile",
   indent: 2,
   topics: [

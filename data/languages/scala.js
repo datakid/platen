@@ -4,7 +4,7 @@ export default {
   short: "SC",
   pigment: "scala",
   family: null,
-  version: "3.7",
+  version: "3.10",
   lexer: "scala",
   indent: 2,
   topics: [

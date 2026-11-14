@@ -4,7 +4,7 @@ export default {
   short: "HS",
   pigment: "haskell",
   family: null,
-  version: "9.8",
+  version: "9.10",
   lexer: "haskell",
   indent: 2,
   topics: [
