@@ -675,5 +675,17 @@ export const lexers = {
     strings: { quotes: [], prefix: /^$/ },
     numberRe: /\d+/y,
     clusters: ["(?:", "(?=", "(?!", "(?<=", "(?<!", "(?<", "*?", "+?", "??", "\\k", "??"]
+  },
+  graphql: {
+    keywords: [
+      "query", "mutation", "subscription", "fragment", "on", "type", "interface", "union", "enum",
+      "input", "scalar", "extend", "schema", "directive", "implements", "repeatable", "true",
+      "false", "null"
+    ],
+    lineComment: "#",
+    blockComment: null,
+    strings: { quotes: ['"""', '"'], prefix: /^$/ },
+    numberRe: /-?\d+(?:\.\d+)?/y,
+    clusters: ["..."]
   }
 };

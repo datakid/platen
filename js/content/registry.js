@@ -64,14 +64,15 @@ export const registry = [
   L("m", "M (Power Query)", "M", "Power Query", 12),
   L("mojo", "Mojo", "MJO", "1.2", 12),
   L("tailwind", "Tailwind CSS", "TW", "4.3", 15, "css", "tailwind"),
-  L("regex", "Regex", "RX", "ES2026", 12)
+  L("regex", "Regex", "RX", "ES2026", 12),
+  L("graphql", "GraphQL", "GQ", "2025", 13)
 ];
 
 export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex", "graphql"]);
 const modules = new Map();
 const flat = new WeakMap();
 

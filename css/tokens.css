@@ -67,6 +67,7 @@
   --pg-mojo: light-dark(#B83B0A, #FB923C);
   --pg-tailwind: light-dark(#0369A1, #38BDF8);
   --pg-regex: light-dark(#566E00, #B5D334);
+  --pg-graphql: light-dark(#C2175B, #F472B6);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -123,3 +124,4 @@ body[data-pg="m"] { --pg: var(--pg-m); }
 body[data-pg="mojo"] { --pg: var(--pg-mojo); }
 body[data-pg="tailwind"] { --pg: var(--pg-tailwind); }
 body[data-pg="regex"] { --pg: var(--pg-regex); }
+body[data-pg="graphql"] { --pg: var(--pg-graphql); }
