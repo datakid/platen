@@ -1,7 +1,7 @@
 export default {
   id: "regex",
   name: "Regex",
-  short: "RX",
+  short: "REG",
   pigment: "regex",
   family: null,
   version: "ES2026",
