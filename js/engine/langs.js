@@ -687,5 +687,19 @@ export const lexers = {
     strings: { quotes: ['"""', '"'], prefix: /^$/ },
     numberRe: /-?\d+(?:\.\d+)?/y,
     clusters: ["..."]
+  },
+  terraform: {
+    keywords: [
+      "resource", "variable", "locals", "output", "module", "data", "provider", "terraform",
+      "required_providers", "required_version", "backend", "lifecycle", "dynamic", "content",
+      "moved", "import", "removed", "check", "assert", "precondition", "postcondition",
+      "validation", "provisioner", "for", "in", "if", "true", "false", "null", "each", "count",
+      "var", "local", "self", "depends_on", "for_each"
+    ],
+    lineComment: "#",
+    blockComment: ["/*", "*/"],
+    strings: { quotes: ['"'], prefix: /^$/ },
+    numberRe: /\d+(?:\.\d+)?/y,
+    clusters: ["==", "!=", "<=", ">=", "&&", "||", "=>", "...", "${", "<<-"]
   }
 };
