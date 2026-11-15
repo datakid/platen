@@ -729,5 +729,19 @@ export const lexers = {
     strings: { quotes: ['"'], prefix: /^$/ },
     numberRe: /[+-]?(?:0x[0-9a-fA-F_]+|\d[\d_]*(?:\.\d*)?(?:[eE][+-]?\d+)?)/y,
     clusters: ["|>", "@@", "->", "<-", ":=", "::", "<>", "==", "!=", "*.", "+.", "-.", "/.", "[|", "|]", "let*", "let+"]
+  },
+  clojure: {
+    keywords: [
+      "def", "defn", "defn-", "defonce", "fn", "let", "if", "if-let", "if-not", "when", "when-let",
+      "cond", "case", "loop", "recur", "do", "ns", "require", "import", "defmacro", "defrecord",
+      "defprotocol", "defmulti", "defmethod", "extend-protocol", "extend-type", "try", "catch",
+      "finally", "throw", "doseq", "dotimes", "for", "while", "dosync", "and", "or", "not", "nil",
+      "true", "false", "delay", "atom", "ref", "agent", "promise"
+    ],
+    lineComment: ";",
+    blockComment: null,
+    strings: { quotes: ['"'], prefix: /^#?$/ },
+    numberRe: /[+-]?\d+(?:\/\d+|\.\d+)?/y,
+    clusters: ["->>", "->", "~@", "#(", "#{", "#\"", "@", "::"]
   }
 };

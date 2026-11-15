@@ -72,14 +72,15 @@ export const registry = [
   L("sed", "sed", "SED", "4.x", 10, null, "bash"),
   L("jq", "jq", "JQ", "1.8", 11, null, "bash"),
   L("fsharp", "F#", "FS", "10", 14),
-  L("ocaml", "OCaml", "OC", "5.5", 14)
+  L("ocaml", "OCaml", "OC", "5.5", 14),
+  L("clojure", "Clojure", "CLJ", "1.12", 15)
 ];
 
 export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex", "graphql", "terraform", "nextjs", "awk", "sed", "jq", "fsharp", "ocaml"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex", "graphql", "terraform", "nextjs", "awk", "sed", "jq", "fsharp", "ocaml", "clojure"]);
 const modules = new Map();
 const flat = new WeakMap();
 

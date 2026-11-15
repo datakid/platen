@@ -75,6 +75,7 @@
   --pg-jq: light-dark(#4F46A5, #A5A0F0);
   --pg-fsharp: light-dark(#2D6A9F, #6DB3E8);
   --pg-ocaml: light-dark(#A8500F, #F2A15C);
+  --pg-clojure: light-dark(#3A5FA0, #9DB8F0);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -139,3 +140,4 @@ body[data-pg="sed"] { --pg: var(--pg-sed); }
 body[data-pg="jq"] { --pg: var(--pg-jq); }
 body[data-pg="fsharp"] { --pg: var(--pg-fsharp); }
 body[data-pg="ocaml"] { --pg: var(--pg-ocaml); }
+body[data-pg="clojure"] { --pg: var(--pg-clojure); }
