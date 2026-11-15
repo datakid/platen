@@ -74,6 +74,7 @@
   --pg-sed: light-dark(#256B4B, #7FD1A8);
   --pg-jq: light-dark(#4F46A5, #A5A0F0);
   --pg-fsharp: light-dark(#2D6A9F, #6DB3E8);
+  --pg-ocaml: light-dark(#A8500F, #F2A15C);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -137,3 +138,4 @@ body[data-pg="awk"] { --pg: var(--pg-awk); }
 body[data-pg="sed"] { --pg: var(--pg-sed); }
 body[data-pg="jq"] { --pg: var(--pg-jq); }
 body[data-pg="fsharp"] { --pg: var(--pg-fsharp); }
+body[data-pg="ocaml"] { --pg: var(--pg-ocaml); }

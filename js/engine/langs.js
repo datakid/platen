@@ -716,5 +716,18 @@ export const lexers = {
     strings: { quotes: ['"'], prefix: /^[$@]*$/ },
     numberRe: /[+-]?(?:0x[0-9a-fA-F]+|\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?)[a-zA-Z]*/y,
     clusters: ["|>", "<|", "||>", ">>", "<<", "->", "<-", "::", "..", "{|", "|}", "[|", "|]", "<>", "(|", "|)"]
+  },
+  ocaml: {
+    keywords: [
+      "let", "in", "and", "rec", "fun", "function", "match", "with", "if", "then", "else", "begin",
+      "end", "for", "to", "downto", "do", "done", "while", "type", "of", "module", "struct", "sig",
+      "open", "include", "functor", "exception", "try", "raise", "assert", "mutable", "val", "new",
+      "object", "method", "when", "as", "true", "false", "ref", "Some", "None", "Ok", "Error"
+    ],
+    lineComment: null,
+    blockComment: ["(*", "*)"],
+    strings: { quotes: ['"'], prefix: /^$/ },
+    numberRe: /[+-]?(?:0x[0-9a-fA-F_]+|\d[\d_]*(?:\.\d*)?(?:[eE][+-]?\d+)?)/y,
+    clusters: ["|>", "@@", "->", "<-", ":=", "::", "<>", "==", "!=", "*.", "+.", "-.", "/.", "[|", "|]", "let*", "let+"]
   }
 };
