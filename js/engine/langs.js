@@ -701,5 +701,20 @@ export const lexers = {
     strings: { quotes: ['"'], prefix: /^$/ },
     numberRe: /\d+(?:\.\d+)?/y,
     clusters: ["==", "!=", "<=", ">=", "&&", "||", "=>", "...", "${", "<<-"]
+  },
+  fsharp: {
+    keywords: [
+      "let", "mutable", "rec", "in", "fun", "function", "match", "with", "if", "then", "else", "elif",
+      "for", "to", "downto", "do", "while", "type", "and", "of", "module", "namespace", "open",
+      "member", "new", "inherit", "interface", "abstract", "override", "default", "static", "val",
+      "private", "public", "internal", "exception", "try", "finally", "raise", "use", "yield",
+      "return", "begin", "end", "not", "true", "false", "null", "as", "when", "get", "set",
+      "async", "task", "seq", "Some", "None", "Ok", "Error"
+    ],
+    lineComment: "//",
+    blockComment: ["(*", "*)"],
+    strings: { quotes: ['"'], prefix: /^[$@]*$/ },
+    numberRe: /[+-]?(?:0x[0-9a-fA-F]+|\d[\d_]*(?:\.\d+)?(?:[eE][+-]?\d+)?)[a-zA-Z]*/y,
+    clusters: ["|>", "<|", "||>", ">>", "<<", "->", "<-", "::", "..", "{|", "|}", "[|", "|]", "<>", "(|", "|)"]
   }
 };
