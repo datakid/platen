@@ -70,6 +70,9 @@
   --pg-graphql: light-dark(#C2175B, #F472B6);
   --pg-terraform: light-dark(#7B42BC, #B392E6);
   --pg-nextjs: light-dark(#222A35, #D8DEE6);
+  --pg-awk: light-dark(#8A5A10, #E0B25C);
+  --pg-sed: light-dark(#256B4B, #7FD1A8);
+  --pg-jq: light-dark(#4F46A5, #A5A0F0);
   --pg: var(--pg-python);
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -129,3 +132,6 @@ body[data-pg="regex"] { --pg: var(--pg-regex); }
 body[data-pg="graphql"] { --pg: var(--pg-graphql); }
 body[data-pg="terraform"] { --pg: var(--pg-terraform); }
 body[data-pg="nextjs"] { --pg: var(--pg-nextjs); }
+body[data-pg="awk"] { --pg: var(--pg-awk); }
+body[data-pg="sed"] { --pg: var(--pg-sed); }
+body[data-pg="jq"] { --pg: var(--pg-jq); }

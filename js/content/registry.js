@@ -67,14 +67,17 @@ export const registry = [
   L("regex", "Regex", "REG", "ES2026", 12),
   L("graphql", "GraphQL", "GQ", "2025", 13),
   L("terraform", "Terraform", "TF", "1.x", 15),
-  L("nextjs", "Next.js", "NX", "16", 14, "javascript", "javascript")
+  L("nextjs", "Next.js", "NX", "16", 14, "javascript", "javascript"),
+  L("awk", "awk", "AWK", "5.x", 11, null, "bash"),
+  L("sed", "sed", "SED", "4.x", 10, null, "bash"),
+  L("jq", "jq", "JQ", "1.8", 11, null, "bash")
 ];
 
 export const readyIds = () => [...READY];
 export const byId = (id) => registry.find((l) => l.id === id) || null;
 export const letter = (vi) => String.fromCharCode(97 + vi);
 
-const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex", "graphql", "terraform", "nextjs"]);
+const READY = new Set(["python", "c", "cpp", "pandas", "numpy", "sklearn", "polars", "lua", "go", "rust", "csharp", "pytorch", "javascript", "typescript", "sql", "bash", "java", "powershell", "html", "css", "git", "react", "django", "fastapi", "express", "solid", "dockerfile", "angular", "svelte", "vue", "dart", "kotlin", "swift", "elixir", "haskell", "julia", "php", "r", "ruby", "scala", "zig", "perl", "json", "yaml", "markdown", "fortran", "assembly", "vba", "m", "mojo", "tailwind", "regex", "graphql", "terraform", "nextjs", "awk", "sed", "jq"]);
 const modules = new Map();
 const flat = new WeakMap();
 
